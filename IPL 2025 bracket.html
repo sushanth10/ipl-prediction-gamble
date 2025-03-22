@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IPL 2025 Match Schedule</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      .container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        width: 80%;
+        max-width: 1200px;
+        padding: 20px;
+        text-align: center;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .match {
+        background: #f0f0ff;
+        padding: 12px;
+        margin: 8px 0;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .date {
+        color: #3b3bff;
+        font-weight: bold;
+        flex: 1;
+        text-align: left;
+      }
+
+      .team {
+        color: #222;
+        font-weight: bold;
+        flex: 2;
+        text-align: center;
+        width: 300px;
+      }
+
+      .winner {
+        color: green;
+        font-weight: bold;
+        flex: 1;
+        text-align: right;
+        white-space: nowrap; 
+        padding-right: 15px; 
+      }
+
+      .match:hover {
+        background: #ddd;
+        transition: 0.3s ease-in-out;
+      }
+
+      .text-bar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .text-bar input {
+          width: 250px;
+          padding: 8px;
+          font-size: 16px;
+          border: 2px solid #ccc;
+          border-radius: 5px;
+          outline: none;
+          transition: border-color 0.3s ease;
+      }
+
+      .text-bar input:focus {
+          border-color: #6a0dad;
+      }
+
+      .text-bar button {
+          padding: 8px 15px;
+          font-size: 16px;
+          background-color: #6a0dad;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+      }
+
+      .text-bar button:hover {
+          background-color: #540a97;
+      }
+
+      .team {
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+
+      .team:hover {
+          color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>IPL 2025 Match Schedule</h1>
+      <div class="text-bar">
+        <input type="text" id="filename" placeholder="Enter file name" />
+        <button onclick="saveWinnersToFile()">Save Winners To Text File</button>
+      </div>
+      <div class="match-table">
+        <div class="match">
+            <span class="date">Date</span>
+            <div class="teams">Home Team vs Away Team</div>
+            <span class="winner">Winner</span>
+        </div>
+    
+        <div class="match">
+            <span class="date">March 22, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Kolkata Knight Riders</span> vs 
+                <span class="team away" onclick="setWinner(this)">Royal Challengers Bengaluru</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">March 23, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Sunrisers Hyderabad</span> vs 
+                <span class="team away" onclick="setWinner(this)">Rajasthan Royals</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">March 23, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Chennai Super Kings</span> vs 
+                <span class="team away" onclick="setWinner(this)">Mumbai Indians</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">March 24, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Delhi Capitals</span> vs 
+                <span class="team away" onclick="setWinner(this)">Lucknow Super Giants</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">March 25, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Gujarat Titans</span> vs 
+                <span class="team away" onclick="setWinner(this)">Punjab Kings</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">March 26, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Rajasthan Royals</span> vs 
+                <span class="team away" onclick="setWinner(this)">Kolkata Knight Riders</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">March 27, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Sunrisers Hyderabad</span> vs 
+                <span class="team away" onclick="setWinner(this)">Lucknow Super Giants</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">March 28, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Chennai Super Kings</span> vs 
+                <span class="team away" onclick="setWinner(this)">Royal Challengers Bengaluru</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">March 29, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Gujarat Titans</span> vs 
+                <span class="team away" onclick="setWinner(this)">Mumbai Indians</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">March 30, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Delhi Capitals</span> vs 
+                <span class="team away" onclick="setWinner(this)">Sunrisers Hyderabad</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">March 30, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Rajasthan Royals</span> vs 
+                <span class="team away" onclick="setWinner(this)">Chennai Super Kings</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">March 31, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Mumbai Indians</span> vs 
+                <span class="team away" onclick="setWinner(this)">Kolkata Knight Riders</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 1, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Lucknow Super Giants</span> vs 
+                <span class="team away" onclick="setWinner(this)">Punjab Kings</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 2, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Royal Challengers Bengaluru</span> vs 
+                <span class="team away" onclick="setWinner(this)">Gujarat Titans</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 3, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Kolkata Knight Riders</span> vs 
+                <span class="team away" onclick="setWinner(this)">Sunrisers Hyderabad</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 4, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Lucknow Super Giants</span> vs 
+                <span class="team away" onclick="setWinner(this)">Mumbai Indians</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 5, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Chennai Super Kings</span> vs 
+                <span class="team away" onclick="setWinner(this)">Delhi Capitals</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 5, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Punjab Kings</span> vs 
+                <span class="team away" onclick="setWinner(this)">Rajasthan Royals</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 6, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Kolkata Knight Riders</span> vs 
+                <span class="team away" onclick="setWinner(this)">Lucknow Super Giants</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 6, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Sunrisers Hyderabad</span> vs 
+                <span class="team away" onclick="setWinner(this)">Gujarat Titans</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 7, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Mumbai Indians</span> vs 
+                <span class="team away" onclick="setWinner(this)">Royal Challengers Bengaluru</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 8, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Punjab Kings</span> vs 
+                <span class="team away" onclick="setWinner(this)">Chennai Super Kings</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 9, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Gujarat Titans</span> vs 
+                <span class="team away" onclick="setWinner(this)">Rajasthan Royals</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 10, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Royal Challengers Bengaluru</span> vs 
+                <span class="team away" onclick="setWinner(this)">Delhi Capitals</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 11, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Chennai Super Kings</span> vs 
+                <span class="team away" onclick="setWinner(this)">Kolkata Knight Riders</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 12, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Lucknow Super Giants</span> vs 
+                <span class="team away" onclick="setWinner(this)">Gujarat Titans</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 12, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Sunrisers Hyderabad</span> vs 
+                <span class="team away" onclick="setWinner(this)">Punjab Kings</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 13, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Rajasthan Royals</span> vs 
+                <span class="team away" onclick="setWinner(this)">Royal Challengers Bengaluru</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 13, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Delhi Capitals</span> vs 
+                <span class="team away" onclick="setWinner(this)">Mumbai Indians</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 14, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Lucknow Super Giants</span> vs 
+                <span class="team away" onclick="setWinner(this)">Chennai Super Kings</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 15, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Punjab Kings</span> vs 
+                <span class="team away" onclick="setWinner(this)">Kolkata Knight Riders</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 16, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Delhi Capitals</span> vs 
+                <span class="team away" onclick="setWinner(this)">Rajasthan Royals</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 17, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Mumbai Indians</span> vs 
+                <span class="team away" onclick="setWinner(this)">Sunrisers Hyderabad</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 18, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Royal Challengers Bengaluru</span> vs 
+                <span class="team away" onclick="setWinner(this)">Punjab Kings</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 19, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Gujarat Titans</span> vs 
+                <span class="team away" onclick="setWinner(this)">Delhi Capitals</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 19, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Rajasthan Royals</span> vs 
+                <span class="team away" onclick="setWinner(this)">Lucknow Super Giants</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 20, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Punjab Kings</span> vs 
+                <span class="team away" onclick="setWinner(this)">Royal Challengers Bengaluru</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 20, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Mumbai Indians</span> vs 
+                <span class="team away" onclick="setWinner(this)">Chennai Super Kings</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 21, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Kolkata Knight Riders</span> vs 
+                <span class="team away" onclick="setWinner(this)">Gujarat Titans</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 22, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Lucknow Super Giants</span> vs 
+                <span class="team away" onclick="setWinner(this)">Delhi Capitals</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 23, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Sunrisers Hyderabad</span> vs 
+                <span class="team away" onclick="setWinner(this)">Mumbai Indians</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 24, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Royal Challengers Bengaluru</span> vs 
+                <span class="team away" onclick="setWinner(this)">Rajasthan Royals</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 25, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Chennai Super Kings</span> vs 
+                <span class="team away" onclick="setWinner(this)">Sunrisers Hyderabad</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 26, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Kolkata Knight Riders</span> vs 
+                <span class="team away" onclick="setWinner(this)">Punjab Kings</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 27, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Mumbai Indians</span> vs 
+                <span class="team away" onclick="setWinner(this)">Lucknow Super Giants</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 27, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Delhi Capitals</span> vs 
+                <span class="team away" onclick="setWinner(this)">Royal Challengers Bengaluru</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 28, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Rajasthan Royals</span> vs 
+                <span class="team away" onclick="setWinner(this)">Gujarat Titans</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 29, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Delhi Capitals</span> vs 
+                <span class="team away" onclick="setWinner(this)">Kolkata Knight Riders</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">April 30, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Chennai Super Kings</span> vs 
+                <span class="team away" onclick="setWinner(this)">Punjab Kings</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 1, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Rajasthan Royals</span> vs 
+                <span class="team away" onclick="setWinner(this)">Mumbai Indians</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 2, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Gujarat Titans</span> vs 
+                <span class="team away" onclick="setWinner(this)">Sunrisers Hyderabad</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 3, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Royal Challengers Bengaluru</span> vs 
+                <span class="team away" onclick="setWinner(this)">Chennai Super Kings</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 4, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Kolkata Knight Riders</span> vs 
+                <span class="team away" onclick="setWinner(this)">Rajasthan Royals</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 4, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Punjab Kings</span> vs 
+                <span class="team away" onclick="setWinner(this)">Lucknow Super Giants</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 5, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Sunrisers Hyderabad</span> vs 
+                <span class="team away" onclick="setWinner(this)">Delhi Capitals</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 6, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Mumbai Indians</span> vs 
+                <span class="team away" onclick="setWinner(this)">Gujarat Titans</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 7, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Kolkata Knight Riders</span> vs 
+                <span class="team away" onclick="setWinner(this)">Chennai Super Kings</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 8, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Punjab Kings</span> vs 
+                <span class="team away" onclick="setWinner(this)">Delhi Capitals</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 9, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Lucknow Super Giants</span> vs 
+                <span class="team away" onclick="setWinner(this)">Royal Challengers Bengaluru</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 10, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Sunrisers Hyderabad</span> vs 
+                <span class="team away" onclick="setWinner(this)">Kolkata Knight Riders</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 11, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Punjab Kings</span> vs 
+                <span class="team away" onclick="setWinner(this)">Mumbai Indians</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 11, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Delhi Capitals</span> vs 
+                <span class="team away" onclick="setWinner(this)">Gujarat Titans</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 12, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Chennai Super Kings</span> vs 
+                <span class="team away" onclick="setWinner(this)">Rajasthan Royals</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 13, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Royal Challengers Bengaluru</span> vs 
+                <span class="team away" onclick="setWinner(this)">Sunrisers Hyderabad</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 14, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Gujarat Titans</span> vs 
+                <span class="team away" onclick="setWinner(this)">Lucknow Super Giants</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 15, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Mumbai Indians</span> vs 
+                <span class="team away" onclick="setWinner(this)">Delhi Capitals</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 16, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Rajasthan Royals</span> vs 
+                <span class="team away" onclick="setWinner(this)">Punjab Kings</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 17, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Royal Challengers Bengaluru</span> vs 
+                <span class="team away" onclick="setWinner(this)">Kolkata Knight Riders</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 18, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Gujarat Titans</span> vs 
+                <span class="team away" onclick="setWinner(this)">Chennai Super Kings</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+                
+        <div class="match">
+            <span class="date">May 18, 2025</span>
+            <div class="teams">
+                <span class="team home" onclick="setWinner(this)">Lucknow Super Giants</span> vs 
+                <span class="team away" onclick="setWinner(this)">Sunrisers Hyderabad</span>
+            </div>
+            <div class="winner"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    function setWinner(teamElement) {
+        // Find the parent match div
+        let matchRow = teamElement.closest('.match');
+        
+        // Find the winner span in the same row
+        let winnerSpan = matchRow.querySelector('.winner');
+        
+        // Update the winner text with the clicked team's name
+        winnerSpan.textContent = teamElement.textContent;
+    }
+
+    function saveWinnersToFile() {
+      let fileName = document.getElementById("filename").value.trim();
+      if (!fileName) {
+          alert("Please enter a filename!");
+          return;
+      }
+
+      let winners = [];
+      document.querySelectorAll(".match").forEach((match, index) => {
+          if (index === 0) return;
+          let winner = match.querySelector(".winner").textContent;
+          winners.push(winner);
+      });
+
+      let fileContent = winners.join("\n");
+      let blob = new Blob([fileContent], { type: "text/plain" });
+      let a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = fileName + ".txt";
+      a.click();
+    }
+    </script>
+</html>
