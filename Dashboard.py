@@ -1,6 +1,10 @@
 import streamlit as st
 import pandas as pd
 import os
+import plotly.express as px
+import plotly.graph_objects as go
+import numpy as np
+
 
 def load_results(results_path):
     """Load the actual match results."""
@@ -23,6 +27,7 @@ def calculate_scores(results_df, predictions):
     leaderboard = []
     completed_matches = results_df.dropna(subset=["Winner"])  # Consider only completed matches
     total_matches = len(completed_matches)
+    points_progression = {participant: [0] for participant in predictions.keys()}
     
     for participant, predicted_winners in predictions.items():
         score = 0
@@ -40,16 +45,17 @@ def calculate_scores(results_df, predictions):
                 correct_predictions += 1
             
             matchwise_points.append(points_earned)
+            points_progression[participant].append(score)
         
         accuracy = (correct_predictions / total_matches) * 100 if total_matches > 0 else 0
         leaderboard.append({
             "Participant": participant,
             "Points": score,
             "Accuracy (%)": round(accuracy, 2),
-            "Matchwise Points": matchwise_points
+            "Matchwise Points": matchwise_points[-5:]
         })
     
-    return pd.DataFrame(leaderboard).sort_values(by="Points", ascending=False)
+    return pd.DataFrame(leaderboard).sort_values(by="Points", ascending=False), points_progression
 
 def matchwise_predictions(schedule_df, predictions):
     """Generate a matchwise prediction table."""
@@ -70,6 +76,7 @@ def matchwise_predictions(schedule_df, predictions):
                     away_predictors.append(participant)
         
         matchwise_data.append({
+            "Date": row.iloc[1],
             "Home Team": home_team,
             "Home Predictors": ", ".join(home_predictors),
             "Away Team": away_team,
@@ -77,6 +84,18 @@ def matchwise_predictions(schedule_df, predictions):
         })
     
     return pd.DataFrame(matchwise_data)
+
+
+def plot_worm_graph(points_progression):
+    """Plot the worm graph showing points progression with smooth curves."""
+    fig = go.Figure()
+    
+    for participant, points in points_progression.items():
+        x = np.linspace(0, len(points) - 1, num=len(points))
+        fig.add_trace(go.Scatter(x=x, y=points, mode='lines', name=participant, line_shape='spline'))
+    
+    fig.update_layout(title="Points Progression", xaxis_title="Matches", yaxis_title="Points", template="plotly_dark")
+    return fig
 
 def main():
     st.set_page_config(layout="wide")
@@ -91,14 +110,16 @@ def main():
     
     results_df = load_results(results_path)
     predictions = load_predictions(predictions_path)
-    leaderboard_df = calculate_scores(results_df, predictions)
+    leaderboard_df, points_progression = calculate_scores(results_df, predictions)
     matchwise_df = matchwise_predictions(schedule_df, predictions)
 
     tab1, tab2, tab3 = st.tabs(["Leaderboard", "All Predictions", "Matchwise Predictions"])
 
     with tab1:         
         st.subheader("Leaderboard")
-        st.dataframe(leaderboard_df, use_container_width=True)
+        st.dataframe(leaderboard_df, use_container_width=True, hide_index=True)
+        st.subheader("Points Progression (Worm Graph)")
+        st.plotly_chart(plot_worm_graph(points_progression), use_container_width=True)
 
     st.write('\n\n')
 
