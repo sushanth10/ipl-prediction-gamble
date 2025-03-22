@@ -27,14 +27,14 @@ def calculate_scores(results_df, predictions):
     leaderboard = []
     completed_matches = results_df.dropna(subset=["Winner"])  # Consider only completed matches
     total_matches = len(completed_matches)
-    points_progression = {participant: [0] for participant in predictions.keys()}  # Track score progression
-
+    points_progression = {participant: [0] for participant in predictions.keys()} 
     for participant, predicted_winners in predictions.items():
         score = 0
         correct_predictions = 0
         matchwise_points = []
         # total_predicted_points = 0
         # total_bonus_points = 0
+        last_five_results = []
 
         for i, row in completed_matches.iterrows():
             actual_winner = row["Winner"]
@@ -47,7 +47,10 @@ def calculate_scores(results_df, predictions):
                 # total_bonus_points += bonus_points 
                 score += points_earned
                 correct_predictions += 1
-
+                last_five_results.append("✅")
+            else:
+                last_five_results.append("❌")
+            
             matchwise_points.append(points_earned)
             points_progression[participant].append(score)
 
@@ -55,10 +58,11 @@ def calculate_scores(results_df, predictions):
         leaderboard.append({
             "Participant": participant,
             "Points": score,
+            "Accuracy (%)": round(accuracy, 2),
             # "Total Predicted Points": total_predicted_points,
             # "Bonus Points": total_bonus_points,
-            "Accuracy (%)": round(accuracy, 2),
-            "Matchwise Points": matchwise_points[-5:]
+            "Matchwise Points (Last 5)": matchwise_points[-5:],
+            "Last 5 Matches": " ".join(last_five_results[-5:])
         })
 
     return pd.DataFrame(leaderboard).sort_values(by="Points", ascending=False), points_progression
@@ -124,7 +128,7 @@ def main():
     with tab1:         
         st.subheader("Leaderboard")
         st.dataframe(leaderboard_df, use_container_width=True, hide_index=True)
-        st.markdown("##### Total Possible Outcomes of 70 Matches : **118 lakh crore crore** (118,00,00,00,00,00,000+) outcomes")  
+        st.markdown("##### Total Possible Match Outcomes for League Matches : **118 lakh crore crore** (118,00,00,00,00,00,000+) outcomes")  
         st.subheader("Points Progression (Worm Graph)")
         st.plotly_chart(plot_worm_graph(points_progression), use_container_width=True)
 
