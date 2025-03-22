@@ -41,7 +41,10 @@ def calculate_scores(results_df, predictions):
             bonus_points = row.get("Bonus Points", 0)
             points_earned = 0
 
-            if i < len(predicted_winners) and predicted_winners[i] == actual_winner:
+            if actual_winner == "NR":
+                points_earned = 5
+                last_five_results.append("➖")
+            elif i < len(predicted_winners) and predicted_winners[i] == actual_winner:
                 points_earned = 10 + bonus_points
                 # total_predicted_points += 10
                 # total_bonus_points += bonus_points 
@@ -128,7 +131,7 @@ def main():
     with tab1:         
         st.subheader("Leaderboard")
         st.dataframe(leaderboard_df, use_container_width=True, hide_index=True)
-        st.markdown("##### Total Possible Match Outcomes for League Matches : **118 lakh crore crore** (118,00,00,00,00,00,000+) outcomes")  
+        st.markdown("##### Total Possible Match Outcomes for League Matches : **59 lakh crore crore** (59,02,95,81,03,58,70,56,51,712) outcomes")  
         st.subheader("Points Progression (Worm Graph)")
         st.plotly_chart(plot_worm_graph(points_progression), use_container_width=True)
 
