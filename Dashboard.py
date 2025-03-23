@@ -131,7 +131,9 @@ def main():
     with tab1:         
         st.subheader("Leaderboard")
         st.dataframe(leaderboard_df, use_container_width=True, hide_index=True)
-        st.markdown("##### Total Possible Match Outcomes for League Matches : **59 lakh crore crore** (59,02,95,81,03,58,70,56,51,712) outcomes")  
+        st.markdown("##### Remaining Match Total Possible Outcomes for League Matches : **59 lakh crore crore** (59,02,95,81,03,58,70,56,51,712) outcomes") 
+
+        st.write('\n\n')
         st.subheader("Points Progression (Worm Graph)")
         st.plotly_chart(plot_worm_graph(points_progression), use_container_width=True)
 
