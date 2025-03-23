@@ -113,6 +113,50 @@ def plot_worm_graph(points_progression):
 def main():
     st.set_page_config(layout="wide")
     st.title("IPL Match Prediction Leaderboard")
+
+    st.markdown("""
+        <style>
+            /* Table Styling */
+            .dataframe {
+                border-collapse: collapse;
+                width: 100%;
+                font-size: 14px;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            
+            /* Table Header */
+            .dataframe th {
+                background-color: #1f1f1f;
+                color: #ffffff;
+                padding: 10px;
+                text-align: center;
+            }
+            
+            /* Table Rows */
+            .dataframe td {
+                padding: 10px;
+                text-align: center;
+                border-bottom: 1px solid #444;
+            }
+            
+            /* Alternate Row Color */
+            .dataframe tr:nth-child(even) {
+                background-color: #2b2b2b;
+            }
+            
+            /* Hover Effect */
+            .dataframe tr:hover {
+                background-color: #3a3a3a;
+            }
+            
+            /* Icons Styling */
+            .tick { color: limegreen; font-size: 18px; }
+            .cross { color: red; font-size: 18px; }
+            .dash { color: grey; font-size: 18px; }
+        </style>
+        """, unsafe_allow_html=True)
+
     
     base_path = "/home/sushanth/Github/ipl-prediction-gamble"  # Change this to your actual folder path
     schedule_path = os.path.join(base_path, "The Schedule/ipl_2025_schedule.csv")
@@ -131,7 +175,7 @@ def main():
     with tab1:         
         st.subheader("Leaderboard")
         st.dataframe(leaderboard_df, use_container_width=True, hide_index=True)
-        st.markdown("##### Remaining Match Total Possible Outcomes for League Matches : **59 lakh crore crore** (59,02,95,81,03,58,70,56,51,712) outcomes") 
+        st.markdown("##### Remaining Match Total Possible Outcomes for League Matches : **147 quintillion** (147,573,952,589,676,412,928) outcomes") 
 
         st.write('\n\n')
         st.subheader("Points Progression (Worm Graph)")
