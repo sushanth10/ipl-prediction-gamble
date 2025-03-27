@@ -89,8 +89,8 @@ def main():
     leaderboard_df["Matchwise Points (Last 5)"] = leaderboard_df["Matchwise Points (Last 5)"].apply(format_matchwise_points)
     matchwise_df = ExtractAndTransform.matchwise_predictions(schedule_df, predictions)
 
-    tab1, tab2, tab3 = st.tabs(["Leaderboard", "All Predictions", "Matchwise Predictions"])
-    # tab1, tab2, tab3, tab4 = st.tabs(["Leaderboard", "All Predictions", "Matchwise Predictions", "Analysis"])
+    # tab1, tab2, tab3 = st.tabs(["Leaderboard", "All Predictions", "Matchwise Predictions"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Leaderboard", "All Predictions", "Matchwise Predictions", "Analysis"])
 
     with tab1:         
         st.subheader("Leaderboard")
@@ -113,25 +113,32 @@ def main():
         st.subheader("Matchwise Predictions")
         st.dataframe(matchwise_df, use_container_width=True)
 
+    with tab4:
+        st.subheader("Participant-wise Team Win Predictions")
+        participant_wise_team_predictions = ExtractAndTransform.get_participant_wise_team_predictions(predictions)
+        participants = participant_wise_team_predictions["Participant"].unique()
+        num_participants = len(participants)
+        cols_per_row = 6
+        for i in range(0, num_participants, cols_per_row):
+            cols = st.columns(cols_per_row)  # Create 6 columns in the row
+            
+            for j, col in enumerate(cols):
+                if i + j < num_participants: 
+                    participant = participants[i + j]
+                    with col:  # Place chart in the respective column
+                        st.write(f"##### {participant}")
+                        fig = Plotting.plot_participant_wise_team_predictions(
+                            participant_wise_team_predictions[participant_wise_team_predictions["Participant"] == participant]
+                        )
+                        fig.update_layout(showlegend=False)
+                        st.plotly_chart(fig, use_container_width=True)
 
-    st.subheader("Participant-wise Team Win Predictions")
-    participant_wise_team_predictions = ExtractAndTransform.get_participant_wise_team_predictions(predictions)
-    participants = participant_wise_team_predictions["Participant"].unique()
-    num_participants = len(participants)
-    cols_per_row = 6
-    for i in range(0, num_participants, cols_per_row):
-        cols = st.columns(cols_per_row)  # Create 4 columns in the row
-        
-        for j, col in enumerate(cols):
-            if i + j < num_participants:  # Ensure index doesn't go out of bounds
-                participant = participants[i + j]
-                with col:  # Place chart in the respective column
-                    st.write(f"##### {participant}")
-                    fig = Plotting.plot_participant_wise_team_predictions(
-                        participant_wise_team_predictions[participant_wise_team_predictions["Participant"] == participant]
-                    )
-                    fig.update_layout(showlegend=False)  # Hide legend for individual graphs
-                    st.plotly_chart(fig, use_container_width=True)
+        st.write('\n\n')
+        counts_df = Analysis.prediction_counts_analysis(predictions)
+        counts_df_mean = counts_df.mean().sort_values(ascending=False)
+        st.subheader("Average Wins by Teams")
+        st.plotly_chart(Plotting.avg_wins_plot(counts_df_mean), use_container_width=True)
+
 
 if __name__ == "__main__":
     main()

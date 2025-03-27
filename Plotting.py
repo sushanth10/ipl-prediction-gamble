@@ -37,6 +37,7 @@ def plot_worm_graph(points_progression):
         fig.add_trace(go.Scatter(x=x, y=points, mode='lines', name=participant, line_shape='spline'))
     
     fig.update_layout(title="Points Progression", xaxis_title="Matches", yaxis_title="Points", template="plotly_dark")
+    fig.write_image("Visuals/worm_graph.png", format="png", scale=4)
     return fig
 
 def plot_participant_wise_team_predictions(participant_wise_team_predictions):
@@ -53,4 +54,16 @@ def plot_participant_wise_team_predictions(participant_wise_team_predictions):
         color_discrete_map=team_colors,
         labels={"Wins": "Wins", "Participant": "Participant"}
     )
+    return fig
+
+def avg_wins_plot(mean_counts_df):
+    """Plot average wins by teams"""
+    fig = px.bar(
+        mean_counts_df,
+        color=mean_counts_df.index,
+        color_discrete_map=team_colors,
+        orientation="h",
+        labels={"value": "Average Wins", "index": "Teams"},
+    )
+    fig.update_layout(showlegend=False)
     return fig
