@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
+from collections import Counter
 
 def load_results(results_path):
     """Load the actual match results."""
@@ -95,3 +96,19 @@ def calculate_scores(results_df, predictions):
         })
 
     return pd.DataFrame(leaderboard).sort_values(by="Points", ascending=False), points_progression
+
+
+def get_participant_wise_team_predictions(predictions):
+    """Get all team predictions by participants, sorted in descending order of team wins."""
+    rows = []
+    
+    for participant, predicted_winners in predictions.items():
+        team_wins = Counter(predicted_winners) 
+        sorted_teams = sorted(team_wins.items(), key=lambda x: x[1], reverse=True) 
+        
+        for team, wins in sorted_teams:
+            rows.append((participant, team, wins))
+
+    top_fours_df = pd.DataFrame(rows, columns=["Participant", "Team", "Wins"])
+    
+    return top_fours_df

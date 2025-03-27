@@ -1,4 +1,3 @@
-import Analysis.analysis
 import streamlit as st
 import pandas as pd
 import os
@@ -96,7 +95,7 @@ def main():
     with tab1:         
         st.subheader("Leaderboard")
         st.write(leaderboard_df.to_html(escape=False, index=True), unsafe_allow_html=True)
-        st.markdown("##### Total Possible Outcomes for Remaining League Matches : **73.7 quintillion** (73,786,976,294,838,206,464) outcomes") 
+        st.markdown("##### Total Possible Outcomes for Remaining League Matches : **9.2 quintillion** (9,223,372,036,854,775,808) outcomes") 
 
         st.write('\n\n')
         st.subheader("Points Progression (Worm Graph)")
@@ -113,6 +112,26 @@ def main():
     with tab3:
         st.subheader("Matchwise Predictions")
         st.dataframe(matchwise_df, use_container_width=True)
+
+
+    st.subheader("Participant-wise Team Win Predictions")
+    participant_wise_team_predictions = ExtractAndTransform.get_participant_wise_team_predictions(predictions)
+    participants = participant_wise_team_predictions["Participant"].unique()
+    num_participants = len(participants)
+    cols_per_row = 6
+    for i in range(0, num_participants, cols_per_row):
+        cols = st.columns(cols_per_row)  # Create 4 columns in the row
+        
+        for j, col in enumerate(cols):
+            if i + j < num_participants:  # Ensure index doesn't go out of bounds
+                participant = participants[i + j]
+                with col:  # Place chart in the respective column
+                    st.write(f"##### {participant}")
+                    fig = Plotting.plot_participant_wise_team_predictions(
+                        participant_wise_team_predictions[participant_wise_team_predictions["Participant"] == participant]
+                    )
+                    fig.update_layout(showlegend=False)  # Hide legend for individual graphs
+                    st.plotly_chart(fig, use_container_width=True)
 
 if __name__ == "__main__":
     main()
