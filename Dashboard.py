@@ -85,7 +85,10 @@ def main():
     predictions = ExtractAndTransform.load_predictions(predictions_path)
     leaderboard_df, points_progression = ExtractAndTransform.calculate_scores(results_df, predictions)
     leaderboard_df["Rank"] = leaderboard_df["Points"].rank(method="dense", ascending=False).astype(int)
-    leaderboard_df = leaderboard_df.set_index("Rank")
+    # leaderboard_df = leaderboard_df.set_index("Rank")
+    col = leaderboard_df.pop("Rank")
+    leaderboard_df.insert(0, "Rank", col)
+    leaderboard_df = leaderboard_df.sort_values(by="Rank").reset_index(drop=True)
     leaderboard_df["Matchwise Points (Last 5)"] = leaderboard_df["Matchwise Points (Last 5)"].apply(format_matchwise_points)
     matchwise_df = ExtractAndTransform.matchwise_predictions(schedule_df, predictions)
 
@@ -94,8 +97,8 @@ def main():
 
     with tab1:         
         st.subheader("Leaderboard")
-        st.write(leaderboard_df.to_html(escape=False, index=True), unsafe_allow_html=True)
-        st.markdown("##### Total Possible Outcomes for Remaining League Matches : **4.6 quintillion** (4,611,686,018,427,387,904) outcomes") 
+        st.write(leaderboard_df.to_html(escape=False, index=False), unsafe_allow_html=True)
+        st.markdown("##### Total Possible Outcomes for Remaining League Matches : **2.3 quintillion** (2,305,843,009,213,693,952) outcomes") 
 
         st.write('\n\n')
         st.subheader("Points Progression (Worm Graph)")
