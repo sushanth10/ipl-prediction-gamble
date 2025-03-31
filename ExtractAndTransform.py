@@ -112,3 +112,23 @@ def get_participant_wise_team_predictions(predictions):
     top_fours_df = pd.DataFrame(rows, columns=["Participant", "Team", "Wins"])
     
     return top_fours_df
+
+def format_outcomes(results_df):
+        total_known_results = len(results_df["Winner"].dropna())
+        number_of_outcomes = 2 ** (len(results_df) - total_known_results)
+        str_number_of_outcomes = f"{number_of_outcomes:,}".split(",")
+        if len(str_number_of_outcomes) == 2:
+            outcomes_string = str_number_of_outcomes[-2] + " thousand"
+        elif len(str_number_of_outcomes) == 3:
+            outcomes_string = str(str_number_of_outcomes[-3]) + " million"
+        elif len(str_number_of_outcomes) == 4:
+            outcomes_string = str(str_number_of_outcomes[-4]) + " billion"
+        elif len(str_number_of_outcomes) == 5:
+            outcomes_string = str(str_number_of_outcomes[-5]) + " trillion"
+        elif len(str_number_of_outcomes) == 6:
+            outcomes_string = str_number_of_outcomes[-6] + " quadrillion"
+        elif len(str_number_of_outcomes) == 7:
+            outcomes_string = str(str_number_of_outcomes[-7]) + " quintillion"
+        else:
+            outcomes_string = str_number_of_outcomes[-1]
+        return number_of_outcomes, outcomes_string

@@ -96,7 +96,8 @@ def main():
     with tab1:         
         st.subheader("Leaderboard")
         st.write(leaderboard_df.to_html(escape=False, index=False), unsafe_allow_html=True)
-        st.markdown("##### Total Possible Outcomes for Remaining League Matches : **576.5 quadrillion** (576,460,752,303,423,488) outcomes") 
+        number_of_outcomes, outcomes_string = ExtractAndTransform.format_outcomes(results_df)
+        st.markdown(f'##### Total Possible Outcomes for Remaining League Matches : **{outcomes_string}** ({number_of_outcomes:,}) outcomes') 
 
         st.write('\n\n')
         st.subheader("Points Progression (Worm Graph)")
