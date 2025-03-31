@@ -63,7 +63,35 @@ def avg_wins_plot(mean_counts_df):
         color=mean_counts_df.index,
         color_discrete_map=team_colors,
         orientation="h",
+        title="Average",
         labels={"value": "Average Wins", "index": "Teams"},
     )
     fig.update_layout(showlegend=False)
+    return fig
+
+def plot_prediction_ratio(prediction_ratio_counts):
+    """Plot the prediction ratio analysis."""
+    fig = px.bar(
+                prediction_ratio_counts,
+                x="Prediction Ratio",
+                y="Count",
+                 color="Prediction Ratio",
+                 color_discrete_sequence=px.colors.qualitative.Set1,
+                 title="Prediction Ratio Analysis",
+                labels={"index": "Prediction Ratio", "value": "Count"}
+                )
+    return fig
+
+def plot_home_away_ratio(home_away_ratio_counts):
+    """Plot the prediction ratio analysis."""
+    fig = px.bar(
+                home_away_ratio_counts,
+                x="Home-Away Ratio", 
+                y="Count", 
+                color="Home-Away Ratio", 
+                color_discrete_sequence=px.colors.qualitative.Set1,
+                # line_shape='spline',
+                title="Home-Away Ratio Analysis",
+                labels={"index": "Home-Away Ratio", "value": "Count"}
+                )
     return fig

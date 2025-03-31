@@ -85,14 +85,12 @@ def main():
     predictions = ExtractAndTransform.load_predictions(predictions_path)
     leaderboard_df, points_progression = ExtractAndTransform.calculate_scores(results_df, predictions)
     leaderboard_df["Rank"] = leaderboard_df["Points"].rank(method="dense", ascending=False).astype(int)
-    # leaderboard_df = leaderboard_df.set_index("Rank")
     col = leaderboard_df.pop("Rank")
     leaderboard_df.insert(0, "Rank", col)
     leaderboard_df = leaderboard_df.sort_values(by="Rank").reset_index(drop=True)
     leaderboard_df["Matchwise Points (Last 5)"] = leaderboard_df["Matchwise Points (Last 5)"].apply(format_matchwise_points)
     matchwise_df = ExtractAndTransform.matchwise_predictions(schedule_df, predictions)
 
-    # tab1, tab2, tab3 = st.tabs(["Leaderboard", "All Predictions", "Matchwise Predictions"])
     tab1, tab2, tab3, tab4 = st.tabs(["Leaderboard", "All Predictions", "Matchwise Predictions", "Analysis"])
 
     with tab1:         
@@ -129,7 +127,7 @@ def main():
                 if i + j < num_participants: 
                     participant = participants[i + j]
                     with col:  # Place chart in the respective column
-                        st.write(f"##### {participant}")
+                        st.write(f"###### {participant}")
                         fig = Plotting.plot_participant_wise_team_predictions(
                             participant_wise_team_predictions[participant_wise_team_predictions["Participant"] == participant]
                         )
@@ -139,9 +137,14 @@ def main():
         st.write('\n\n')
         counts_df = Analysis.prediction_counts_analysis(predictions)
         counts_df_mean = counts_df.mean().sort_values(ascending=False)
-        st.subheader("Average Wins by Teams")
         st.plotly_chart(Plotting.avg_wins_plot(counts_df_mean), use_container_width=True)
 
+        st.write('\n\n')
+        st.subheader("Prediction Ratio Analysis")
+        prediction_ratio_counts, home_away_ratio_counts = Analysis.get_prediction_ratios(matchwise_df)
+        st.plotly_chart(Plotting.plot_prediction_ratio(prediction_ratio_counts), use_container_width=True)
+        st.plotly_chart(Plotting.plot_home_away_ratio(home_away_ratio_counts), use_container_width=True)
+        st.write('\n\n')
 
 if __name__ == "__main__":
     main()
