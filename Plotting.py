@@ -31,10 +31,16 @@ team_initials = {
 def plot_worm_graph(points_progression):
     """Plot the worm graph showing points progression with smooth curves."""
     fig = go.Figure()
+
+    colorscale = px.colors.qualitative.G10
+    participants = list(points_progression.keys())
+    color_map = {participants[i]: colorscale[i % len(colorscale)] for i in range(len(participants))}
+ 
     
     for participant, points in points_progression.items():
         x = np.linspace(0, len(points) - 1, num=len(points))
-        fig.add_trace(go.Scatter(x=x, y=points, mode='lines', name=participant, line_shape='spline'))
+        fig.add_trace(go.Scatter(x=x, y=points, mode='lines', name=participant,
+                                 line=dict(color=color_map[participant], width=2), line_shape='spline'))
     
     fig.update_layout(title="Points Progression", xaxis_title="Matches", yaxis_title="Points", template="plotly_dark")
     fig.write_image("The Visuals/worm_graph.png", format="png", scale=4)
