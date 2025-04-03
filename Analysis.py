@@ -22,3 +22,12 @@ def get_prediction_ratios(matchwise_predictions_df):
     home_away_ratio_counts.columns = ["Home-Away Ratio", "Count"]
     home_away_ratio_counts.sort_values(by="Home-Away Ratio", ascending=True, inplace=True)
     return prediction_ratio_counts, home_away_ratio_counts
+
+
+def home_away_percentage(schedule_df, predictions_df):
+    matchwise_predictions_df = pd.concat([schedule_df, predictions_df], axis=1)
+    for participant in predictions_df.columns:
+        matchwise_predictions_df[participant] = np.where( matchwise_predictions_df[participant] == matchwise_predictions_df[" Home Team"], "Home", "Away")
+    matchwise_predictions_df = matchwise_predictions_df.iloc[:,4:]
+    percentage_df = matchwise_predictions_df.apply(lambda col: col.value_counts(normalize=True) * 100).fillna(0).T
+    return percentage_df

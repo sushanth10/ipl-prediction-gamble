@@ -147,5 +147,10 @@ def main():
         st.plotly_chart(Plotting.plot_home_away_ratio(home_away_ratio_counts), use_container_width=True)
         st.write('\n\n')
 
+        percentage_df = Analysis.home_away_percentage(schedule_df, pd.DataFrame(predictions))
+        percentage_df.sort_values(by="Home", ascending=False, inplace=True)
+        percentage_df = percentage_df.rename(columns={"Home": "Home %", "Away": "Away %"})
+        st.plotly_chart(Plotting.plot_home_away_percentage(percentage_df), use_container_width=True)
+
 if __name__ == "__main__":
     main()

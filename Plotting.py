@@ -101,3 +101,36 @@ def plot_home_away_ratio(home_away_ratio_counts):
                 labels={"index": "Home-Away Ratio", "value": "Count"}
                 )
     return fig
+
+def plot_home_away_percentage(percentage_df):
+    """Plot the prediction ratio analysis."""
+    avg_home_percentage = percentage_df["Home %"].mean()
+    fig = px.bar(
+                percentage_df,
+                x="Home %", 
+                y=percentage_df.index,
+                orientation="h", 
+                color=percentage_df.index, 
+                color_discrete_sequence=px.colors.qualitative.Set1,
+                # line_shape='spline',
+                title="Home/Away Percentage Analysis",
+                labels={"index": "Participant", "value": "Home Percentage"}
+                )
+    
+    fig.add_shape(
+        type="line",
+        x0=avg_home_percentage, x1=avg_home_percentage,
+        y0=-0.5, y1=len(percentage_df.index) - 0.5,
+        line=dict(color="white", width=2, dash="dash"),
+        name="Average Home Percentage"
+    )
+
+    fig.add_annotation(
+        x=avg_home_percentage,
+        y=-0.5,
+        text=f"Avg: {avg_home_percentage:.2f}%",
+        showarrow=False,
+        font=dict(color="black", size=12),
+        bgcolor="white"
+    )
+    return fig
