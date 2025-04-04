@@ -125,6 +125,11 @@
         <input type="text" id="filename" placeholder="Enter file name" />
         <button onclick="saveWinnersToFile()">Save Winners To Text File</button>
       </div>
+      <div class="text-bar">
+        <input type="file" id="loadFile" accept=".txt">
+        <button onclick="loadWinnersFromFile()">Load Winners</button>
+      </div>
+
       <div class="match-table">
         <div class="match">
             <span class="date">Date</span>
@@ -796,6 +801,30 @@
       a.href = URL.createObjectURL(blob);
       a.download = fileName + ".txt";
       a.click();
+    }
+
+
+    function loadWinnersFromFile() {
+        let fileInput = document.getElementById("loadFile");
+        let file = fileInput.files[0];
+
+        if (!file) {
+            alert("Please select a file first!");
+            return;
+        }
+
+        let reader = new FileReader();
+        reader.onload = function(event) {
+            let lines = event.target.result.split("\n");
+            let matches = document.querySelectorAll(".match");
+
+            matches.forEach((match, index) => {
+                if (index <= lines.length && index > 0) {
+                    match.querySelector(".winner").textContent = lines[index-1].trim();
+                }
+            });
+        };
+        reader.readAsText(file);
     }
     </script>
 </html>
