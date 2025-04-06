@@ -128,7 +128,7 @@ def plot_home_away_percentage(percentage_df):
     fig.add_annotation(
         x=avg_home_percentage,
         y=-0.5,
-        text=f"Avg: {avg_home_percentage:.2f}%",
+        text=f"Average Home Win %: {avg_home_percentage:.2f}%",
         showarrow=False,
         font=dict(color="black", size=12),
         bgcolor="white"
