@@ -76,7 +76,7 @@ def main():
     
     base_path = "/home/sushanth/Github/ipl-prediction-gamble"  # Change this to your actual folder path
     schedule_path = os.path.join(base_path, "The Schedule/ipl_2025_schedule.csv")
-    predictions_path = os.path.join(base_path, "The Gambles")
+    predictions_path = os.path.join(base_path, "The Calculated Gambles")
     results_path = os.path.join(base_path, "The Results")
 
     schedule_df = pd.read_csv(schedule_path)
