@@ -17,7 +17,7 @@ The game leaderboard is built using **Streamlit** and **Python**, providing a dy
 ### **2️⃣ Scoring System**  
 - ✅ **Correct Prediction** → Earns points (e.g., 10 points per correct guess).  
 - ❌ **Incorrect Prediction** → No points awarded.  
-- Additional bonus points may be added for streaks, accuracy, away match wins, upsets.  
+- Additional bonus points are added for away match wins and upsets (based on that day's points table positions).  
 
 ### **3️⃣ Leaderboard & Tracking**  
 - The results need to be updated in a csv file for results.
