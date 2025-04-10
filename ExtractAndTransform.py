@@ -132,3 +132,11 @@ def format_outcomes(results_df):
         else:
             outcomes_string = str_number_of_outcomes[-1]
         return number_of_outcomes, outcomes_string
+
+def format_arrow(val):
+    if val > 0:
+        return f"{abs(val)}🔼"
+    elif val < 0:
+        return f"{abs(val)}🔽"
+    else:
+        return f"{val}"

@@ -77,16 +77,25 @@ def main():
     base_path = "/home/sushanth/Github/ipl-prediction-gamble"  # Change this to your actual folder path
     schedule_path = os.path.join(base_path, "The Schedule/ipl_2025_schedule.csv")
     predictions_path = os.path.join(base_path, "The Calculated Gambles")
+    old_predictions_path = os.path.join(base_path, "The Gambles")
     results_path = os.path.join(base_path, "The Results")
 
     schedule_df = pd.read_csv(schedule_path)
     
     results_df = ExtractAndTransform.load_results(results_path)
     predictions = ExtractAndTransform.load_predictions(predictions_path)
+    old_predictions_df = ExtractAndTransform.load_predictions(old_predictions_path)
     leaderboard_df, points_progression = ExtractAndTransform.calculate_scores(results_df, predictions)
+    old_leaderboard_df, old_points_progression = ExtractAndTransform.calculate_scores(results_df, old_predictions_df)
+    total_leaderboard = pd.merge(old_leaderboard_df, leaderboard_df, on="Participant")[["Participant","Points_x","Points_y"]]
+    total_leaderboard['Points Difference'] = total_leaderboard["Points_y"] - total_leaderboard["Points_x"]
+    total_leaderboard["Change"] = total_leaderboard["Points Difference"].apply(ExtractAndTransform.format_arrow)
+    leaderboard_df = pd.merge(total_leaderboard[['Participant','Change']], leaderboard_df, on="Participant")
     leaderboard_df["Rank"] = leaderboard_df["Points"].rank(method="dense", ascending=False).astype(int)
     col = leaderboard_df.pop("Rank")
+    col2 = leaderboard_df.pop("Change")
     leaderboard_df.insert(0, "Rank", col)
+    leaderboard_df.insert(3, "Change", col2)
     leaderboard_df = leaderboard_df.sort_values(by="Rank").reset_index(drop=True)
     leaderboard_df["Matchwise Points (Last 5)"] = leaderboard_df["Matchwise Points (Last 5)"].apply(format_matchwise_points)
     matchwise_df = ExtractAndTransform.matchwise_predictions(schedule_df, predictions)
