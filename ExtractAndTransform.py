@@ -62,6 +62,12 @@ def calculate_scores(results_df, predictions):
         # total_predicted_points = 0
         # total_bonus_points = 0
         last_five_results = []
+        longest_winning_streak = 0
+        current_winning_streak = 0
+        winning_period = ""
+        longest_losing_streak = 0
+        current_losing_streak = 0
+        losing_period = ""
 
         for i, row in completed_matches.iterrows():
             actual_winner = row["Winner"]
@@ -78,7 +84,17 @@ def calculate_scores(results_df, predictions):
                 score += points_earned
                 correct_predictions += 1
                 last_five_results.append("✅")
+                current_winning_streak +=1
+                current_losing_streak = 0
+                if current_winning_streak >= longest_winning_streak:
+                    longest_winning_streak = current_winning_streak
+                    winning_period = completed_matches.iloc[i-longest_winning_streak+1]["Date"] + " - " + row["Date"]  
             else:
+                current_losing_streak += 1 
+                current_winning_streak = 0
+                if current_losing_streak >= longest_losing_streak:
+                    longest_losing_streak = current_losing_streak
+                    losing_period = completed_matches.iloc[i-longest_losing_streak+1]["Date"] + " - " + row["Date"]
                 last_five_results.append("❌")
             
             matchwise_points.append(points_earned)
@@ -92,7 +108,11 @@ def calculate_scores(results_df, predictions):
             # "Total Predicted Points": total_predicted_points,
             # "Bonus Points": total_bonus_points,
             "Matchwise Points (Last 5)": matchwise_points[-5:],
-            "Last 5 Matches": " ".join(last_five_results[-5:])
+            "Last 5 Matches": " ".join(last_five_results[-5:]),
+            "Longest Winning Streak": longest_winning_streak,
+            "Longest Losing Streak": longest_losing_streak,
+            "Winning Period": winning_period,
+            "Losing Period": losing_period,
         })
 
     return pd.DataFrame(leaderboard).sort_values(by="Points", ascending=False), points_progression

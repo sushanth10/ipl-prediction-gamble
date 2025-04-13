@@ -92,10 +92,6 @@ def main():
     total_leaderboard["Change"] = total_leaderboard["Points Difference"].apply(ExtractAndTransform.format_arrow)
     leaderboard_df = pd.merge(total_leaderboard[['Participant','Change']], leaderboard_df, on="Participant")
     leaderboard_df["Rank"] = leaderboard_df["Points"].rank(method="dense", ascending=False).astype(int)
-    col = leaderboard_df.pop("Rank")
-    col2 = leaderboard_df.pop("Change")
-    leaderboard_df.insert(0, "Rank", col)
-    leaderboard_df.insert(3, "Change", col2)
     leaderboard_df = leaderboard_df.sort_values(by="Rank").reset_index(drop=True)
     leaderboard_df["Matchwise Points (Last 5)"] = leaderboard_df["Matchwise Points (Last 5)"].apply(format_matchwise_points)
     matchwise_df = ExtractAndTransform.matchwise_predictions(schedule_df, predictions)
@@ -104,13 +100,14 @@ def main():
 
     with tab1:         
         st.subheader("Leaderboard")
-        st.write(leaderboard_df.to_html(escape=False, index=False), unsafe_allow_html=True)
+        st.write(leaderboard_df[["Rank","Participant","Points",'Change','Accuracy (%)','Matchwise Points (Last 5)','Last 5 Matches']].to_html(escape=False, index=False), unsafe_allow_html=True)
         number_of_outcomes, outcomes_string = ExtractAndTransform.format_outcomes(results_df)
         st.markdown(f'##### Total Possible Outcomes for Remaining League Matches : **{outcomes_string}** ({number_of_outcomes:,}) outcomes') 
 
         st.write('\n\n')
         st.subheader("Points Progression Worm")
         st.plotly_chart(Plotting.plot_worm_graph(points_progression), use_container_width=True)
+        # st.write(leaderboard_df, use_container_width=True)
 
     st.write('\n\n')
 
