@@ -109,6 +109,7 @@ def main():
         st.plotly_chart(Plotting.plot_worm_graph(points_progression), use_container_width=True)
         # st.write(leaderboard_df, use_container_width=True)
 
+        st.plotly_chart(Plotting.plot_animated_worm_graph(points_progression), use_container_width=True)
     st.write('\n\n')
 
     with tab2 : 

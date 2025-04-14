@@ -134,3 +134,59 @@ def plot_home_away_percentage(percentage_df):
         bgcolor="white"
     )
     return fig
+
+
+def plot_animated_worm_graph(points_progression):
+    """Plot animated worm graph showing points progression with smooth curves."""
+    participants = list(points_progression.keys())
+    num_matches = len(next(iter(points_progression.values())))  # assumes equal length
+
+    colorscale = px.colors.qualitative.G10
+    color_map = {participants[i]: colorscale[i % len(colorscale)] for i in range(len(participants))}
+
+    fig = go.Figure()
+
+    for participant in participants:
+        fig.add_trace(go.Scatter(
+            x=[], y=[], mode='lines', name=participant,
+            line=dict(color=color_map[participant], width=2),
+            line_shape='spline'
+        ))
+
+    frames = []
+    for i in range(0, num_matches + 2):
+        frame_data = []
+        for participant in participants:
+            x_vals = list(range(i))
+            y_vals = points_progression[participant][:i]
+            frame_data.append(go.Scatter(
+                x=x_vals,
+                y=y_vals
+            ))
+        frames.append(go.Frame(data=frame_data, name=str(i)))
+
+    fig.frames = frames
+
+    fig.update_layout(
+        title="Points Progression Over Matches",
+        xaxis_title="Matches",
+        yaxis_title="Points",
+        template="plotly_dark",
+        updatemenus=[{
+            "type": "buttons",
+            "buttons": [{
+                "label": "Play",
+                "method": "animate",
+                "args": [None, {"frame": {"duration": 500, "redraw": True}, "fromcurrent": True}]
+            }]
+        }],
+        sliders=[{
+            "steps": [{
+                "method": "animate",
+                "args": [[str(i)], {"mode": "immediate", "frame": {"duration": 500}, "transition": {"duration": 500}}],
+                "label": f"Match {i}"
+            } for i in range(1, num_matches + 1)]
+        }]
+    )
+
+    return fig
