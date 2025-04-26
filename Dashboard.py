@@ -85,7 +85,6 @@ def main():
     results_df = ExtractAndTransform.load_results(results_path)
     predictions = ExtractAndTransform.load_predictions(predictions_path)
     old_predictions_df = ExtractAndTransform.load_predictions(old_predictions_path)
-    leaderboard_df, points_progression = ExtractAndTransform.calculate_scores(results_df, predictions)
     old_leaderboard_df, old_points_progression = ExtractAndTransform.calculate_scores(results_df, old_predictions_df)
     total_leaderboard = pd.merge(old_leaderboard_df, leaderboard_df, on="Participant")[["Participant","Points_x","Points_y"]]
     total_leaderboard['Points Difference'] = total_leaderboard["Points_y"] - total_leaderboard["Points_x"]
