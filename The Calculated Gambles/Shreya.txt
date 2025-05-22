@@ -55,16 +55,16 @@ Lucknow Super Giants
 Delhi Capitals
 Mumbai Indians
 Kolkata Knight Riders
-Punjab Kings
 Royal Challengers Bengaluru
-Kolkata Knight Riders
 Punjab Kings
-Gujarat Titans
-Rajasthan Royals
-Royal Challengers Bengaluru
-Lucknow Super Giants
-Delhi Capitals
-Punjab Kings
-Royal Challengers Bengaluru
 Gujarat Titans
 Sunrisers Hyderabad
+Rajasthan Royals
+Delhi Capitals
+Lucknow Super Giants
+Royal Challengers Bengaluru
+Punjab Kings
+Gujarat Titans
+Kolkata Knight Riders
+Punjab Kings
+Royal Challengers Bengaluru

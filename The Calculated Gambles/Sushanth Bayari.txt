@@ -55,16 +55,16 @@ Punjab Kings
 Sunrisers Hyderabad
 Gujarat Titans
 Chennai Super Kings
-Punjab Kings
 Royal Challengers Bengaluru
-Sunrisers Hyderabad
 Punjab Kings
 Gujarat Titans
+Sunrisers Hyderabad
 Chennai Super Kings
-Royal Challengers Bengaluru
-Gujarat Titans
 Mumbai Indians
-Punjab Kings
+Gujarat Titans
 Royal Challengers Bengaluru
+Punjab Kings
 Gujarat Titans
 Sunrisers Hyderabad
+Punjab Kings
+Royal Challengers Bengaluru

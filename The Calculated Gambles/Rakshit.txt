@@ -55,16 +55,16 @@ Lucknow Super Giants
 Sunrisers Hyderabad
 Gujarat Titans
 Chennai Super Kings
-Delhi Capitals
-Lucknow Super Giants
 Kolkata Knight Riders
-Mumbai Indians
-Gujarat Titans
-Chennai Super Kings
-Royal Challengers Bengaluru
-Gujarat Titans
-Mumbai Indians
 Punjab Kings
-Kolkata Knight Riders
 Gujarat Titans
 Sunrisers Hyderabad
+Chennai Super Kings
+Mumbai Indians
+Gujarat Titans
+Royal Challengers Bengaluru
+Delhi Capitals
+Gujarat Titans
+Kolkata Knight Riders
+Mumbai Indians
+Lucknow Super Giants
