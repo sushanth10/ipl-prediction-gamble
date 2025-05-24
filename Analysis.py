@@ -15,6 +15,7 @@ def get_prediction_ratios(matchwise_predictions_df):
     matchwise_predictions_df["Prediction Difference"] = (matchwise_predictions_df['Home Predictors'].str.split(',').apply(len) - matchwise_predictions_df['Away Predictors'].str.split(',').apply(len))
     matchwise_predictions_df["Prediction Ratio"] = matchwise_predictions_df["Absolute Prediction Difference"].map(prediction_difference_map)
     matchwise_predictions_df["Home-Away Ratio"] = matchwise_predictions_df["Prediction Difference"].map(home_away_ratio_map)
+    # major_gen_predictions = matchwise_predictions_df.apply(lambda row: row["Home Team"] if row["Prediction Difference"] > 0 else row["Away Team"], axis=1)
     prediction_ratio_counts = matchwise_predictions_df["Prediction Ratio"].value_counts().reset_index()
     prediction_ratio_counts.columns = ["Prediction Ratio", "Count"]
     prediction_ratio_counts = prediction_ratio_counts.sort_values(by="Count", ascending=False)

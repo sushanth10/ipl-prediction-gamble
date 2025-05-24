@@ -1,6 +1,8 @@
 import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
+import pandas as pd
+import streamlit as st
 
 team_colors = {
     'Chennai Super Kings': '#F9CD05',  # Yellow
@@ -167,26 +169,117 @@ def plot_animated_worm_graph(points_progression):
 
     fig.frames = frames
 
+    y_max = max(max(points) for points in points_progression.values())
+    x_max = num_matches
+
     fig.update_layout(
         title="Points Progression Over Matches",
         xaxis_title="Matches",
         yaxis_title="Points",
-        template="plotly_dark",
+        template="plotly_dark",    
+        yaxis=dict(range=[0, y_max + 5]),
+        xaxis=dict(range=[0, x_max]),
         updatemenus=[{
             "type": "buttons",
             "buttons": [{
                 "label": "Play",
                 "method": "animate",
-                "args": [None, {"frame": {"duration": 500, "redraw": True}, "fromcurrent": True}]
+                "args": [None, {"frame": {"duration": 500, "redraw": False}, "fromcurrent": True}]
             }]
         }],
         sliders=[{
             "steps": [{
                 "method": "animate",
-                "args": [[str(i)], {"mode": "immediate", "frame": {"duration": 500}, "transition": {"duration": 500}}],
+                "args": [[str(i)], {"mode": "immediate", "frame": {"duration": 100}, "transition": {"duration": 0}}],
                 "label": f"Match {i}"
             } for i in range(1, num_matches + 1)]
         }]
     )
 
+    return fig
+
+
+def plot_bar_chart_race(points_progression) :
+    """Plot for bar chart race showing points progression."""
+    data = []
+    for participant, scores in points_progression.items():
+        for match, points in enumerate(scores):
+            data.append({"Participant": participant, "Match": match, "Points": points})
+    points_progression_df = pd.DataFrame(data)
+    points_progression_df["Rank"] = points_progression_df.groupby("Match")["Points"].rank(method="first", ascending=False)
+    points_progression_df.sort_values(by=["Match", "Rank"], inplace=True)
+    # st.write(points_progression_df.to_html(index=False), unsafe_allow_html=True)
+
+    fig = px.bar(points_progression_df, 
+                 orientation="h",
+                 x="Points",
+                 y="Participant",
+                color="Participant",    
+                # range_x=[0, points_progression_df["Points"].max() + 10],            
+                 color_discrete_sequence=px.colors.qualitative.Set1,
+                 title="Points Progression",
+                 animation_frame="Match")
+    
+    fig.update_layout(
+        updatemenus=[{
+            "type": "buttons",
+            "buttons": [{
+                "label": "Play",
+                "method": "animate",
+                "args": [None, {
+                    "frame": {"duration": 1500, "redraw": False},   # Slower animation (1000ms per frame)
+                    "fromcurrent": True,
+                    "transition": {"duration": 5000}
+                }]
+            }]
+        }]
+    )
+    
+    fig.update_layout(template="plotly_dark", yaxis={"categoryorder": "total ascending"}, )
+
+
+    return fig
+
+
+
+def plot_time_spent_position(time_spent_position_df):
+    all_ranks = pd.Series(range(1, 12), name="Rank")
+
+    participants = time_spent_position_df['Participant'].unique()
+
+    colorscale = px.colors.qualitative.Bold
+    color_map = {participants[i]: colorscale[i % len(colorscale)] for i in range(len(participants))}
+
+    for participant in time_spent_position_df['Participant'].unique():
+        sub_df = time_spent_position_df[time_spent_position_df['Participant'] == participant]
+        sub_df = pd.merge(all_ranks, sub_df, on="Rank", how="left").fillna(0)
+
+        x = np.linspace(1, 11, num = 11)
+
+        fig = px.line(
+            x = x,
+            y = sub_df['Count'],
+            line_shape='spline',
+            title = f'Time spent by {participant}',
+            color_discrete_sequence=[color_map[participant]]
+        )
+
+        fig.update_layout(
+            xaxis=dict(dtick=1),
+            template="plotly_dark"
+        )
+
+        st.plotly_chart(fig, use_container_width=True)    
+
+def plot_position_graph(points_progression):
+    data = []
+    for participant, scores in points_progression.items():
+        for match, points in enumerate(scores):
+            data.append({"Participant": participant, "Match": match, "Points": points})
+    points_progression_df = pd.DataFrame(data)
+    points_progression_df = points_progression_df[~points_progression_df["Participant"].isin(["Wanderers", "Homies"])]
+    points_progression_df["Rank"] = points_progression_df.groupby("Match")["Points"].rank(method="first", ascending=False)
+    fig = px.line(points_progression_df, x="Match", y="Rank", color="Participant", line_shape='spline')
+    fig.update_layout(title="Position Graph", xaxis_title="Matches", yaxis_title="Rank", template="plotly_dark")
+    fig.update_yaxes(autorange="reversed")
     return fig

@@ -77,6 +77,7 @@ def calculate_scores(results_df, predictions):
             if actual_winner == "NR":
                 points_earned = 5
                 last_five_results.append("➖")
+                score += points_earned
             elif i < len(predicted_winners) and predicted_winners[i] == actual_winner:
                 points_earned = 10 + bonus_points
                 # total_predicted_points += 10
@@ -91,7 +92,7 @@ def calculate_scores(results_df, predictions):
                     winning_period = completed_matches.iloc[i-longest_winning_streak+1]["Date"] + " - " + row["Date"]  
             else:
                 current_losing_streak += 1 
-                current_winning_streak = 0
+                current_winning_streak = 0 
                 if current_losing_streak >= longest_losing_streak:
                     longest_losing_streak = current_losing_streak
                     losing_period = completed_matches.iloc[i-longest_losing_streak+1]["Date"] + " - " + row["Date"]
