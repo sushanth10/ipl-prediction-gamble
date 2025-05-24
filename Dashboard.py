@@ -86,14 +86,17 @@ def main():
     predictions = ExtractAndTransform.load_predictions(predictions_path)
     old_predictions_df = ExtractAndTransform.load_predictions(old_predictions_path)
     old_leaderboard_df, old_points_progression = ExtractAndTransform.calculate_scores(results_df, old_predictions_df)
+    leaderboard_df, points_progression = ExtractAndTransform.calculate_scores(results_df, predictions)
     total_leaderboard = pd.merge(old_leaderboard_df, leaderboard_df, on="Participant")[["Participant","Points_x","Points_y"]]
     total_leaderboard['Points Difference'] = total_leaderboard["Points_y"] - total_leaderboard["Points_x"]
     total_leaderboard["Change"] = total_leaderboard["Points Difference"].apply(ExtractAndTransform.format_arrow)
     leaderboard_df = pd.merge(total_leaderboard[['Participant','Change']], leaderboard_df, on="Participant")
+    leaderboard_df = leaderboard_df[~leaderboard_df["Participant"].isin(["Wanderers","Homies"])]
     leaderboard_df["Rank"] = leaderboard_df["Points"].rank(method="dense", ascending=False).astype(int)
     leaderboard_df = leaderboard_df.sort_values(by="Rank").reset_index(drop=True)
     leaderboard_df["Matchwise Points (Last 5)"] = leaderboard_df["Matchwise Points (Last 5)"].apply(format_matchwise_points)
     matchwise_df = ExtractAndTransform.matchwise_predictions(schedule_df, predictions)
+    prediction_ratio_counts, home_away_ratio_counts = Analysis.get_prediction_ratios(matchwise_df)
 
     tab1, tab2, tab3, tab4 = st.tabs(["Leaderboard", "All Predictions", "Matchwise Predictions", "Analysis"])
 
@@ -157,6 +160,8 @@ def main():
         percentage_df.sort_values(by="Home", ascending=False, inplace=True)
         percentage_df = percentage_df.rename(columns={"Home": "Home %", "Away": "Away %"})
         st.plotly_chart(Plotting.plot_home_away_percentage(percentage_df), use_container_width=True)
+        # st.plotly_chart(Plotting.plot_bar_chart_race(points_progression), use_container_width=True)
+        st.plotly_chart(Plotting.plot_position_graph(points_progression), use_container_width=True)
 
 if __name__ == "__main__":
     main()
