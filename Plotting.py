@@ -3,6 +3,7 @@ import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
 import streamlit as st
+import time
 
 team_colors = {
     'Chennai Super Kings': '#F9CD05',  # Yellow
@@ -90,19 +91,34 @@ def plot_prediction_ratio(prediction_ratio_counts):
                 )
     return fig
 
-def plot_home_away_ratio(home_away_ratio_counts):
+def plot_home_away_ratio(home_away_ratio_counts, steps=20, delay=0.05):
     """Plot the prediction ratio analysis."""
-    fig = px.bar(
-                home_away_ratio_counts,
-                x="Home-Away Ratio", 
-                y="Count", 
-                color="Home-Away Ratio", 
-                color_discrete_sequence=px.colors.qualitative.Set1,
-                # line_shape='spline',
-                title="Home-Away Ratio Analysis",
-                labels={"index": "Home-Away Ratio", "value": "Count"}
-                )
-    return fig
+    container = st.empty()
+
+    # Normalize and prepare data
+    df = home_away_ratio_counts.copy().reset_index(drop=True)
+    max_counts = df["Count"].max()
+    df["Home-Away Ratio"] = df["Home-Away Ratio"].astype(str)  # Ensure it's string for consistent display
+
+    # Animate in 'steps' frames
+    for step in range(1, steps + 1):
+        progress_ratio = step / steps
+        df_animated = df.copy()
+        df_animated["Animated Count"] = df["Count"] * progress_ratio
+
+        fig = px.bar(
+            df_animated,
+            x="Home-Away Ratio",
+            y="Animated Count",
+            color="Home-Away Ratio",
+            color_discrete_sequence=px.colors.qualitative.Set1,
+            title="Home-Away Ratio Analysis",
+            labels={"Animated Count": "Count"},
+            range_y=[0, max_counts * 1.1],  # keep scale fixed
+        )
+
+        container.plotly_chart(fig, use_container_width=True)
+        time.sleep(delay)
 
 def plot_home_away_percentage(percentage_df):
     """Plot the prediction ratio analysis."""
@@ -138,66 +154,45 @@ def plot_home_away_percentage(percentage_df):
     return fig
 
 
-def plot_animated_worm_graph(points_progression):
+def plot_animated_worm_graph(points_progression, delay=0.1):
     """Plot animated worm graph showing points progression with smooth curves."""
+    container = st.empty()
+
     participants = list(points_progression.keys())
-    num_matches = len(next(iter(points_progression.values())))  # assumes equal length
-
+    num_matches = len(next(iter(points_progression.values())))
     colorscale = px.colors.qualitative.G10
-    color_map = {participants[i]: colorscale[i % len(colorscale)] for i in range(len(participants))}
+    color_map = {p: colorscale[i % len(colorscale)] for i, p in enumerate(participants)}
+    y_max = max(max(v) for v in points_progression.values())
 
-    fig = go.Figure()
+    for frame in range(1, num_matches + 1):
+        fig = go.Figure()
 
-    for participant in participants:
-        fig.add_trace(go.Scatter(
-            x=[], y=[], mode='lines', name=participant,
-            line=dict(color=color_map[participant], width=2),
-            line_shape='spline'
-        ))
-
-    frames = []
-    for i in range(0, num_matches + 2):
-        frame_data = []
-        for participant in participants:
-            x_vals = list(range(i))
-            y_vals = points_progression[participant][:i]
-            frame_data.append(go.Scatter(
+        for p in participants:
+            x_vals = list(range(frame))
+            y_vals = points_progression[p][:frame]
+            fig.add_trace(go.Scatter(
                 x=x_vals,
-                y=y_vals
+                y=y_vals,
+                mode='lines',
+                name=p,
+                line=dict(color=color_map[p], width=3),
+                marker=dict(size=6),
+                line_shape='spline'
             ))
-        frames.append(go.Frame(data=frame_data, name=str(i)))
 
-    fig.frames = frames
+        fig.update_layout(
+            title="📊 Points Progression",
+            xaxis_title="Matches",
+            yaxis_title="Points",
+            yaxis=dict(range=[0, y_max + 5]),
+            xaxis=dict(range=[0, num_matches]),
+            template="plotly_dark",
+            showlegend=True,
+            transition=dict(duration=200, easing="cubic-in-out")  # smoother slide
+        )
 
-    y_max = max(max(points) for points in points_progression.values())
-    x_max = num_matches
-
-    fig.update_layout(
-        title="Points Progression Over Matches",
-        xaxis_title="Matches",
-        yaxis_title="Points",
-        template="plotly_dark",    
-        yaxis=dict(range=[0, y_max + 5]),
-        xaxis=dict(range=[0, x_max]),
-        updatemenus=[{
-            "type": "buttons",
-            "buttons": [{
-                "label": "Play",
-                "method": "animate",
-                "args": [None, {"frame": {"duration": 500, "redraw": False}, "fromcurrent": True}]
-            }]
-        }],
-        sliders=[{
-            "steps": [{
-                "method": "animate",
-                "args": [[str(i)], {"mode": "immediate", "frame": {"duration": 100}, "transition": {"duration": 0}}],
-                "label": f"Match {i}"
-            } for i in range(1, num_matches + 1)]
-        }]
-    )
-
-    return fig
-
+        container.plotly_chart(fig, use_container_width=True)
+        time.sleep(delay)
 
 def plot_bar_chart_race(points_progression) :
     """Plot for bar chart race showing points progression."""

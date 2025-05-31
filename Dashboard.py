@@ -47,6 +47,20 @@ def main():
             .dataframe tr:hover {
                 background-color: #3a3a3a;
             }
+                
+            .dataframe tr {
+                transition: all 0.2s ease-in-out;
+            }
+
+            .dataframe tr:hover {
+                transform: scale(1.02);
+                background-color: #44475a; /* Updated background on hover */
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Soft shadow */
+                z-index: 2;
+                position: relative;
+                font-size: 16px; /* Grows from 14px to 16px */
+                font-weight: 600;
+            }
             
             /* Icons Styling */
             .tick { color: limegreen; font-size: 18px; }
@@ -91,7 +105,7 @@ def main():
     total_leaderboard['Points Difference'] = total_leaderboard["Points_y"] - total_leaderboard["Points_x"]
     total_leaderboard["Change"] = total_leaderboard["Points Difference"].apply(ExtractAndTransform.format_arrow)
     leaderboard_df = pd.merge(total_leaderboard[['Participant','Change']], leaderboard_df, on="Participant")
-    leaderboard_df = leaderboard_df[~leaderboard_df["Participant"].isin(["Wanderers","Homies"])]
+    # leaderboard_df = leaderboard_df[~leaderboard_df["Participant"].isin(["Wanderers","Homies"])]
     leaderboard_df["Rank"] = leaderboard_df["Points"].rank(method="dense", ascending=False).astype(int)
     leaderboard_df = leaderboard_df.sort_values(by="Rank").reset_index(drop=True)
     leaderboard_df["Matchwise Points (Last 5)"] = leaderboard_df["Matchwise Points (Last 5)"].apply(format_matchwise_points)
@@ -108,10 +122,10 @@ def main():
 
         st.write('\n\n')
         st.subheader("Points Progression Worm")
-        st.plotly_chart(Plotting.plot_worm_graph(points_progression), use_container_width=True)
+        # st.plotly_chart(Plotting.plot_worm_graph(points_progression), use_container_width=True)
         # st.write(leaderboard_df, use_container_width=True)
 
-        st.plotly_chart(Plotting.plot_animated_worm_graph(points_progression), use_container_width=True)
+        Plotting.plot_animated_worm_graph(points_progression)
     st.write('\n\n')
 
     with tab2 : 
@@ -153,7 +167,7 @@ def main():
         st.subheader("Prediction Ratio Analysis")
         prediction_ratio_counts, home_away_ratio_counts = Analysis.get_prediction_ratios(matchwise_df)
         st.plotly_chart(Plotting.plot_prediction_ratio(prediction_ratio_counts), use_container_width=True)
-        st.plotly_chart(Plotting.plot_home_away_ratio(home_away_ratio_counts), use_container_width=True)
+        Plotting.plot_home_away_ratio(home_away_ratio_counts)
         st.write('\n\n')
 
         percentage_df = Analysis.home_away_percentage(schedule_df, pd.DataFrame(predictions))
