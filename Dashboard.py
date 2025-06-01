@@ -12,80 +12,8 @@ def main():
     st.set_page_config(layout="wide")
     st.title("IPL Match Prediction Leaderboard")
 
-    st.markdown("""
-        <style>
-            /* Table Styling */
-            .dataframe {
-                border-collapse: collapse;
-                width: 100%;
-                font-size: 14px;
-                border-radius: 8px;
-                overflow: hidden;
-            }
-            
-            /* Table Header */
-            .dataframe th {
-                background-color: #1f1f1f;
-                color: #ffffff;
-                padding: 10px;
-                text-align: center;
-            }
-            
-            /* Table Rows */
-            .dataframe td {
-                padding: 10px;
-                text-align: center;
-                border-bottom: 1px solid #444;
-            }
-            
-            /* Alternate Row Color */
-            .dataframe tr:nth-child(even) {
-                background-color: #2b2b2b;
-            }
-            
-            /* Hover Effect */
-            .dataframe tr:hover {
-                background-color: #3a3a3a;
-            }
-                
-            .dataframe tr {
-                transition: all 0.2s ease-in-out;
-            }
-
-            .dataframe tr:hover {
-                transform: scale(1.02);
-                background-color: #44475a; /* Updated background on hover */
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Soft shadow */
-                z-index: 2;
-                position: relative;
-                font-size: 16px; /* Grows from 14px to 16px */
-                font-weight: 600;
-            }
-            
-            /* Icons Styling */
-            .tick { color: limegreen; font-size: 18px; }
-            .cross { color: red; font-size: 18px; }
-            .dash { color: grey; font-size: 18px; }
-                
-            .matchwise-points {
-                display: flex;
-                gap: 6px;
-            }
-
-            .matchwise-points span {
-                padding: 4px 12px;
-                border-radius: 50px;  /* Makes it a pill */
-                font-weight: bold;
-                font-size: 14px;
-                color: white;
-                background-color: #17a2b8; /* Single color (Teal) */
-                min-width: 35px;
-                text-align: center;
-                display: inline-block;
-            }
-
-        </style>
-        """, unsafe_allow_html=True)
+    with open("styles.css") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
     
     base_path = "/home/sushanth/Github/ipl-prediction-gamble"  # Change this to your actual folder path
@@ -116,7 +44,7 @@ def main():
 
     with tab1:         
         st.subheader("Leaderboard")
-        st.write(leaderboard_df[["Rank","Participant","Points",'Change','Accuracy (%)','Matchwise Points (Last 5)','Last 5 Matches']].to_html(escape=False, index=False), unsafe_allow_html=True)
+        st.write(leaderboard_df[["Rank","Participant","Points",'Change','Accuracy (%)','Matchwise Points (Last 5)','Last 5 Matches',"Longest Winning Streak",'Longest Losing Streak', 'Winning Period','Losing Period']].to_html(escape=False, index=False), unsafe_allow_html=True)
         number_of_outcomes, outcomes_string = ExtractAndTransform.format_outcomes(results_df)
         st.markdown(f'##### Total Possible Outcomes for Remaining League Matches : **{outcomes_string}** ({number_of_outcomes:,}) outcomes') 
 

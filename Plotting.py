@@ -72,10 +72,11 @@ def avg_wins_plot(mean_counts_df):
         color=mean_counts_df.index,
         color_discrete_map=team_colors,
         orientation="h",
-        title="Average",
+        title="Average Wins by Teams",
         labels={"value": "Average Wins", "index": "Teams"},
     )
     fig.update_layout(showlegend=False)
+    fig.write_image("The Visuals/Average Win Prediction.png", format="png", scale=4)
     return fig
 
 def plot_prediction_ratio(prediction_ratio_counts):
@@ -277,4 +278,5 @@ def plot_position_graph(points_progression):
     fig = px.line(points_progression_df, x="Match", y="Rank", color="Participant", line_shape='spline')
     fig.update_layout(title="Position Graph", xaxis_title="Matches", yaxis_title="Rank", template="plotly_dark")
     fig.update_yaxes(autorange="reversed")
+    fig.write_image("The Visuals/position_graph.png", format="png", scale=4)
     return fig
