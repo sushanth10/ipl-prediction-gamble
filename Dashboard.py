@@ -44,7 +44,7 @@ def main():
 
     with tab1:         
         st.subheader("Leaderboard")
-        st.write(leaderboard_df[["Rank","Participant","Points",'Change','Accuracy (%)','Matchwise Points (Last 5)','Last 5 Matches',"Longest Winning Streak",'Longest Losing Streak', 'Winning Period','Losing Period']].to_html(escape=False, index=False), unsafe_allow_html=True)
+        st.write(leaderboard_df[["Rank","Participant","Points",'Change','Accuracy (%)','Matchwise Points (Last 5)','Last 5 Matches']].to_html(escape=False, index=False), unsafe_allow_html=True)
         number_of_outcomes, outcomes_string = ExtractAndTransform.format_outcomes(results_df)
         st.markdown(f'##### Total Possible Outcomes for Remaining League Matches : **{outcomes_string}** ({number_of_outcomes:,}) outcomes') 
 
