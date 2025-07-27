@@ -44,7 +44,7 @@ def main():
 
     with tab1:         
         st.subheader("Leaderboard")
-        st.write(leaderboard_df[["Rank","Participant","Points",'Change','Accuracy (%)','Matchwise Points (Last 5)','Last 5 Matches']].to_html(escape=False, index=False), unsafe_allow_html=True)
+        st.write(leaderboard_df[["Rank","Participant","Points",'Change','Accuracy (%)','Matchwise Points (Last 5)','Last 5 Matches', "Predicted Points","Bonus Points","Correct Predictions"]].to_html(escape=False, index=False), unsafe_allow_html=True)
         number_of_outcomes, outcomes_string = ExtractAndTransform.format_outcomes(results_df)
         st.markdown(f'##### Total Possible Outcomes for Remaining League Matches : **{outcomes_string}** ({number_of_outcomes:,}) outcomes') 
 
@@ -54,6 +54,7 @@ def main():
         # st.write(leaderboard_df, use_container_width=True)
 
         Plotting.plot_animated_worm_graph(points_progression)
+        st.write(total_leaderboard, use_container_width=True)
     st.write('\n\n')
 
     with tab2 : 
@@ -104,6 +105,9 @@ def main():
         st.plotly_chart(Plotting.plot_home_away_percentage(percentage_df), use_container_width=True)
         # st.plotly_chart(Plotting.plot_bar_chart_race(points_progression), use_container_width=True)
         st.plotly_chart(Plotting.plot_position_graph(points_progression), use_container_width=True)
+        points_progression_df = pd.DataFrame(points_progression)[1:]
+        points_progression_df = points_progression_df.reset_index().rename(columns={'index': 'Match Number'})
+        st.dataframe(points_progression_df, use_container_width=True, hide_index=True)
 
 if __name__ == "__main__":
     main()

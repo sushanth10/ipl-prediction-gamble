@@ -32,3 +32,18 @@ def home_away_percentage(schedule_df, predictions_df):
     matchwise_predictions_df = matchwise_predictions_df.iloc[:,4:]
     percentage_df = matchwise_predictions_df.apply(lambda col: col.value_counts(normalize=True) * 100).fillna(0).T
     return percentage_df
+
+def get_points_progression_df(points_progression) :
+    """Plot for bar chart race showing points progression."""
+    data = []
+    for participant, scores in points_progression.items():
+        for match, points in enumerate(scores):
+            data.append({"Participant": participant, "Match": match, "Points": points})
+    points_progression_df = pd.DataFrame(data)
+    points_progression_df["Rank"] = points_progression_df.groupby("Match")["Points"].rank(method="first", ascending=False)
+    points_progression_df.sort_values(by=["Match", "Rank"], inplace=True)
+    return points_progression_df
+
+def get_time_spent_position(points_progression_df):
+    time_spent_position_df = points_progression_df.groupby(by=['Participant','Rank']).size().reset_index(name="Count")
+    return time_spent_position_df

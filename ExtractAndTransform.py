@@ -59,8 +59,8 @@ def calculate_scores(results_df, predictions):
         score = 0
         correct_predictions = 0
         matchwise_points = []
-        # total_predicted_points = 0
-        # total_bonus_points = 0
+        total_predicted_points = 0
+        total_bonus_points = 0
         last_five_results = []
         longest_winning_streak = 0
         current_winning_streak = 0
@@ -80,8 +80,9 @@ def calculate_scores(results_df, predictions):
                 score += points_earned
             elif i < len(predicted_winners) and predicted_winners[i] == actual_winner:
                 points_earned = 10 + bonus_points
-                # total_predicted_points += 10
-                # total_bonus_points += bonus_points 
+                if i < 70:
+                    total_predicted_points += 10
+                    total_bonus_points += bonus_points 
                 score += points_earned
                 correct_predictions += 1
                 last_five_results.append("✅")
@@ -106,14 +107,16 @@ def calculate_scores(results_df, predictions):
             "Participant": participant,
             "Points": score,
             "Accuracy (%)": round(accuracy, 2),
-            # "Total Predicted Points": total_predicted_points,
-            # "Bonus Points": total_bonus_points,
+            "Predicted Points": total_predicted_points,
+            "Bonus Points": total_bonus_points,
+            "Matchwise Points (All)": matchwise_points,
             "Matchwise Points (Last 5)": matchwise_points[-5:],
             "Last 5 Matches": " ".join(last_five_results[-5:]),
             "Longest Winning Streak": longest_winning_streak,
             "Longest Losing Streak": longest_losing_streak,
             "Winning Period": winning_period,
             "Losing Period": losing_period,
+            "Correct Predictions": correct_predictions,
         })
 
     return pd.DataFrame(leaderboard).sort_values(by="Points", ascending=False), points_progression
