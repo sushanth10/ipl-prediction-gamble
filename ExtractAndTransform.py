@@ -227,3 +227,236 @@ def get_all_match_slots(results_df, schedule_df):
             "Current Winner": row["Winner"] if pd.notna(row["Winner"]) else "TBD",
         })
     return slots
+
+
+def get_advanced_metrics(results_df, predictions):
+    """Return advanced per-participant metrics: Consistency, Form, Upset Accuracy,
+    Clutch Rate, Contrarian Index, Crowd Follower %, Best Solo Match."""
+    completed = results_df.dropna(subset=["Winner"]).reset_index(drop=True)
+    participants = list(predictions.keys())
+    n = len(completed)
+
+    # Build majority pick per match
+    majority = []
+    for i in range(n):
+        picks = [predictions[p][i] if i < len(predictions[p]) else None for p in participants]
+        picks = [p for p in picks if p is not None]
+        from collections import Counter
+        majority_pick = Counter(picks).most_common(1)[0][0] if picks else None
+        majority.append(majority_pick)
+
+    # Identify upset matches (away team won)
+    upset_mask = [
+        row["Winner"] == row["Away Team"]
+        for _, row in completed.iterrows()
+    ]
+
+    # Identify close/split matches: abs difference in predictions <= 1
+    home_counts = []
+    away_counts = []
+    for i in range(n):
+        row = completed.iloc[i]
+        home_picks = sum(
+            1 for p in participants
+            if i < len(predictions[p]) and predictions[p][i] == row["Home Team"]
+        )
+        away_picks = len(participants) - home_picks
+        home_counts.append(home_picks)
+        away_counts.append(away_picks)
+
+    split_mask = [abs(h - a) <= 1 for h, a in zip(home_counts, away_counts)]
+
+    rows = []
+    for participant in participants:
+        preds = predictions[participant]
+        per_match_correct = []
+        per_match_points = []
+        for i, row in completed.iterrows():
+            actual = row["Winner"]
+            bonus = row.get("Bonus Points", 0) or 0
+            if i < len(preds):
+                correct = (preds[i] == actual) if actual != "NR" else None
+                if actual == "NR":
+                    pts = 5
+                elif correct:
+                    pts = 10 + bonus
+                else:
+                    pts = 0
+            else:
+                correct = None
+                pts = 0
+            per_match_correct.append(correct)
+            per_match_points.append(pts)
+
+        # Consistency: 100 - std of matchwise points (higher = more consistent)
+        import numpy as np
+        std_pts = float(np.std(per_match_points))
+        consistency = max(0.0, round(100.0 - std_pts, 1))
+
+        # Current Form: exponentially weighted accuracy on last 10 non-NR matches
+        non_nr = [(i, c) for i, c in enumerate(per_match_correct) if c is not None]
+        last10 = non_nr[-10:]
+        if last10:
+            weights = np.exp(np.linspace(-1, 0, len(last10)))
+            weights /= weights.sum()
+            form = round(float(np.dot([int(c) for _, c in last10], weights)) * 100, 1)
+        else:
+            form = 0.0
+
+        # Upset accuracy
+        upset_correct = [c for c, u in zip(per_match_correct, upset_mask) if u and c is not None]
+        upset_acc = round(sum(upset_correct) / len(upset_correct) * 100, 1) if upset_correct else 0.0
+
+        # Clutch rate
+        clutch_correct = [c for c, s in zip(per_match_correct, split_mask) if s and c is not None]
+        clutch_rate = round(sum(clutch_correct) / len(clutch_correct) * 100, 1) if clutch_correct else 0.0
+
+        # Contrarian: went against majority AND was correct
+        contrarian_events = [
+            c
+            for i, (c, maj) in enumerate(zip(per_match_correct, majority))
+            if c is not None and i < len(preds) and preds[i] != maj
+        ]
+        contrarian_idx = round(sum(1 for c in contrarian_events if c) / max(len(contrarian_events), 1) * 100, 1)
+
+        # Crowd follower %
+        with_majority = [
+            1 for i, maj in enumerate(majority)
+            if i < len(preds) and preds[i] == maj
+        ]
+        crowd_pct = round(sum(with_majority) / max(n, 1) * 100, 1)
+
+        # Best solo match: match where participant was correct and fewest others were
+        others_correct_count = []
+        for i in range(n):
+            if i < len(preds) and per_match_correct[i]:
+                others = sum(
+                    1 for p2 in participants if p2 != participant
+                    and i < len(predictions[p2])
+                    and predictions[p2][i] == completed.iloc[i]["Winner"]
+                )
+                others_correct_count.append((i, others))
+        if others_correct_count:
+            best_idx, _ = min(others_correct_count, key=lambda x: x[1])
+            best_row = completed.iloc[best_idx]
+            best_match = f"M{int(best_row['Match #'])}: {best_row['Home Team'][:3]} vs {best_row['Away Team'][:3]}"
+        else:
+            best_match = "—"
+
+        rows.append({
+            "Participant":         participant,
+            "Consistency Score":   consistency,
+            "Current Form (%)":    form,
+            "Upset Accuracy (%)": upset_acc,
+            "Clutch Rate (%)":     clutch_rate,
+            "Contrarian Index (%)": contrarian_idx,
+            "Crowd Follower (%)":  crowd_pct,
+            "Best Solo Match":     best_match,
+        })
+
+    return pd.DataFrame(rows)
+
+
+def get_team_accuracy_matrix(results_df, predictions, schedule_df):
+    """Return a DataFrame[participant × team] = accuracy % predicting that team's matches."""
+    completed = results_df.dropna(subset=["Winner"]).copy()
+    schedule_df = schedule_df.copy()
+    schedule_df.columns = schedule_df.columns.str.strip()
+    participants = list(predictions.keys())
+
+    teams = sorted(set(schedule_df["Home Team"].tolist() + schedule_df["Away Team"].tolist()))
+    data = {p: {} for p in participants}
+
+    for i, row in completed.iterrows():
+        actual = row["Winner"]
+        if actual == "NR":
+            continue
+        home = row["Home Team"]
+        away = row["Away Team"]
+        match_idx = int(row["Match #"]) - 1  # 0-based
+        for p in participants:
+            pred = predictions[p][match_idx] if match_idx < len(predictions[p]) else None
+            correct = int(pred == actual) if pred is not None else None
+            for team in [home, away]:
+                if team not in data[p]:
+                    data[p][team] = []
+                if correct is not None:
+                    data[p][team].append(correct)
+
+    rows = {}
+    for p in participants:
+        rows[p] = {}
+        for team in teams:
+            vals = data[p].get(team, [])
+            rows[p][team] = round(sum(vals) / len(vals) * 100, 1) if vals else None
+
+    return pd.DataFrame(rows).T  # participants on rows, teams on columns
+
+
+def get_match_difficulty(results_df, predictions, schedule_df):
+    """Return a per-match difficulty DataFrame sorted by % correct ascending."""
+    completed = results_df.dropna(subset=["Winner"]).reset_index(drop=True)
+    participants = list(predictions.keys())
+    rows = []
+    for i, row in completed.iterrows():
+        actual = row["Winner"]
+        if actual == "NR":
+            continue
+        match_idx = int(row["Match #"]) - 1
+        correct_count = sum(
+            1 for p in participants
+            if match_idx < len(predictions[p]) and predictions[p][match_idx] == actual
+        )
+        pct_correct = round(correct_count / len(participants) * 100, 1)
+        is_upset = actual == row["Away Team"]
+        rows.append({
+            "Match #":    int(row["Match #"]),
+            "Match":      f"M{int(row['Match #'])}: {row['Home Team'][:3]} vs {row['Away Team'][:3]}",
+            "Winner":     actual,
+            "Was Upset":  is_upset,
+            "% Correct":  pct_correct,
+            "Correct":    correct_count,
+            "Total":      len(participants),
+        })
+    return pd.DataFrame(rows).sort_values("% Correct")
+
+
+def get_agreement_matrix(predictions, results_df):
+    """Return symmetric DataFrame[participant × participant] = % match on completed matches."""
+    completed = results_df.dropna(subset=["Winner"]).reset_index(drop=True)
+    participants = sorted(predictions.keys())
+    n = len(completed)
+    matrix = {p1: {} for p1 in participants}
+    for p1 in participants:
+        for p2 in participants:
+            agree = sum(
+                1 for i in range(n)
+                if i < len(predictions[p1]) and i < len(predictions[p2])
+                and predictions[p1][i] == predictions[p2][i]
+            )
+            total = min(n, len(predictions[p1]), len(predictions[p2]))
+            matrix[p1][p2] = round(agree / total * 100, 1) if total else 0
+    return pd.DataFrame(matrix)
+
+
+def get_points_distribution(results_df, predictions):
+    """Return a DataFrame[participant × score_bucket] of match counts."""
+    completed = results_df.dropna(subset=["Winner"]).reset_index(drop=True)
+    participants = list(predictions.keys())
+    rows = []
+    for p in participants:
+        preds = predictions[p]
+        buckets = {"0 pts": 0, "5 pts": 0, "10 pts": 0, "20 pts": 0}
+        for i, row in completed.iterrows():
+            actual = row["Winner"]
+            bonus = int(row.get("Bonus Points", 0) or 0)
+            pred = preds[i] if i < len(preds) else None
+            if actual == "NR":
+                buckets["5 pts"] += 1
+            elif pred == actual:
+                key = "20 pts" if bonus > 0 else "10 pts"
+                buckets[key] += 1
+            else:
+                buckets["0 pts"] += 1
+        rows.append({"Participant": p, **buckets})
+    return pd.DataFrame(rows)

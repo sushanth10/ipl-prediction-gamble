@@ -549,3 +549,221 @@ def generate_leaderboard_card(leaderboard_df, output_path="The Visuals/leaderboa
 
     plt.close(fig)
     return img_bytes
+
+
+# ─── New Visuals for Advanced Stats ──────────────────────────────────────────
+
+def plot_team_accuracy_heatmap(matrix_df):
+    """Plotly heatmap of Participant × Team accuracy %."""
+    import plotly.graph_objects as go
+    fig = go.Figure(data=go.Heatmap(
+        z=matrix_df.values,
+        x=matrix_df.columns,
+        y=matrix_df.index,
+        colorscale="RdYlGn",
+        zmin=0, zmax=100,
+        text=matrix_df.round(0).astype(str).values + "%",
+        texttemplate="%{text}",
+        hoverinfo="x+y+z",
+        showscale=True
+    ))
+    fig.update_layout(
+        title="🎯 Team-by-Team Accuracy",
+        xaxis_title="Team",
+        yaxis_title="Participant",
+        template="plotly_dark",
+        height=400 + 30 * len(matrix_df),
+        margin=dict(l=10, r=10, t=50, b=10)
+    )
+    return fig
+
+
+def plot_match_difficulty(difficulty_df):
+    """Horizontal bar chart showing % of participants who got each match right."""
+    # Reverse so hardest matches are at the top (lowest % correct)
+    df = difficulty_df.sort_values("% Correct", ascending=True).copy()
+    
+    colors = ["#ef4444" if upset else "#3b82f6" for upset in df["Was Upset"]]
+    texts = [f"{c}/{t} ({pct}%)" for c, t, pct in zip(df["Correct"], df["Total"], df["% Correct"])]
+
+    fig = go.Figure(go.Bar(
+        x=df["% Correct"],
+        y=df["Match"],
+        orientation="h",
+        marker_color=colors,
+        text=texts,
+        textposition="auto"
+    ))
+    fig.update_layout(
+        title="🔥 Hardest Matches to Predict (Red = Away team won)",
+        xaxis_title="% Correct",
+        yaxis_title="Match",
+        template="plotly_dark",
+        height=300 + 20 * len(df),
+        margin=dict(l=10, r=10, t=50, b=10),
+        xaxis=dict(range=[0, 105])
+    )
+    return fig
+
+
+def plot_agreement_matrix(agree_df):
+    """Symmetric heatmap of participant agreement %."""
+    fig = go.Figure(data=go.Heatmap(
+        z=agree_df.values,
+        x=agree_df.columns,
+        y=agree_df.index,
+        colorscale="Purples",
+        zmin=0, zmax=100,
+        text=agree_df.round(0).astype(str).values + "%",
+        texttemplate="%{text}",
+        hoverinfo="x+y+z",
+        showscale=True
+    ))
+    fig.update_layout(
+        title="🤝 Participant Agreement Matrix (% identical picks)",
+        xaxis_title="Participant",
+        yaxis_title="Participant",
+        template="plotly_dark",
+        height=400 + 30 * len(agree_df),
+        margin=dict(l=10, r=10, t=50, b=10)
+    )
+    return fig
+
+
+def plot_points_distribution(dist_df):
+    """Stacked/Grouped bar of 0, 5, 10, 20 pt matches per participant."""
+    fig = go.Figure()
+    colors = {"0 pts": "#ef4444", "5 pts": "#6b7280", "10 pts": "#3b82f6", "20 pts": "#22c55e"}
+    
+    for bucket in ["0 pts", "5 pts", "10 pts", "20 pts"]:
+        fig.add_trace(go.Bar(
+            name=bucket,
+            x=dist_df["Participant"],
+            y=dist_df[bucket],
+            marker_color=colors[bucket],
+            text=dist_df[bucket],
+            textposition="auto"
+        ))
+    
+    fig.update_layout(
+        barmode="stack",
+        title="📊 Distribution of Match Scores",
+        xaxis_title="Participant",
+        yaxis_title="Count of Matches",
+        template="plotly_dark",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+    )
+    return fig
+
+
+def plot_calendar_heatmap(results_df, predictions, schedule_df):
+    """Grid of match outcomes: green = majority right, red = majority wrong."""
+    completed = results_df.dropna(subset=["Winner"]).reset_index(drop=True)
+    participants = list(predictions.keys())
+    
+    cells = []
+    for i, row in schedule_df.iterrows():
+        match_num = int(row.iloc[0])
+        idx = match_num - 1
+        
+        if idx < len(completed):
+            actual = completed.iloc[idx]["Winner"]
+            if actual == "NR":
+                color = "#6b7280"  # Gray
+                text = "NR"
+            else:
+                correct = sum(1 for p in participants if idx < len(predictions[p]) and predictions[p][idx] == actual)
+                pct = correct / len(participants)
+                color = "#22c55e" if pct >= 0.5 else "#ef4444"
+                text = f"{correct}/{len(participants)}"
+        else:
+            color = "#1f2937"  # Dark gray (not played)
+            text = "TBD"
+            
+        cells.append({
+            "Match": match_num,
+            "Teams": f"{row.iloc[2][:3]} v {row.iloc[3][:3]}",
+            "Color": color,
+            "Text": text
+        })
+        
+    df = pd.DataFrame(cells)
+    
+    # Grid layout: 7 columns (approx 1 week)
+    cols = 8
+    rows = (len(df) + cols - 1) // cols
+    
+    z_colors = np.full((rows, cols), np.nan)
+    text_grid = np.full((rows, cols), "", dtype=object)
+    hover_grid = np.full((rows, cols), "", dtype=object)
+    
+    # Map colors to numeric for Plotly heatmap
+    color_map = {"#1f2937": 0, "#ef4444": 1, "#6b7280": 2, "#22c55e": 3}
+    custom_colorscale = [[0, "#1f2937"], [0.33, "#ef4444"], [0.66, "#6b7280"], [1, "#22c55e"]]
+    
+    for i, r in df.iterrows():
+        row_idx = i // cols
+        col_idx = i % cols
+        z_colors[row_idx, col_idx] = color_map.get(r["Color"], 0)
+        text_grid[row_idx, col_idx] = f"<b>M{r['Match']}</b><br>{r['Text']}"
+        hover_grid[row_idx, col_idx] = f"Match {r['Match']}<br>{r['Teams']}<br>{r['Text']}"
+        
+    fig = go.Figure(data=go.Heatmap(
+        z=z_colors,
+        text=text_grid,
+        customdata=hover_grid,
+        texttemplate="%{text}",
+        hovertemplate="%{customdata}<extra></extra>",
+        colorscale=custom_colorscale,
+        showscale=False,
+        xgap=4, ygap=4
+    ))
+    
+    fig.update_layout(
+        title="📅 Season Calendar (Green = Majority Correct, Red = Majority Wrong)",
+        template="plotly_dark",
+        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, autorange="reversed"),
+        height=100 * rows,
+        margin=dict(l=10, r=10, t=50, b=10)
+    )
+    return fig
+
+
+def plot_personality_cards(advanced_df):
+    """Return HTML string for the personality cards."""
+    html = '<div style="display: flex; flex-wrap: wrap; gap: 20px;">'
+    
+    personas = [
+        {"title": "The Lone Wolf", "metric": "Best Solo Match", "desc": "Scored big when no one else did", "icon": "🐺"},
+        {"title": "The Contrarian", "metric": "Contrarian Index (%)", "desc": "Highest % going successfully against the grain", "icon": "🔥", "sort": False},
+        {"title": "The Sheep", "metric": "Crowd Follower (%)", "desc": "Always picked with the majority", "icon": "🐑", "sort": False},
+        {"title": "The Clutch Player", "metric": "Clutch Rate (%)", "desc": "Most accurate on the tight 50/50 split games", "icon": "🎯", "sort": False},
+    ]
+    
+    for p in personas:
+        if p["metric"] in advanced_df.columns:
+            if "sort" in p:
+                winner_row = advanced_df.sort_values(p["metric"], ascending=p["sort"]).iloc[0]
+                val = f"{winner_row[p['metric']]:.1f}%"
+            else:
+                # Find someone with an actual match, not "—"
+                valid = advanced_df[advanced_df[p["metric"]] != "—"]
+                if not valid.empty:
+                    winner_row = valid.iloc[0]
+                    val = winner_row[p["metric"]]
+                else:
+                    winner_row = advanced_df.iloc[0]
+                    val = "None"
+                    
+            html += f'''
+            <div style="flex: 1; min-width: 250px; background: rgba(124,92,255,0.1); border: 1px solid rgba(124,92,255,0.3); border-radius: 12px; padding: 20px;">
+                <h3 style="margin: 0 0 10px 0; font-size: 1.2rem; color: #e2e8ff;">{p["icon"]} {p["title"]}</h3>
+                <h2 style="margin: 0 0 5px 0; color: #a78bfa; font-size: 1.8rem;">{winner_row["Participant"]}</h2>
+                <div style="font-size: 1.1rem; font-weight: bold; color: #fff;">{val}</div>
+                <div style="font-size: 0.85rem; color: #8b93b8; margin-top: 8px;">{p["desc"]}</div>
+            </div>
+            '''
+            
+    html += '</div>'
+    return html

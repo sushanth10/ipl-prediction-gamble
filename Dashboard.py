@@ -172,6 +172,16 @@ def main():
     matchwise_df = ExtractAndTransform.matchwise_predictions(schedule_df, predictions)
     prediction_ratio_counts, home_away_ratio_counts = Analysis.get_prediction_ratios(matchwise_df)
 
+    # Calculate advanced metrics
+    advanced_metrics_df = ExtractAndTransform.get_advanced_metrics(results_df, predictions)
+    team_acc_matrix = ExtractAndTransform.get_team_accuracy_matrix(results_df, predictions, schedule_df)
+    difficulty_df = ExtractAndTransform.get_match_difficulty(results_df, predictions, schedule_df)
+    agree_matrix = ExtractAndTransform.get_agreement_matrix(predictions, results_df)
+    points_dist = ExtractAndTransform.get_points_distribution(results_df, predictions)
+
+    # Merge advanced metrics into main leaderboard for display
+    leaderboard_df = pd.merge(leaderboard_df, advanced_metrics_df, on="Participant", how="left")
+
     # ── Top-level KPIs ───────────────────────────────────────────────────────
     leader = leaderboard_df.iloc[0]
     total_matches = len(results_df)
@@ -187,13 +197,16 @@ def main():
     st.write("")
 
     # ── Tabs ─────────────────────────────────────────────────────────────────
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
         "🏆  Leaderboard",
         "📋  All Predictions",
         "🔢  Matchwise",
         "📊  Analysis",
         "⚔️  Head-to-Head",
         "🔮  Scenarios",
+        "🎭  Personalities",
+        "📅  Calendar",
+        "🏟️  Team Intelligence",
     ])
 
     # ── TAB 1: Leaderboard ──────────────────────────────────────────────────
@@ -222,7 +235,52 @@ def main():
 
         # Full leaderboard
         section_label("📊", "Full Leaderboard")
-        render_leaderboard_table(leaderboard_df)
+        
+        # We need a custom render function here to include the new columns without breaking the old layout:
+        display_cols = ["Rank", "Participant", "Points", "Change", "Accuracy (%)",
+                        "Consistency Score", "Current Form (%)", "Upset Accuracy (%)", "Clutch Rate (%)",
+                        "Matchwise Points (Last 5)", "Last 5 Matches",
+                        "Predicted Points", "Bonus Points", "Correct Predictions"]
+        
+        lb_disp = leaderboard_df[display_cols].copy()
+        
+        # Build HTML table manually to have full control over the huge width
+        rows_html = ""
+        for _, row in lb_disp.iterrows():
+            rank = int(row["Rank"])
+            rank_cls = {1: "rank-1", 2: "rank-2", 3: "rank-3"}.get(rank, "rank-n")
+            change_val = str(row.get("Change", ""))
+            change_cls = "change-up" if "▲" in change_val or "🔼" in change_val else "change-down" if "▼" in change_val or "🔽" in change_val else "change-same"
+
+            rows_html += f"""
+            <tr>
+                <td><span class="rank-badge {rank_cls}">{rank}</span></td>
+                <td style="font-weight:600;">{row['Participant']}</td>
+                <td style="font-weight:800;color:#f0f0ff;font-size:1.1rem;">{int(row['Points'])}</td>
+                <td class="{change_cls}">{change_val}</td>
+                <td style="color:#a78bfa;font-weight:700;">{row['Accuracy (%)']:.1f}%</td>
+                <td style="color:#c4c9e8;">{row['Consistency Score']:.1f}</td>
+                <td style="color:#c4c9e8;">{row['Current Form (%)']:.1f}%</td>
+                <td style="color:#c4c9e8;">{row['Upset Accuracy (%)']:.1f}%</td>
+                <td style="color:#c4c9e8;">{row['Clutch Rate (%)']:.1f}%</td>
+                <td class="matchwise-points">{row['Matchwise Points (Last 5)']}</td>
+                <td style="letter-spacing:1px;font-size:0.8rem;">{row.get('Last 5 Matches','')}</td>
+                <td style="color:#8b93b8;font-size:0.8rem;">{int(row.get('Predicted Points',0))}</td>
+                <td style="color:#8b93b8;font-size:0.8rem;">{int(row.get('Bonus Points',0))}</td>
+                <td style="color:#8b93b8;font-size:0.8rem;">{int(row.get('Correct Predictions',0))}</td>
+            </tr>"""
+
+        headers = ["Rank", "Name", "Points", "Chg", "Accuracy", "Consist.", "Form", "Upset Acc", "Clutch",
+                   "Last 5 Pts", "Last 5", "Pred Pts", "Bonus", "Correct"]
+        headers_html = "".join(f"<th style='white-space:nowrap;'>{h}</th>" for h in headers)
+
+        st.markdown(f"""
+        <div style="overflow-x:auto;border-radius:14px;border:1px solid rgba(255,255,255,0.07);">
+            <table class="lb-table" style="min-width:1200px;">
+                <thead><tr>{headers_html}</tr></thead>
+                <tbody>{rows_html}</tbody>
+            </table>
+        </div>""", unsafe_allow_html=True)
 
         number_of_outcomes, outcomes_string = ExtractAndTransform.format_outcomes(results_df)
         st.markdown(
@@ -373,6 +431,62 @@ def main():
 
         section_label("📊", "Simulated Leaderboard")
         st.dataframe(simulated_lb, use_container_width=True, hide_index=True)
+
+
+    # ── TAB 7: Personalities ────────────────────────────────────────────────
+    with tab7:
+        section_label("🎭", "Participant Personas & Awards")
+        st.markdown(
+            '<p style="color:#8b93b8;font-size:0.88rem;margin-bottom:20px;">'
+            'Fun personality quirks and betting patterns extracted from the season\'s prediction data.</p>',
+            unsafe_allow_html=True
+        )
+        st.markdown(Plotting.plot_personality_cards(advanced_metrics_df), unsafe_allow_html=True)
+        
+        st.write("\n\n")
+        section_label("🧠", "Advanced Metrics Breakdown")
+        st.dataframe(
+            advanced_metrics_df.drop("Participant", axis=1).set_index(advanced_metrics_df["Participant"]),
+            use_container_width=True
+        )
+
+
+    # ── TAB 8: Calendar ─────────────────────────────────────────────────────
+    with tab8:
+        section_label("📅", "Season Match Calendar")
+        st.markdown(
+            '<p style="color:#8b93b8;font-size:0.88rem;margin-bottom:10px;">'
+            'A chronological grid of all matches. Green cells mean the majority picked correctly, '
+            'Red means the majority got it wrong. Hover to see exact numbers.</p>',
+            unsafe_allow_html=True
+        )
+        st.plotly_chart(Plotting.plot_calendar_heatmap(results_df, predictions, schedule_df), use_container_width=True)
+        
+        st.write("\n\n")
+        section_label("📉", "Match Difficulty Ranking")
+        st.plotly_chart(Plotting.plot_match_difficulty(difficulty_df), use_container_width=True)
+
+
+    # ── TAB 9: Team Intelligence ─────────────────────────────────────────────
+    with tab9:
+        section_label("🎯", "Participant vs Team Accuracy Matrix")
+        st.markdown(
+            '<p style="color:#8b93b8;font-size:0.88rem;margin-bottom:10px;">'
+            'Which teams do participants consistently read well, and which are their blind spots?</p>',
+            unsafe_allow_html=True
+        )
+        st.plotly_chart(Plotting.plot_team_accuracy_heatmap(team_acc_matrix), use_container_width=True)
+        
+        st.write("\n\n")
+        col_pts, col_agree = st.columns([1, 1.2])
+        
+        with col_pts:
+            section_label("📊", "Points Distribution")
+            st.plotly_chart(Plotting.plot_points_distribution(points_dist), use_container_width=True)
+            
+        with col_agree:
+            section_label("🤝", "Participant Agreement Matrix")
+            st.plotly_chart(Plotting.plot_agreement_matrix(agree_matrix), use_container_width=True)
 
 
 if __name__ == "__main__":
