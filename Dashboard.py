@@ -445,6 +445,15 @@ def main():
         
         st.write("\n\n")
         section_label("🧠", "Advanced Metrics Breakdown")
+        st.info("""
+        **What do these metrics mean?**
+        - **Consistency Score**: How steady a predictor is. Lower variance in scoring = higher consistency.
+        - **Current Form**: Weighted accuracy over the entire season, with recent matches heavily weighted.
+        - **Upset Accuracy**: Win percentage in matches where the away team won.
+        - **Clutch Rate**: Win percentage in the hardest-to-predict matches (where the crowd was split 50/50).
+        - **Contrarian Index**: How often a participant picked against the majority *and won*.
+        - **Crowd Follower %**: How often a participant's pick aligned with the majority of players.
+        """)
         st.dataframe(
             advanced_metrics_df.drop("Participant", axis=1).set_index(advanced_metrics_df["Participant"]),
             use_container_width=True
@@ -457,13 +466,19 @@ def main():
         st.markdown(
             '<p style="color:#8b93b8;font-size:0.88rem;margin-bottom:10px;">'
             'A chronological grid of all matches. Green cells mean the majority picked correctly, '
-            'Red means the majority got it wrong. Hover to see exact numbers.</p>',
+            'Red means the majority got it wrong (Upset). Hover to see exact numbers.</p>',
             unsafe_allow_html=True
         )
         st.plotly_chart(Plotting.plot_calendar_heatmap(results_df, predictions, schedule_df), use_container_width=True)
         
         st.write("\n\n")
         section_label("📉", "Match Difficulty Ranking")
+        st.markdown(
+            '<p style="color:#8b93b8;font-size:0.88rem;margin-bottom:10px;">'
+            'Ranks all completed matches by how many participants correctly predicted the winner. '
+            'Matches at the top were the hardest to predict.</p>',
+            unsafe_allow_html=True
+        )
         st.plotly_chart(Plotting.plot_match_difficulty(difficulty_df), use_container_width=True)
 
 
@@ -472,7 +487,8 @@ def main():
         section_label("🎯", "Participant vs Team Accuracy Matrix")
         st.markdown(
             '<p style="color:#8b93b8;font-size:0.88rem;margin-bottom:10px;">'
-            'Which teams do participants consistently read well, and which are their blind spots?</p>',
+            'Displays the percentage of times a participant correctly predicted matches involving a specific team. '
+            'Use this to see who reads which franchise best!</p>',
             unsafe_allow_html=True
         )
         st.plotly_chart(Plotting.plot_team_accuracy_heatmap(team_acc_matrix), use_container_width=True)
