@@ -756,14 +756,14 @@ def plot_personality_cards(advanced_df):
                     winner_row = advanced_df.iloc[0]
                     val = "None"
                     
-            html += f'''
-            <div style="flex: 1; min-width: 250px; background: rgba(124,92,255,0.1); border: 1px solid rgba(124,92,255,0.3); border-radius: 12px; padding: 20px;">
-                <h3 style="margin: 0 0 10px 0; font-size: 1.2rem; color: #e2e8ff;">{p["icon"]} {p["title"]}</h3>
-                <h2 style="margin: 0 0 5px 0; color: #a78bfa; font-size: 1.8rem;">{winner_row["Participant"]}</h2>
-                <div style="font-size: 1.1rem; font-weight: bold; color: #fff;">{val}</div>
-                <div style="font-size: 0.85rem; color: #8b93b8; margin-top: 8px;">{p["desc"]}</div>
-            </div>
-            '''
+            html += (
+                f'<div style="flex: 1; min-width: 250px; background: rgba(124,92,255,0.1); border: 1px solid rgba(124,92,255,0.3); border-radius: 12px; padding: 20px;">'
+                f'<h3 style="margin: 0 0 10px 0; font-size: 1.2rem; color: #e2e8ff;">{p["icon"]} {p["title"]}</h3>'
+                f'<h2 style="margin: 0 0 5px 0; color: #a78bfa; font-size: 1.8rem;">{winner_row["Participant"]}</h2>'
+                f'<div style="font-size: 1.1rem; font-weight: bold; color: #fff;">{val}</div>'
+                f'<div style="font-size: 0.85rem; color: #8b93b8; margin-top: 8px;">{p["desc"]}</div>'
+                f'</div>'
+            )
             
     html += '</div>'
     return html
