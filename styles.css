@@ -1,69 +1,390 @@
-/* Table Styling */
-.dataframe {
-    border-collapse: collapse;
-    width: 100%;
-    font-size: 14px;
-    border-radius: 8px;
+/* ═══════════════════════════════════════════════════════════════
+   IPL Prediction Dashboard — Premium Dark Theme
+   ═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+/* ── Global ─────────────────────────────────────────────────── */
+html, body, [class*="css"] {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+/* App background */
+.stApp {
+    background: #09090f !important;
+}
+
+/* Main block container max-width */
+.block-container {
+    padding-top: 1.5rem !important;
+    padding-bottom: 3rem !important;
+    max-width: 1400px !important;
+}
+
+/* ── Tab Bar ────────────────────────────────────────────────── */
+.stTabs [data-baseweb="tab-list"] {
+    background: #13131e !important;
+    border-radius: 14px !important;
+    padding: 6px !important;
+    gap: 4px !important;
+    border: 1px solid rgba(255,255,255,0.07) !important;
+    overflow-x: auto;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background: transparent !important;
+    color: #8b93b8 !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    padding: 8px 18px !important;
+    border: none !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    background: rgba(255,255,255,0.06) !important;
+    color: #e2e8ff !important;
+}
+
+.stTabs [aria-selected="true"] {
+    background: linear-gradient(135deg, #7c5cff, #a855f7) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 16px rgba(124,92,255,0.35) !important;
+}
+
+.stTabs [data-baseweb="tab-highlight"] {
+    display: none !important;
+}
+
+/* Tab panel */
+.stTabs [data-baseweb="tab-panel"] {
+    padding-top: 1.5rem !important;
+}
+
+/* ── Metric Cards ────────────────────────────────────────────── */
+[data-testid="metric-container"] {
+    background: #13131e !important;
+    border: 1px solid rgba(255,255,255,0.07) !important;
+    border-radius: 14px !important;
+    padding: 18px 20px !important;
+    transition: border-color 0.2s, transform 0.15s !important;
+}
+
+[data-testid="metric-container"]:hover {
+    border-color: rgba(124,92,255,0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+[data-testid="stMetricLabel"] {
+    color: #8b93b8 !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+}
+
+[data-testid="stMetricValue"] {
+    color: #f0f0ff !important;
+    font-size: 1.6rem !important;
+    font-weight: 800 !important;
+}
+
+[data-testid="stMetricDelta"] {
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.stButton > button {
+    background: linear-gradient(135deg, #7c5cff, #a855f7) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.88rem !important;
+    padding: 10px 20px !important;
+    transition: all 0.2s !important;
+    box-shadow: 0 4px 14px rgba(124,92,255,0.3) !important;
+}
+
+.stButton > button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(124,92,255,0.45) !important;
+}
+
+/* Download button variant */
+.stDownloadButton > button {
+    background: #1a1a2a !important;
+    border: 1px solid rgba(124,92,255,0.5) !important;
+    color: #a78bfa !important;
+    box-shadow: none !important;
+}
+
+.stDownloadButton > button:hover {
+    background: rgba(124,92,255,0.12) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* ── Selectbox / Inputs ──────────────────────────────────────── */
+.stSelectbox [data-baseweb="select"] > div,
+.stTextInput > div > div > input {
+    background: #13131e !important;
+    border: 1px solid rgba(255,255,255,0.09) !important;
+    border-radius: 10px !important;
+    color: #f0f0ff !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+.stSelectbox [data-baseweb="select"] > div:hover,
+.stTextInput > div > div > input:focus {
+    border-color: rgba(124,92,255,0.5) !important;
+}
+
+/* ── Dataframes ──────────────────────────────────────────────── */
+[data-testid="stDataFrame"] {
+    border-radius: 14px !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(255,255,255,0.07) !important;
+}
+
+/* ── Expander ────────────────────────────────────────────────── */
+[data-testid="stExpander"] {
+    background: #13131e !important;
+    border: 1px solid rgba(255,255,255,0.07) !important;
+    border-radius: 14px !important;
+    overflow: hidden !important;
+}
+
+[data-testid="stExpander"] summary {
+    font-weight: 600 !important;
+    color: #c4c9e8 !important;
+    padding: 14px 18px !important;
+}
+
+[data-testid="stExpander"] summary:hover {
+    color: #fff !important;
+    background: rgba(255,255,255,0.03) !important;
+}
+
+/* ── Info / Alert boxes ──────────────────────────────────────── */
+[data-testid="stAlert"] {
+    background: rgba(124,92,255,0.10) !important;
+    border: 1px solid rgba(124,92,255,0.30) !important;
+    border-radius: 12px !important;
+    color: #c4b5fd !important;
+}
+
+/* ── Divider ─────────────────────────────────────────────────── */
+hr {
+    border-color: rgba(255,255,255,0.07) !important;
+    margin: 1.2rem 0 !important;
+}
+
+/* ── File uploader ───────────────────────────────────────────── */
+[data-testid="stFileUploadDropzone"] {
+    background: #13131e !important;
+    border: 1px dashed rgba(124,92,255,0.4) !important;
+    border-radius: 12px !important;
+    color: #8b93b8 !important;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #13131e; }
+::-webkit-scrollbar-thumb { background: #2a2a44; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #7c5cff; }
+
+/* ═══════════════════════════════════════════════════════════════
+   CUSTOM COMPONENT STYLES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Dashboard Header ────────────────────────────────────────── */
+.ipl-header {
+    background: linear-gradient(135deg, #13131e 0%, #1a1230 100%);
+    border: 1px solid rgba(124,92,255,0.2);
+    border-radius: 20px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    position: relative;
     overflow: hidden;
 }
 
-/* Table Header */
-.dataframe th {
-    background-color: #1f1f1f;
-    color: #ffffff;
-    padding: 10px;
-    text-align: center;
+.ipl-header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(124,92,255,0.18) 0%, transparent 70%);
+    pointer-events: none;
 }
 
-/* Table Rows */
-.dataframe td {
-    padding: 10px;
-    text-align: center;
-    border-bottom: 1px solid #444;
+.ipl-header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 160px; height: 160px;
+    background: radial-gradient(circle, rgba(255,107,53,0.12) 0%, transparent 70%);
+    pointer-events: none;
 }
 
-/* Alternate Row Color */
-.dataframe tr:nth-child(even) {
-    background-color: #2b2b2b;
+.ipl-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #fff 30%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
 }
 
-/* Hover Effect */
-.dataframe tr:hover {
-    background-color: #3a3a3a;
-}
-    
-.dataframe tr {
-    transition: all 0.2s ease-in-out;
+.ipl-subtitle {
+    font-size: 0.9rem;
+    color: #8b93b8;
+    margin-top: 4px;
 }
 
-.dataframe tr:hover {
-    transform: scale(1.02);
-    background-color: #44475a; /* Updated background on hover */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Soft shadow */
-    z-index: 2;
-    position: relative;
-    font-size: 16px; /* Grows from 14px to 16px */
-    font-weight: 600;
-}
-
-/* Icons Styling */
-.tick { color: limegreen; font-size: 18px; }
-.cross { color: red; font-size: 18px; }
-.dash { color: grey; font-size: 18px; }
-    
-.matchwise-points {
-    display: flex;
-    gap: 6px;
-}
-
-.matchwise-points span {
-    padding: 4px 12px;
-    border-radius: 50px;  /* Makes it a pill */
-    font-weight: bold;
-    font-size: 14px;
-    color: white;
-    background-color: #17a2b8; /* Single color (Teal) */
-    min-width: 35px;
-    text-align: center;
+.ipl-badge {
     display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(124,92,255,0.15);
+    border: 1px solid rgba(124,92,255,0.35);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #a78bfa;
+    letter-spacing: 0.5px;
+    margin-top: 10px;
 }
+
+/* ── Podium Cards ────────────────────────────────────────────── */
+.podium-card {
+    border-radius: 18px;
+    padding: 22px 18px;
+    text-align: center;
+    border: 2px solid;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.podium-card::before {
+    content: '';
+    position: absolute;
+    top: -30px; left: 50%;
+    transform: translateX(-50%);
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+.podium-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
+
+.podium-medal  { font-size: 2.8rem; display: block; margin-bottom: 8px; }
+.podium-name   { font-size: 1.2rem; font-weight: 700; margin: 4px 0; }
+.podium-pts    { font-size: 2rem; font-weight: 900; margin: 6px 0; }
+.podium-stats  { font-size: 0.8rem; color: #8b93b8; margin-top: 4px; }
+
+/* ── Section Label ───────────────────────────────────────────── */
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 28px 0 14px;
+}
+
+.section-label h3 {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #8b93b8;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.section-label .section-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.07);
+}
+
+/* ── Leaderboard Table Rows ──────────────────────────────────── */
+.lb-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 4px;
+    font-size: 0.9rem;
+}
+
+.lb-table thead th {
+    background: #13131e;
+    color: #8b93b8;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.lb-table tbody tr {
+    background: #13131e;
+    transition: background 0.15s;
+}
+
+.lb-table tbody tr:hover { background: #1e1e32; }
+
+.lb-table tbody td {
+    padding: 10px 14px;
+    color: #f0f0ff;
+    border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.lb-table tbody tr:first-child td { border-radius: 10px 10px 0 0; background: rgba(255,215,0,0.06); }
+.lb-table tbody tr:nth-child(2) td { background: rgba(192,192,192,0.06); }
+.lb-table tbody tr:nth-child(3) td { background: rgba(205,127,50,0.06); }
+
+.rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.85rem;
+}
+
+.rank-1 { background: rgba(255,215,0,0.2);   color: #FFD700; }
+.rank-2 { background: rgba(192,192,192,0.2); color: #C0C0C0; }
+.rank-3 { background: rgba(205,127,50,0.2);  color: #CD7F32; }
+.rank-n { background: rgba(255,255,255,0.07); color: #8b93b8; }
+
+.change-up   { color: #22c55e; font-weight: 700; }
+.change-down { color: #ef4444; font-weight: 700; }
+.change-same { color: #8b93b8; }
+
+/* ── Last 5 pill ─────────────────────────────────────────────── */
+.matchwise-points span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 24px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.78rem;
+    margin: 0 1px;
+    background: rgba(124,92,255,0.2);
+    color: #c4b5fd;
+}
+
+/* ── Streak bars ─────────────────────────────────────────────── */
+.streak-val-win  { color: #22c55e; font-weight: 700; }
+.streak-val-loss { color: #ef4444; font-weight: 700; }

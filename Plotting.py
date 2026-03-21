@@ -4,6 +4,13 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 import time
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+from matplotlib.patches import FancyBboxPatch
+from datetime import datetime
+
 
 team_colors = {
     'Chennai Super Kings': '#F9CD05',  # Yellow
@@ -280,3 +287,265 @@ def plot_position_graph(points_progression):
     fig.update_yaxes(autorange="reversed")
     fig.write_image("The Visuals/position_graph.png", format="png", scale=4)
     return fig
+
+
+def plot_streak_heatmap(leaderboard_df):
+    """Heatmap comparing win/loss streaks across all participants."""
+    df = leaderboard_df[["Participant", "Longest Winning Streak", "Longest Losing Streak"]].copy()
+    df = df.sort_values("Longest Winning Streak", ascending=False)
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        name="🔥 Win Streak",
+        x=df["Participant"],
+        y=df["Longest Winning Streak"],
+        marker_color="#22c55e",
+        text=df["Longest Winning Streak"],
+        textposition="auto",
+    ))
+
+    fig.add_trace(go.Bar(
+        name="❄️ Loss Streak",
+        x=df["Participant"],
+        y=df["Longest Losing Streak"],
+        marker_color="#ef4444",
+        text=df["Longest Losing Streak"],
+        textposition="auto",
+    ))
+
+    fig.update_layout(
+        barmode="group",
+        title="🏆 Longest Win & Loss Streaks",
+        xaxis_title="Participant",
+        yaxis_title="Streak Length (Matches)",
+        template="plotly_dark",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    )
+    return fig
+
+
+def plot_h2h_comparison(h2h_df, p1, p2):
+    """Dual line chart showing cumulative points for two participants in H2H."""
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=h2h_df["Match #"],
+        y=h2h_df[f"{p1} Cumulative"],
+        mode="lines+markers",
+        name=p1,
+        line=dict(width=3, shape="spline"),
+        marker=dict(size=5),
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=h2h_df["Match #"],
+        y=h2h_df[f"{p2} Cumulative"],
+        mode="lines+markers",
+        name=p2,
+        line=dict(width=3, shape="spline"),
+        marker=dict(size=5),
+    ))
+
+    fig.update_layout(
+        title=f"📈 Cumulative Points: {p1} vs {p2}",
+        xaxis_title="Match #",
+        yaxis_title="Cumulative Points",
+        template="plotly_dark",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    )
+    return fig
+
+
+def generate_leaderboard_card(leaderboard_df, output_path="The Visuals/leaderboard_card.png"):
+    """
+    Generate a high-quality, dark-themed leaderboard summary image.
+    Includes a top-3 podium section and a full ranked leaderboard table.
+    Saved to output_path and returned as bytes for Streamlit download.
+    """
+    BG        = "#0e1117"
+    CARD_BG   = "#1a1d27"
+    ACCENT    = "#262b3d"
+    TEXT      = "#f0f2f6"
+    SUBTEXT   = "#8b96b0"
+    GOLD      = "#FFD700"
+    SILVER    = "#C0C0C0"
+    BRONZE    = "#CD7F32"
+    GREEN     = "#22c55e"
+    RED       = "#ef4444"
+
+    medal_colors  = [GOLD, SILVER, BRONZE]
+    medal_labels  = ["#1  GOLD", "#2  SILVER", "#3  BRONZE"]
+    podium_bg     = ["#2a2200", "#1e1e1e", "#211408"]
+    podium_border = [GOLD, SILVER, BRONZE]
+
+    # ── Sort and prepare data ──────────────────────────────────────────────
+    lb = leaderboard_df.sort_values("Rank").reset_index(drop=True)
+    top3 = lb[lb["Rank"] <= 3].head(3)
+
+    # Strip HTML from Last 5 (just use the text representations)
+    def safe_str(val):
+        """Return a plain-text version of any value."""
+        import re
+        return re.sub(r"<[^>]+>", "", str(val)).strip() if val else ""
+
+    last5_raw = lb.get("Last 5 Matches", pd.Series([""] * len(lb)))
+    accuracies = lb.get("Accuracy (%)", pd.Series([0.0] * len(lb)))
+    streaks_w  = lb.get("Longest Winning Streak", pd.Series([0] * len(lb)))
+    streaks_l  = lb.get("Longest Losing Streak", pd.Series([0] * len(lb)))
+
+    # ── Figure setup ──────────────────────────────────────────────────────
+    n_rows  = len(lb)
+    fig_h   = 4.0 + 0.42 * n_rows   # dynamic height
+    fig, ax = plt.subplots(figsize=(16, fig_h), facecolor=BG)
+    ax.set_facecolor(BG)
+    ax.axis("off")
+
+    total_h = 1.0   # normalized height canvas
+    y_cursor = 0.99  # starts near top
+
+    # ── Title ─────────────────────────────────────────────────────────────
+    title_h = 0.072
+    fig.text(0.5, y_cursor - title_h * 0.45,
+             "IPL Prediction Game 2025  |  Leaderboard",
+             ha="center", va="center", fontsize=26, fontweight="bold",
+             color=TEXT, fontfamily="DejaVu Sans")
+    fig.text(0.5, y_cursor - title_h * 0.85,
+             f"Generated  {datetime.now().strftime('%d %b %Y, %I:%M %p')}",
+             ha="center", va="center", fontsize=11, color=SUBTEXT)
+    y_cursor -= title_h + 0.01
+
+    # ── Podium Cards (top 3) ───────────────────────────────────────────────
+    podium_h   = 0.20
+    card_w     = 0.27
+    card_gap   = 0.025
+    start_x    = 0.5 - (3 * card_w + 2 * card_gap) / 2
+
+    for i, (_, row) in enumerate(top3.iterrows()):
+        cx = start_x + i * (card_w + card_gap)
+        cy = y_cursor - podium_h
+
+        # Card background
+        card = FancyBboxPatch((cx, cy), card_w, podium_h,
+                              boxstyle="round,pad=0.01",
+                              facecolor=podium_bg[i],
+                              edgecolor=podium_border[i],
+                              linewidth=2.5,
+                              transform=fig.transFigure, clip_on=False)
+        fig.add_artist(card)
+
+        cx_mid = cx + card_w / 2
+
+        fig.text(cx_mid, cy + podium_h * 0.82,
+                 medal_labels[i], ha="center", va="center",
+                 fontsize=15, color=medal_colors[i], fontweight="bold",
+                 transform=fig.transFigure)
+        fig.text(cx_mid, cy + podium_h * 0.57,
+                 row["Participant"], ha="center", va="center",
+                 fontsize=17, fontweight="bold", color=TEXT,
+                 transform=fig.transFigure)
+        fig.text(cx_mid, cy + podium_h * 0.36,
+                 f"{int(row['Points'])} pts",
+                 ha="center", va="center",
+                 fontsize=22, fontweight="black", color=medal_colors[i],
+                 transform=fig.transFigure)
+        accuracy = accuracies.iloc[i] if i < len(accuracies) else 0
+        correct  = int(row.get("Correct Predictions", 0))
+        fig.text(cx_mid, cy + podium_h * 0.14,
+                 f"{accuracy:.1f}% accuracy  ·  {correct} correct",
+                 ha="center", va="center",
+                 fontsize=10, color=SUBTEXT, transform=fig.transFigure)
+
+    y_cursor -= podium_h + 0.025
+
+    # ── Full Leaderboard Table ─────────────────────────────────────────────
+    col_labels  = ["Rank", "Participant", "Points", "Accuracy", "Last 5", "W-Streak", "L-Streak"]
+    col_widths  = [0.06,    0.18,          0.09,     0.10,       0.25,     0.09,        0.09     ]
+    col_aligns  = ["center","left",        "center", "center",   "left",   "center",    "center"  ]
+    row_h       = 0.048
+
+    # Header
+    x_starts = [0.03]
+    for w in col_widths[:-1]:
+        x_starts.append(x_starts[-1] + w)
+
+    # Header background
+    hdr_bg = FancyBboxPatch((0.02, y_cursor - row_h), 0.96, row_h,
+                             boxstyle="round,pad=0.005",
+                             facecolor=ACCENT, edgecolor="none",
+                             transform=fig.transFigure, clip_on=False)
+    fig.add_artist(hdr_bg)
+
+    for j, (label, xs, al) in enumerate(zip(col_labels, x_starts, col_aligns)):
+        tx = xs if al == "left" else xs + col_widths[j] / 2
+        fig.text(tx, y_cursor - row_h * 0.5,
+                 label, ha=al, va="center",
+                 fontsize=11, fontweight="bold", color=SUBTEXT,
+                 transform=fig.transFigure)
+
+    y_cursor -= row_h + 0.004
+
+    # Rows
+    for idx, row in lb.iterrows():
+        rank      = int(row["Rank"])
+        bg_color  = "#1c1f2e" if idx % 2 == 0 else CARD_BG
+
+        row_rect = FancyBboxPatch((0.02, y_cursor - row_h), 0.96, row_h,
+                                  boxstyle="round,pad=0.003",
+                                  facecolor=bg_color, edgecolor="none",
+                                  transform=fig.transFigure, clip_on=False)
+        fig.add_artist(row_rect)
+
+        # Rank badge color
+        if rank == 1:   rank_col = GOLD
+        elif rank == 2: rank_col = SILVER
+        elif rank == 3: rank_col = BRONZE
+        else:           rank_col = TEXT
+
+        last5_str = safe_str(lb.at[idx, "Last 5 Matches"]) if "Last 5 Matches" in lb.columns else ""
+        # Replace emoji with plain text equivalents (emoji fonts not available in matplotlib)
+        last5_str = (
+            last5_str
+            .replace("\u2705", "W")   # ✅ -> W
+            .replace("\u274c", "L")   # ❌ -> L
+            .replace("\u2796", "D")   # ➖ -> D (draw / NR)
+            .replace("\u2764", "-")
+        )
+        accuracy_val = accuracies.iloc[idx] if idx < len(accuracies) else 0
+        wstreak = int(streaks_w.iloc[idx]) if idx < len(streaks_w) else 0
+        lstreak = int(streaks_l.iloc[idx]) if idx < len(streaks_l) else 0
+
+        row_data = [
+            (str(rank),                   rank_col,  col_aligns[0]),
+            (str(row["Participant"]),      TEXT,      col_aligns[1]),
+            (str(int(row["Points"])),      TEXT,      col_aligns[2]),
+            (f"{accuracy_val:.1f}%",       SUBTEXT,   col_aligns[3]),
+            (last5_str,                    TEXT,      col_aligns[4]),
+            (str(wstreak),                 GREEN,     col_aligns[5]),
+            (str(lstreak),                 RED,       col_aligns[6]),
+        ]
+
+        for j, (val, color, align) in enumerate(row_data):
+            tx = x_starts[j] if align == "left" else x_starts[j] + col_widths[j] / 2
+            fig.text(tx, y_cursor - row_h * 0.5,
+                     val, ha=align, va="center",
+                     fontsize=11, color=color, fontweight="bold" if j == 0 else "normal",
+                     transform=fig.transFigure)
+
+        y_cursor -= row_h + 0.003
+
+    # ── Footer ────────────────────────────────────────────────────────────
+    fig.text(0.5, 0.012,
+             "IPL Prediction Game 2025  |  Powered by Streamlit",
+             ha="center", va="bottom", fontsize=9, color=SUBTEXT,
+             transform=fig.transFigure)
+
+    plt.tight_layout(pad=0)
+    plt.savefig(output_path, dpi=180, bbox_inches="tight",
+                facecolor=BG, edgecolor="none")
+
+    with open(output_path, "rb") as f:
+        img_bytes = f.read()
+
+    plt.close(fig)
+    return img_bytes
