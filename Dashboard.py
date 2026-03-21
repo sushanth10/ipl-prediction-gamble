@@ -178,6 +178,7 @@ def main():
     difficulty_df = ExtractAndTransform.get_match_difficulty(results_df, predictions, schedule_df)
     agree_matrix = ExtractAndTransform.get_agreement_matrix(predictions, results_df)
     points_dist = ExtractAndTransform.get_points_distribution(results_df, predictions)
+    stadium_df = ExtractAndTransform.get_stadium_luck(results_df, predictions, schedule_df)
 
     # Merge advanced metrics into main leaderboard for display
     leaderboard_df = pd.merge(leaderboard_df, advanced_metrics_df, on="Participant", how="left")
@@ -493,6 +494,15 @@ def main():
         )
         st.plotly_chart(Plotting.plot_team_accuracy_heatmap(team_acc_matrix), use_container_width=True)
         
+        st.write("\n\n")
+        section_label("🗺️", "Stadium Luck Map")
+        st.markdown(
+            '<p style="color:#8b93b8;font-size:0.88rem;margin-bottom:10px;">'
+            'An interactive map of India showing all IPL stadiums. Hover to see which predictor has the most wins (Lucky) and losses (Unlucky) at each ground.</p>',
+            unsafe_allow_html=True
+        )
+        st.plotly_chart(Plotting.plot_stadium_map(stadium_df), use_container_width=True)
+
         st.write("\n\n")
         col_pts, col_agree = st.columns([1, 1.2])
         

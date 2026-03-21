@@ -460,3 +460,83 @@ def get_points_distribution(results_df, predictions):
                 buckets["0 pts"] += 1
         rows.append({"Participant": p, **buckets})
     return pd.DataFrame(rows)
+
+
+def get_stadium_luck(results_df, predictions, schedule_df):
+    """Return a DataFrame mapping each IPL stadium to its Lucky and Unlucky predictors."""
+    STADIUMS = {
+        "Chennai Super Kings": {"Stadium": "M. A. Chidambaram Stadium", "Lat": 13.0628, "Lon": 80.2793},
+        "Delhi Capitals": {"Stadium": "Arun Jaitley Stadium", "Lat": 28.6378, "Lon": 77.2432},
+        "Gujarat Titans": {"Stadium": "Narendra Modi Stadium", "Lat": 23.0917, "Lon": 72.5975},
+        "Kolkata Knight Riders": {"Stadium": "Eden Gardens", "Lat": 22.5646, "Lon": 88.3433},
+        "Lucknow Super Giants": {"Stadium": "Ekana Cricket Stadium", "Lat": 26.8115, "Lon": 81.0152},
+        "Mumbai Indians": {"Stadium": "Wankhede Stadium", "Lat": 18.9389, "Lon": 72.8256},
+        "Punjab Kings": {"Stadium": "M. Yadavindra Singh Stadium", "Lat": 30.7760, "Lon": 76.7589},
+        "Rajasthan Royals": {"Stadium": "Sawai Mansingh Stadium", "Lat": 26.8940, "Lon": 75.8033},
+        "Royal Challengers Bengaluru": {"Stadium": "M. Chinnaswamy Stadium", "Lat": 12.9788, "Lon": 77.5996},
+        "Sunrisers Hyderabad": {"Stadium": "Rajiv Gandhi Intl Stadium", "Lat": 17.4065, "Lon": 78.5505}
+    }
+    
+    completed = results_df.dropna(subset=["Winner"]).reset_index(drop=True)
+    participants = list(predictions.keys())
+    
+    # Initialize trackers for each team (stadium)
+    stadium_stats = {team: {p: {"wins": 0, "losses": 0} for p in participants} for team in STADIUMS.keys()}
+    
+    for i, row in completed.iterrows():
+        actual = row["Winner"]
+        if actual == "NR":
+            continue
+            
+        home_team = row.get("Home Team")
+        match_idx = int(row["Match #"]) - 1
+        
+        # If home_team isn't in schedule_df directly, we should get it from schedule
+        if pd.isna(home_team) or not home_team:
+            sched_row = schedule_df[schedule_df["Match #"].astype(str) == str(row["Match #"])]
+            if not sched_row.empty:
+                home_team = sched_row.iloc[0]["Home Team"]
+                
+        if pd.notna(home_team) and home_team in STADIUMS:
+            for p in participants:
+                if match_idx < len(predictions[p]):
+                    if predictions[p][match_idx] == actual:
+                        stadium_stats[home_team][p]["wins"] += 1
+                    else:
+                        stadium_stats[home_team][p]["losses"] += 1
+
+    # Compile the final dataframe
+    rows = []
+    for team, info in STADIUMS.items():
+        stats = stadium_stats[team]
+        
+        # Find lucky (max wins)
+        lucky_p = max(participants, key=lambda p: stats[p]["wins"])
+        lucky_wins = stats[lucky_p]["wins"]
+        
+        # Find unlucky (max losses)
+        unlucky_p = max(participants, key=lambda p: stats[p]["losses"])
+        unlucky_losses = stats[unlucky_p]["losses"]
+        
+        # If no matches played yet, handle gracefully
+        if lucky_wins == 0 and unlucky_losses == 0:
+            lucky_str = "None (0 Wins)"
+            unlucky_str = "None (0 Losses)"
+        else:
+            # Handle ties by joining names
+            lucky_ties = [p for p in participants if stats[p]["wins"] == lucky_wins]
+            unlucky_ties = [p for p in participants if stats[p]["losses"] == unlucky_losses]
+            
+            lucky_str = f"{', '.join(lucky_ties)} ({lucky_wins} Wins)" if lucky_wins > 0 else "None"
+            unlucky_str = f"{', '.join(unlucky_ties)} ({unlucky_losses} Losses)" if unlucky_losses > 0 else "None"
+            
+        rows.append({
+            "Team": team,
+            "Stadium": info["Stadium"],
+            "Lat": info["Lat"],
+            "Lon": info["Lon"],
+            "Lucky Predictor": lucky_str,
+            "Unlucky Predictor": unlucky_str
+        })
+        
+    return pd.DataFrame(rows)

@@ -767,3 +767,35 @@ def plot_personality_cards(advanced_df):
             
     html += '</div>'
     return html
+
+
+def plot_stadium_map(stadium_df):
+    """Plot an interactive map of India showing IPL stadiums with lucky/unlucky predictors."""
+    fig = px.scatter_mapbox(
+        stadium_df, 
+        lat="Lat", 
+        lon="Lon", 
+        hover_name="Stadium",
+        hover_data={
+            "Lat": False,
+            "Lon": False,
+            "Team": True,
+            "Lucky Predictor": True,
+            "Unlucky Predictor": True
+        },
+        color_discrete_sequence=["#a78bfa"],
+        zoom=3.8, 
+        center={"lat": 22.0, "lon": 79.0},
+        height=600
+    )
+    
+    fig.update_traces(marker=dict(size=14, opacity=0.8, symbol="circle"))
+    
+    fig.update_layout(
+        title="🗺️ India Stadiums: Lucky & Unlucky Predictors",
+        mapbox_style="carto-darkmatter",
+        template="plotly_dark",
+        margin=dict(l=10, r=10, t=50, b=10)
+    )
+    
+    return fig
