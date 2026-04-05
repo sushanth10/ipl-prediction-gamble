@@ -4,7 +4,9 @@ import os
 import streamlit as st
 
 def prediction_counts_analysis(predictions):
-    counts_df = pd.DataFrame(predictions)
+    max_len = max(len(v) for v in predictions.values())
+    padded = {k: v + [''] * (max_len - len(v)) for k, v in predictions.items()}
+    counts_df = pd.DataFrame(padded)
     counts_df = counts_df.apply(pd.Series.value_counts).T.fillna(0).astype(int)
     return counts_df
 

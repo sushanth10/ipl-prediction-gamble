@@ -357,7 +357,7 @@ def plot_h2h_comparison(h2h_df, p1, p2):
     return fig
 
 
-def generate_leaderboard_card(leaderboard_df, output_path="The Visuals/leaderboard_card.png"):
+def generate_leaderboard_card(leaderboard_df, output_path="The Visuals/leaderboard_card.png", total_matches=0):
     """
     Generate a high-quality, dark-themed leaderboard summary image.
     Includes a top-3 podium section and a full ranked leaderboard table.
@@ -390,6 +390,7 @@ def generate_leaderboard_card(leaderboard_df, output_path="The Visuals/leaderboa
         return re.sub(r"<[^>]+>", "", str(val)).strip() if val else ""
 
     last5_raw = lb.get("Last 5 Matches", pd.Series([""] * len(lb)))
+    last5_pts = lb.get("Matchwise Points (Last 5)", pd.Series([[]] * len(lb)))
     accuracies = lb.get("Accuracy (%)", pd.Series([0.0] * len(lb)))
     streaks_w  = lb.get("Longest Winning Streak", pd.Series([0] * len(lb)))
     streaks_l  = lb.get("Longest Losing Streak", pd.Series([0] * len(lb)))
@@ -404,64 +405,52 @@ def generate_leaderboard_card(leaderboard_df, output_path="The Visuals/leaderboa
     total_h = 1.0   # normalized height canvas
     y_cursor = 0.99  # starts near top
 
-    # ── Title ─────────────────────────────────────────────────────────────
-    title_h = 0.072
-    fig.text(0.5, y_cursor - title_h * 0.45,
-             "IPL Prediction Game 2025  |  Leaderboard",
-             ha="center", va="center", fontsize=26, fontweight="bold",
-             color=TEXT, fontfamily="DejaVu Sans")
-    fig.text(0.5, y_cursor - title_h * 0.85,
-             f"Generated  {datetime.now().strftime('%d %b %Y, %I:%M %p')}",
-             ha="center", va="center", fontsize=11, color=SUBTEXT)
-    y_cursor -= title_h + 0.01
+    # ── Title & Header ────────────────────────────────────────────────────
+    # Main Header Text
+    fig.text(0.02, y_cursor - 0.03, "IPL Prediction Dashboard 2026", 
+             fontsize=28, fontweight="bold", color=TEXT, fontfamily="DejaVu Sans", ha="left")
 
-    # ── Podium Cards (top 3) ───────────────────────────────────────────────
-    podium_h   = 0.20
-    card_w     = 0.27
-    card_gap   = 0.025
-    start_x    = 0.5 - (3 * card_w + 2 * card_gap) / 2
+    # Badge
+    badge = FancyBboxPatch((0.025, y_cursor - 0.080), 0.16, 0.025,
+                           boxstyle="round,pad=0.005", facecolor="#2c1f38", edgecolor="#4e336b",
+                           transform=fig.transFigure, clip_on=False)
+    fig.add_artist(badge)
+    fig.text(0.03, y_cursor - 0.067, "RCB \u2014 Defending Champions", fontsize=10, color="#b29ee3", fontweight="bold")
+    
+    # ── KPIs ───────────────────────────────────────────────────────────────
+    if len(lb) > 0:
+        leader_name = lb.iloc[0]["Participant"]
+        leader_pts  = f"{int(lb.iloc[0]['Points'])} pts"
+    else:
+        leader_name, leader_pts = "-", "-"
+    
+    parts   = f"{len(lb)}"
+    avg_acc = f"{accuracies.mean() if len(accuracies) > 0 else 0:.1f}%"
+    
+    # KPI 1. Leader
+    fig.text(0.025, y_cursor - 0.15, "LEADER", fontsize=10, color=SUBTEXT, fontweight="bold")
+    fig.text(0.025, y_cursor - 0.175, leader_name, fontsize=18, color=TEXT, fontweight="bold")
+    fig.text(0.025, y_cursor - 0.198, leader_pts, fontsize=11, color=GREEN)
 
-    for i, (_, row) in enumerate(top3.iterrows()):
-        cx = start_x + i * (card_w + card_gap)
-        cy = y_cursor - podium_h
+    # KPI 2. Matches
+    fig.text(0.30, y_cursor - 0.15, "MATCHES PLAYED", fontsize=10, color=SUBTEXT, fontweight="bold")
+    fig.text(0.30, y_cursor - 0.175, str(total_matches), fontsize=18, color=TEXT, fontweight="bold")
+    fig.text(0.30, y_cursor - 0.198, "of 70 league", fontsize=11, color=GREEN)
 
-        # Card background
-        card = FancyBboxPatch((cx, cy), card_w, podium_h,
-                              boxstyle="round,pad=0.01",
-                              facecolor=podium_bg[i],
-                              edgecolor=podium_border[i],
-                              linewidth=2.5,
-                              transform=fig.transFigure, clip_on=False)
-        fig.add_artist(card)
+    # KPI 3. Participants
+    fig.text(0.58, y_cursor - 0.15, "PARTICIPANTS", fontsize=10, color=SUBTEXT, fontweight="bold")
+    fig.text(0.58, y_cursor - 0.175, parts, fontsize=18, color=TEXT, fontweight="bold")
+    
+    # KPI 4. Avg Accuracy
+    fig.text(0.80, y_cursor - 0.15, "AVG ACCURACY", fontsize=10, color=SUBTEXT, fontweight="bold")
+    fig.text(0.80, y_cursor - 0.175, avg_acc, fontsize=18, color=TEXT, fontweight="bold")
 
-        cx_mid = cx + card_w / 2
-
-        fig.text(cx_mid, cy + podium_h * 0.82,
-                 medal_labels[i], ha="center", va="center",
-                 fontsize=15, color=medal_colors[i], fontweight="bold",
-                 transform=fig.transFigure)
-        fig.text(cx_mid, cy + podium_h * 0.57,
-                 row["Participant"], ha="center", va="center",
-                 fontsize=17, fontweight="bold", color=TEXT,
-                 transform=fig.transFigure)
-        fig.text(cx_mid, cy + podium_h * 0.36,
-                 f"{int(row['Points'])} pts",
-                 ha="center", va="center",
-                 fontsize=22, fontweight="black", color=medal_colors[i],
-                 transform=fig.transFigure)
-        accuracy = accuracies.iloc[i] if i < len(accuracies) else 0
-        correct  = int(row.get("Correct Predictions", 0))
-        fig.text(cx_mid, cy + podium_h * 0.14,
-                 f"{accuracy:.1f}% accuracy  ·  {correct} correct",
-                 ha="center", va="center",
-                 fontsize=10, color=SUBTEXT, transform=fig.transFigure)
-
-    y_cursor -= podium_h + 0.025
+    y_cursor -= 0.25
 
     # ── Full Leaderboard Table ─────────────────────────────────────────────
-    col_labels  = ["Rank", "Participant", "Points", "Accuracy", "Last 5", "W-Streak", "L-Streak"]
-    col_widths  = [0.06,    0.18,          0.09,     0.10,       0.25,     0.09,        0.09     ]
-    col_aligns  = ["center","left",        "center", "center",   "left",   "center",    "center"  ]
+    col_labels  = ["Rank", "Participant", "Points", "Accuracy", "Last 5 Form", "Last 5 Pts", "W-Streak", "L-Streak"]
+    col_widths  = [0.06,    0.16,          0.09,     0.10,       0.20,          0.13,         0.09,        0.09     ]
+    col_aligns  = ["center","left",        "center", "center",   "left",        "left",       "center",    "center"  ]
     row_h       = 0.048
 
     # Header
@@ -515,14 +504,20 @@ def generate_leaderboard_card(leaderboard_df, output_path="The Visuals/leaderboa
         wstreak = int(streaks_w.iloc[idx]) if idx < len(streaks_w) else 0
         lstreak = int(streaks_l.iloc[idx]) if idx < len(streaks_l) else 0
 
+        # Extract Last 5 Points (using regex to strip HTML and space out)
+        vals = last5_pts.iloc[idx] if idx < len(last5_pts) else ""
+        import re
+        pts_str = "  ".join(re.findall(r">(\d+)<", str(vals)))
+
         row_data = [
             (str(rank),                   rank_col,  col_aligns[0]),
             (str(row["Participant"]),      TEXT,      col_aligns[1]),
             (str(int(row["Points"])),      TEXT,      col_aligns[2]),
             (f"{accuracy_val:.1f}%",       SUBTEXT,   col_aligns[3]),
             (last5_str,                    TEXT,      col_aligns[4]),
-            (str(wstreak),                 GREEN,     col_aligns[5]),
-            (str(lstreak),                 RED,       col_aligns[6]),
+            (pts_str,                      TEXT,      col_aligns[5]),
+            (str(wstreak),                 GREEN,     col_aligns[6]),
+            (str(lstreak),                 RED,       col_aligns[7]),
         ]
 
         for j, (val, color, align) in enumerate(row_data):
@@ -536,7 +531,7 @@ def generate_leaderboard_card(leaderboard_df, output_path="The Visuals/leaderboa
 
     # ── Footer ────────────────────────────────────────────────────────────
     fig.text(0.5, 0.012,
-             "IPL Prediction Game 2025  |  Powered by Streamlit",
+             "IPL Prediction Game 2026",
              ha="center", va="bottom", fontsize=9, color=SUBTEXT,
              transform=fig.transFigure)
 
@@ -769,33 +764,39 @@ def plot_personality_cards(advanced_df):
     return html
 
 
-def plot_stadium_map(stadium_df):
-    """Plot an interactive map of India showing IPL stadiums with lucky/unlucky predictors."""
+def plot_stadium_map(stadium_df, user_name):
+    """Plot an interactive map of India showing stadium wins/losses for a specific predictor."""
+    # Create an artificial min-size to ensure 0-win stadiums still appear as a small dot
+    stadium_df["Bubble Size"] = stadium_df["Wins"].astype(float) + 0.1
+    
     fig = px.scatter_mapbox(
         stadium_df, 
         lat="Lat", 
         lon="Lon", 
         hover_name="Stadium",
+        size="Bubble Size",
+        color="Win %",
+        color_continuous_scale="Viridis",
         hover_data={
             "Lat": False,
             "Lon": False,
+            "Bubble Size": False,
             "Team": True,
-            "Lucky Predictor": True,
-            "Unlucky Predictor": True
+            "Wins": True,
+            "Losses": True,
+            "Win %": ":.1f"
         },
-        color_discrete_sequence=["#a78bfa"],
         zoom=3.8, 
         center={"lat": 22.0, "lon": 79.0},
         height=600
     )
     
-    fig.update_traces(marker=dict(size=14, opacity=0.8, symbol="circle"))
-    
     fig.update_layout(
-        title="🗺️ India Stadiums: Lucky & Unlucky Predictors",
+        title=f"🗺️ {user_name}'s Stadium Luck Map",
         mapbox_style="carto-darkmatter",
         template="plotly_dark",
-        margin=dict(l=10, r=10, t=50, b=10)
+        margin=dict(l=10, r=10, t=50, b=10),
+        coloraxis_colorbar=dict(title="Win %")
     )
     
     return fig

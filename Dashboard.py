@@ -126,7 +126,7 @@ def render_streak_table(leaderboard_df):
 def main():
     st.set_page_config(
         layout="wide",
-        page_title="IPL Prediction Dashboard 2025",
+        page_title="IPL Prediction Dashboard 2026",
         page_icon="🏏",
     )
 
@@ -139,17 +139,17 @@ def main():
     # ── Custom Header ────────────────────────────────────────────────────────
     st.markdown("""
     <div class="ipl-header">
-        <div class="ipl-title">🏏 IPL Prediction Dashboard 2025</div>
+        <div class="ipl-title">🏏 IPL Prediction Dashboard 2026</div>
         <div class="ipl-subtitle">Track predictions · Compare performances · Explore scenarios</div>
         <span class="ipl-badge">🏆 RCB — Defending Champions</span>
     </div>
     """, unsafe_allow_html=True)
 
     # ── Data Loading ─────────────────────────────────────────────────────────
-    schedule_path      = os.path.join(base_path, "The Schedule/ipl_2025_schedule.csv")
-    predictions_path   = os.path.join(base_path, "The Calculated Gambles")
-    old_predictions_path = os.path.join(base_path, "The Gambles")
-    results_path       = os.path.join(base_path, "The Results")
+    schedule_path        = os.path.join(base_path, "The Schedule/ipl_2026_schedule.csv")
+    predictions_path     = os.path.join(base_path, "The 2026 Gambles")
+    old_predictions_path = os.path.join(base_path, "The 2026 Gambles")  # same folder — no revision split yet
+    results_path         = os.path.join(base_path, "The 2026 Results")
 
     schedule_df = pd.read_csv(schedule_path)
     schedule_df.columns = schedule_df.columns.str.strip()
@@ -157,6 +157,14 @@ def main():
 
     predictions     = ExtractAndTransform.load_predictions(predictions_path)
     old_predictions = ExtractAndTransform.load_predictions(old_predictions_path)
+
+    # ── Guard: no predictions yet ────────────────────────────────────────────
+    if not predictions:
+        st.info(
+            "📂 **No prediction files found yet in `The 2026 Gambles/` folder.**\n\n"
+            "Have everyone fill in the bracket and drop their `.txt` files there to get started!"
+        )
+        st.stop()
 
     old_lb, _            = ExtractAndTransform.calculate_scores(results_df, old_predictions)
     leaderboard_df, points_progression = ExtractAndTransform.calculate_scores(results_df, predictions)
@@ -178,8 +186,6 @@ def main():
     difficulty_df = ExtractAndTransform.get_match_difficulty(results_df, predictions, schedule_df)
     agree_matrix = ExtractAndTransform.get_agreement_matrix(predictions, results_df)
     points_dist = ExtractAndTransform.get_points_distribution(results_df, predictions)
-    stadium_df = ExtractAndTransform.get_stadium_luck(results_df, predictions, schedule_df)
-
     # Merge advanced metrics into main leaderboard for display
     leaderboard_df = pd.merge(leaderboard_df, advanced_metrics_df, on="Participant", how="left")
 
@@ -191,7 +197,7 @@ def main():
 
     k1, k2, k3, k4 = st.columns(4)
     k1.metric("🥇 Leader", leader["Participant"], f"{int(leader['Points'])} pts")
-    k2.metric("📋 Matches Played", total_matches, f"of 74 league")
+    k2.metric("📋 Matches Played", total_matches, f"of 70 league")
     k3.metric("👥 Participants", num_participants)
     k4.metric("🎯 Avg Accuracy", f"{avg_accuracy:.1f}%")
 
@@ -212,9 +218,9 @@ def main():
 
     # ── TAB 1: Leaderboard ──────────────────────────────────────────────────
     with tab1:
-        # Shareable image
+        # Shareable leaderboard card
         card_path = os.path.join(base_path, "The Visuals/leaderboard_card.png")
-        img_bytes = Plotting.generate_leaderboard_card(leaderboard_df, output_path=card_path)
+        img_bytes = Plotting.generate_leaderboard_card(leaderboard_df, output_path=card_path, total_matches=total_matches)
 
         import datetime
         dl_col, prev_col = st.columns([1, 3])
@@ -230,9 +236,9 @@ def main():
             with st.expander("🖼️ Preview Card", expanded=False):
                 st.image(img_bytes, use_column_width=True)
 
-        # Podium
-        section_label("🏅", "Top Predictors")
-        render_podium(leaderboard_df)
+        # ── Podium / medal cards (commented out — re-enable when season is underway) ──
+        # section_label("🏅", "Top Predictors")
+        # render_podium(leaderboard_df)
 
         # Full leaderboard
         section_label("📊", "Full Leaderboard")
@@ -303,7 +309,9 @@ def main():
     # ── TAB 2: All Predictions ───────────────────────────────────────────────
     with tab2:
         section_label("📋", "All Predictions")
-        st.dataframe(pd.DataFrame(predictions), use_container_width=True, hide_index=True)
+        max_len = max(len(v) for v in predictions.values())
+        padded = {k: v + [''] * (max_len - len(v)) for k, v in predictions.items()}
+        st.dataframe(pd.DataFrame(padded), use_container_width=True, hide_index=True)
 
     # ── TAB 3: Matchwise Predictions ────────────────────────────────────────
     with tab3:
@@ -340,7 +348,9 @@ def main():
         Plotting.plot_home_away_ratio(home_away_ratio_counts)
 
         section_label("🏠", "Home / Away Prediction %")
-        percentage_df = Analysis.home_away_percentage(schedule_df, pd.DataFrame(predictions))
+        _max_len = max(len(v) for v in predictions.values())
+        _padded = {k: v + [''] * (_max_len - len(v)) for k, v in predictions.items()}
+        percentage_df = Analysis.home_away_percentage(schedule_df, pd.DataFrame(_padded))
         percentage_df.sort_values("Home", ascending=False, inplace=True)
         percentage_df = percentage_df.rename(columns={"Home": "Home %", "Away": "Away %"})
         st.plotly_chart(Plotting.plot_home_away_percentage(percentage_df), use_container_width=True)
@@ -498,10 +508,12 @@ def main():
         section_label("🗺️", "Stadium Luck Map")
         st.markdown(
             '<p style="color:#8b93b8;font-size:0.88rem;margin-bottom:10px;">'
-            'An interactive map of India showing all IPL stadiums. Hover to see which predictor has the most wins (Lucky) and losses (Unlucky) at each ground.</p>',
+            'An interactive map of India showing all IPL stadiums. Select a participant to see their lucky and unlucky grounds. Larger colored bubbles indicate more wins.</p>',
             unsafe_allow_html=True
         )
-        st.plotly_chart(Plotting.plot_stadium_map(stadium_df), use_container_width=True)
+        selected_map_user = st.selectbox("Select Participant for Stadium Map", list(predictions.keys()))
+        user_stadium_df = ExtractAndTransform.get_user_stadium_stats(results_df, predictions, schedule_df, selected_map_user)
+        st.plotly_chart(Plotting.plot_stadium_map(user_stadium_df, selected_map_user), use_container_width=True)
 
         st.write("\n\n")
         col_pts, col_agree = st.columns([1, 1.2])

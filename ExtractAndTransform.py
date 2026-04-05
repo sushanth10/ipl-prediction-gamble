@@ -462,8 +462,8 @@ def get_points_distribution(results_df, predictions):
     return pd.DataFrame(rows)
 
 
-def get_stadium_luck(results_df, predictions, schedule_df):
-    """Return a DataFrame mapping each IPL stadium to its Lucky and Unlucky predictors."""
+def get_user_stadium_stats(results_df, predictions, schedule_df, selected_user):
+    """Return a DataFrame mapping each IPL stadium to the wins and losses for a specific predictor."""
     STADIUMS = {
         "Chennai Super Kings": {"Stadium": "M. A. Chidambaram Stadium", "Lat": 13.0628, "Lon": 80.2793},
         "Delhi Capitals": {"Stadium": "Arun Jaitley Stadium", "Lat": 28.6378, "Lon": 77.2432},
@@ -478,10 +478,10 @@ def get_stadium_luck(results_df, predictions, schedule_df):
     }
     
     completed = results_df.dropna(subset=["Winner"]).reset_index(drop=True)
-    participants = list(predictions.keys())
     
     # Initialize trackers for each team (stadium)
-    stadium_stats = {team: {p: {"wins": 0, "losses": 0} for p in participants} for team in STADIUMS.keys()}
+    stadium_stats = {team: {"wins": 0, "losses": 0} for team in STADIUMS.keys()}
+    user_preds = predictions.get(selected_user, [])
     
     for i, row in completed.iterrows():
         actual = row["Winner"]
@@ -498,45 +498,28 @@ def get_stadium_luck(results_df, predictions, schedule_df):
                 home_team = sched_row.iloc[0]["Home Team"]
                 
         if pd.notna(home_team) and home_team in STADIUMS:
-            for p in participants:
-                if match_idx < len(predictions[p]):
-                    if predictions[p][match_idx] == actual:
-                        stadium_stats[home_team][p]["wins"] += 1
-                    else:
-                        stadium_stats[home_team][p]["losses"] += 1
+            if match_idx < len(user_preds):
+                if user_preds[match_idx] == actual:
+                    stadium_stats[home_team]["wins"] += 1
+                else:
+                    stadium_stats[home_team]["losses"] += 1
 
     # Compile the final dataframe
     rows = []
     for team, info in STADIUMS.items():
-        stats = stadium_stats[team]
-        
-        # Find lucky (max wins)
-        lucky_p = max(participants, key=lambda p: stats[p]["wins"])
-        lucky_wins = stats[lucky_p]["wins"]
-        
-        # Find unlucky (max losses)
-        unlucky_p = max(participants, key=lambda p: stats[p]["losses"])
-        unlucky_losses = stats[unlucky_p]["losses"]
-        
-        # If no matches played yet, handle gracefully
-        if lucky_wins == 0 and unlucky_losses == 0:
-            lucky_str = "None (0 Wins)"
-            unlucky_str = "None (0 Losses)"
-        else:
-            # Handle ties by joining names
-            lucky_ties = [p for p in participants if stats[p]["wins"] == lucky_wins]
-            unlucky_ties = [p for p in participants if stats[p]["losses"] == unlucky_losses]
-            
-            lucky_str = f"{', '.join(lucky_ties)} ({lucky_wins} Wins)" if lucky_wins > 0 else "None"
-            unlucky_str = f"{', '.join(unlucky_ties)} ({unlucky_losses} Losses)" if unlucky_losses > 0 else "None"
-            
+        wins = stadium_stats[team]["wins"]
+        losses = stadium_stats[team]["losses"]
+        total = wins + losses
+        win_ratio = (wins / total * 100) if total > 0 else 0.0
+
         rows.append({
             "Team": team,
             "Stadium": info["Stadium"],
             "Lat": info["Lat"],
             "Lon": info["Lon"],
-            "Lucky Predictor": lucky_str,
-            "Unlucky Predictor": unlucky_str
+            "Wins": wins,
+            "Losses": losses,
+            "Win %": win_ratio
         })
-        
+
     return pd.DataFrame(rows)
