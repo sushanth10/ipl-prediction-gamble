@@ -437,7 +437,7 @@
     <span class="trophy">🏆</span>
     <h1>IPL 2026 Prediction Sheet</h1>
     <p class="subtitle">Tap a team to pick your winner · Save &amp; share your predictions</p>
-    <span class="badge">19th Edition · March 28 – May 31, 2026 · 84 Matches</span>
+    <span class="badge">19th Edition · March 28 – May 24, 2026 · 70 League Matches</span>
   </div>
 
   <!-- Stats Bar -->
@@ -477,7 +477,7 @@
 
   <div class="footer">
     <p>IPL 2026 · Prediction Game · Tap a team to register your pick</p>
-    <p style="margin-top:4px;">⚡ Only Phase 1 schedule (Mar 28 – Apr 12) is confirmed. Phase 2+ marked as TBD.</p>
+    <p style="margin-top:4px;">⚡ Full league stage schedule (Mar 28 – May 24) confirmed. Playoff venues TBD.</p>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -497,37 +497,84 @@ const TEAMS = {
   'Lucknow Super Giants':        { code: 'LSG', icon: '🩵' },
 };
 
-// ── IPL 2026 Schedule ──────────────────────────────────────────────────────
-// Phase 1 (confirmed): Mar 28 – Apr 12
-// Phase 2+ (TBD)
+// ── IPL 2026 Schedule — Full League Stage (70 Matches, Mar 28 – May 24, 2026) ──
 const MATCHES = [
-  // ── Phase 1: Confirmed ──────────────────────────────────────
-  { date:'March 28, 2026',  home:'Royal Challengers Bengaluru', away:'Sunrisers Hyderabad',  venue:'M. Chinnaswamy Stadium, Bengaluru', time:'7:30 PM' },
-  { date:'March 29, 2026',  home:'Mumbai Indians',              away:'Kolkata Knight Riders', venue:'Wankhede Stadium, Mumbai',          time:'7:30 PM' },
-  { date:'March 30, 2026',  home:'Rajasthan Royals',            away:'Chennai Super Kings',   venue:'ACA Stadium, Guwahati',             time:'7:30 PM' },
-  { date:'March 31, 2026',  home:'Punjab Kings',                away:'Delhi Capitals',        venue:'PCA Stadium, New Chandigarh',       time:'7:30 PM' },
-  { date:'April 1, 2026',   home:'Lucknow Super Giants',        away:'Delhi Capitals',        venue:'BRSABV Ekana Stadium, Lucknow',     time:'7:30 PM' },
-  { date:'April 2, 2026',   home:'Kolkata Knight Riders',       away:'Sunrisers Hyderabad',   venue:'Eden Gardens, Kolkata',             time:'7:30 PM' },
-  { date:'April 3, 2026',   home:'Chennai Super Kings',         away:'Punjab Kings',          venue:'MA Chidambaram Stadium, Chennai',   time:'7:30 PM' },
-  { date:'April 4, 2026',   home:'Delhi Capitals',              away:'Mumbai Indians',        venue:'Arun Jaitley Stadium, Delhi',       time:'3:30 PM' },
-  { date:'April 4, 2026',   home:'Gujarat Titans',              away:'Rajasthan Royals',      venue:'Narendra Modi Stadium, Ahmedabad',  time:'7:30 PM' },
-  { date:'April 5, 2026',   home:'Sunrisers Hyderabad',         away:'Lucknow Super Giants',  venue:'Rajiv Gandhi Intl. Stadium, Hyd.',  time:'3:30 PM' },
-  { date:'April 5, 2026',   home:'Royal Challengers Bengaluru', away:'Chennai Super Kings',   venue:'M. Chinnaswamy Stadium, Bengaluru', time:'7:30 PM' },
-  { date:'April 6, 2026',   home:'Mumbai Indians',              away:'Punjab Kings',          venue:'Wankhede Stadium, Mumbai',          time:'7:30 PM' },
-  { date:'April 7, 2026',   home:'Rajasthan Royals',            away:'Mumbai Indians',        venue:'ACA Stadium, Guwahati',             time:'7:30 PM' },
-  { date:'April 8, 2026',   home:'Delhi Capitals',              away:'Gujarat Titans',        venue:'Arun Jaitley Stadium, Delhi',       time:'7:30 PM' },
-  { date:'April 9, 2026',   home:'Kolkata Knight Riders',       away:'Lucknow Super Giants',  venue:'Eden Gardens, Kolkata',             time:'7:30 PM' },
-  { date:'April 10, 2026',  home:'Punjab Kings',                away:'Royal Challengers Bengaluru', venue:'PCA Stadium, New Chandigarh', time:'7:30 PM' },
-  { date:'April 11, 2026',  home:'Chennai Super Kings',         away:'Delhi Capitals',        venue:'MA Chidambaram Stadium, Chennai',   time:'7:30 PM' },
-  { date:'April 12, 2026',  home:'Sunrisers Hyderabad',         away:'Rajasthan Royals',      venue:'Rajiv Gandhi Intl. Stadium, Hyd.',  time:'7:30 PM' },
-  { date:'April 12, 2026',  home:'Gujarat Titans',              away:'Kolkata Knight Riders', venue:'Narendra Modi Stadium, Ahmedabad',  time:'3:30 PM' },
-  // ── Phase 2: TBD ──────────────────────────────────────────────
-  ...Array.from({length:61}, (_,i) => ({ tbd: true, num: i + 20 })),
+  // ── League Stage: All 70 Matches (Confirmed) ────────────────
+  { date:'March 28, 2026',  home:'Royal Challengers Bengaluru', away:'Sunrisers Hyderabad',        venue:'M. Chinnaswamy Stadium, Bengaluru',               time:'7:30 PM' },
+  { date:'March 29, 2026',  home:'Mumbai Indians',              away:'Kolkata Knight Riders',      venue:'Wankhede Stadium, Mumbai',                        time:'7:30 PM' },
+  { date:'March 30, 2026',  home:'Rajasthan Royals',            away:'Chennai Super Kings',        venue:'Barsapara Cricket Stadium, Guwahati',             time:'7:30 PM' },
+  { date:'March 31, 2026',  home:'Punjab Kings',                away:'Gujarat Titans',             venue:'Maharaja Yadavindra Singh Intl. Stadium, Mullanpur', time:'7:30 PM' },
+  { date:'April 1, 2026',   home:'Lucknow Super Giants',        away:'Delhi Capitals',             venue:'Ekana Cricket Stadium, Lucknow',                  time:'7:30 PM' },
+  { date:'April 2, 2026',   home:'Kolkata Knight Riders',       away:'Sunrisers Hyderabad',        venue:'Eden Gardens, Kolkata',                           time:'7:30 PM' },
+  { date:'April 3, 2026',   home:'Chennai Super Kings',         away:'Punjab Kings',               venue:'MA Chidambaram Stadium, Chennai',                 time:'7:30 PM' },
+  { date:'April 4, 2026',   home:'Delhi Capitals',              away:'Mumbai Indians',             venue:'Arun Jaitley Stadium, Delhi',                     time:'3:30 PM' },
+  { date:'April 4, 2026',   home:'Gujarat Titans',              away:'Rajasthan Royals',           venue:'Narendra Modi Stadium, Ahmedabad',                time:'7:30 PM' },
+  { date:'April 5, 2026',   home:'Sunrisers Hyderabad',         away:'Lucknow Super Giants',       venue:'Rajiv Gandhi International Stadium, Hyderabad',   time:'3:30 PM' },
+  { date:'April 5, 2026',   home:'Royal Challengers Bengaluru', away:'Chennai Super Kings',        venue:'M. Chinnaswamy Stadium, Bengaluru',               time:'7:30 PM' },
+  { date:'April 6, 2026',   home:'Kolkata Knight Riders',       away:'Punjab Kings',               venue:'Eden Gardens, Kolkata',                           time:'7:30 PM' },
+  { date:'April 7, 2026',   home:'Rajasthan Royals',            away:'Mumbai Indians',             venue:'Barsapara Cricket Stadium, Guwahati',             time:'7:30 PM' },
+  { date:'April 8, 2026',   home:'Delhi Capitals',              away:'Gujarat Titans',             venue:'Arun Jaitley Stadium, Delhi',                     time:'7:30 PM' },
+  { date:'April 9, 2026',   home:'Kolkata Knight Riders',       away:'Lucknow Super Giants',       venue:'Eden Gardens, Kolkata',                           time:'7:30 PM' },
+  { date:'April 10, 2026',  home:'Rajasthan Royals',            away:'Royal Challengers Bengaluru',venue:'Barsapara Cricket Stadium, Guwahati',             time:'7:30 PM' },
+  { date:'April 11, 2026',  home:'Punjab Kings',                away:'Sunrisers Hyderabad',        venue:'Maharaja Yadavindra Singh Intl. Stadium, Mullanpur', time:'3:30 PM' },
+  { date:'April 11, 2026',  home:'Chennai Super Kings',         away:'Delhi Capitals',             venue:'MA Chidambaram Stadium, Chennai',                 time:'7:30 PM' },
+  { date:'April 12, 2026',  home:'Lucknow Super Giants',        away:'Gujarat Titans',             venue:'Ekana Cricket Stadium, Lucknow',                  time:'3:30 PM' },
+  { date:'April 12, 2026',  home:'Mumbai Indians',              away:'Royal Challengers Bengaluru',venue:'Wankhede Stadium, Mumbai',                        time:'7:30 PM' },
+  { date:'April 13, 2026',  home:'Sunrisers Hyderabad',         away:'Rajasthan Royals',           venue:'Rajiv Gandhi International Stadium, Hyderabad',   time:'7:30 PM' },
+  { date:'April 14, 2026',  home:'Chennai Super Kings',         away:'Kolkata Knight Riders',      venue:'MA Chidambaram Stadium, Chennai',                 time:'7:30 PM' },
+  { date:'April 15, 2026',  home:'Royal Challengers Bengaluru', away:'Lucknow Super Giants',       venue:'M. Chinnaswamy Stadium, Bengaluru',               time:'7:30 PM' },
+  { date:'April 16, 2026',  home:'Mumbai Indians',              away:'Punjab Kings',               venue:'Wankhede Stadium, Mumbai',                        time:'7:30 PM' },
+  { date:'April 17, 2026',  home:'Gujarat Titans',              away:'Kolkata Knight Riders',      venue:'Narendra Modi Stadium, Ahmedabad',                time:'7:30 PM' },
+  { date:'April 18, 2026',  home:'Royal Challengers Bengaluru', away:'Delhi Capitals',             venue:'M. Chinnaswamy Stadium, Bengaluru',               time:'3:30 PM' },
+  { date:'April 18, 2026',  home:'Sunrisers Hyderabad',         away:'Chennai Super Kings',        venue:'Rajiv Gandhi International Stadium, Hyderabad',   time:'7:30 PM' },
+  { date:'April 19, 2026',  home:'Kolkata Knight Riders',       away:'Rajasthan Royals',           venue:'Eden Gardens, Kolkata',                           time:'3:30 PM' },
+  { date:'April 19, 2026',  home:'Punjab Kings',                away:'Lucknow Super Giants',       venue:'Maharaja Yadavindra Singh Intl. Stadium, Mullanpur', time:'7:30 PM' },
+  { date:'April 20, 2026',  home:'Gujarat Titans',              away:'Mumbai Indians',             venue:'Narendra Modi Stadium, Ahmedabad',                time:'7:30 PM' },
+  { date:'April 21, 2026',  home:'Sunrisers Hyderabad',         away:'Delhi Capitals',             venue:'Rajiv Gandhi International Stadium, Hyderabad',   time:'7:30 PM' },
+  { date:'April 22, 2026',  home:'Lucknow Super Giants',        away:'Rajasthan Royals',           venue:'Ekana Cricket Stadium, Lucknow',                  time:'7:30 PM' },
+  { date:'April 23, 2026',  home:'Mumbai Indians',              away:'Chennai Super Kings',        venue:'Wankhede Stadium, Mumbai',                        time:'7:30 PM' },
+  { date:'April 24, 2026',  home:'Royal Challengers Bengaluru', away:'Gujarat Titans',             venue:'M. Chinnaswamy Stadium, Bengaluru',               time:'7:30 PM' },
+  { date:'April 25, 2026',  home:'Delhi Capitals',              away:'Punjab Kings',               venue:'Arun Jaitley Stadium, Delhi',                     time:'3:30 PM' },
+  { date:'April 25, 2026',  home:'Rajasthan Royals',            away:'Sunrisers Hyderabad',        venue:'Sawai Mansingh Stadium, Jaipur',                  time:'7:30 PM' },
+  { date:'April 26, 2026',  home:'Gujarat Titans',              away:'Chennai Super Kings',        venue:'Narendra Modi Stadium, Ahmedabad',                time:'3:30 PM' },
+  { date:'April 26, 2026',  home:'Lucknow Super Giants',        away:'Kolkata Knight Riders',      venue:'Ekana Cricket Stadium, Lucknow',                  time:'7:30 PM' },
+  { date:'April 27, 2026',  home:'Delhi Capitals',              away:'Royal Challengers Bengaluru',venue:'Arun Jaitley Stadium, Delhi',                     time:'7:30 PM' },
+  { date:'April 28, 2026',  home:'Punjab Kings',                away:'Rajasthan Royals',           venue:'Maharaja Yadavindra Singh Intl. Stadium, Mullanpur', time:'7:30 PM' },
+  { date:'April 29, 2026',  home:'Mumbai Indians',              away:'Sunrisers Hyderabad',        venue:'Wankhede Stadium, Mumbai',                        time:'7:30 PM' },
+  { date:'April 30, 2026',  home:'Gujarat Titans',              away:'Royal Challengers Bengaluru',venue:'Narendra Modi Stadium, Ahmedabad',                time:'7:30 PM' },
+  { date:'May 1, 2026',     home:'Rajasthan Royals',            away:'Delhi Capitals',             venue:'Sawai Mansingh Stadium, Jaipur',                  time:'7:30 PM' },
+  { date:'May 2, 2026',     home:'Chennai Super Kings',         away:'Mumbai Indians',             venue:'MA Chidambaram Stadium, Chennai',                 time:'7:30 PM' },
+  { date:'May 3, 2026',     home:'Sunrisers Hyderabad',         away:'Kolkata Knight Riders',      venue:'Rajiv Gandhi International Stadium, Hyderabad',   time:'3:30 PM' },
+  { date:'May 3, 2026',     home:'Gujarat Titans',              away:'Punjab Kings',               venue:'Narendra Modi Stadium, Ahmedabad',                time:'7:30 PM' },
+  { date:'May 4, 2026',     home:'Mumbai Indians',              away:'Lucknow Super Giants',       venue:'Wankhede Stadium, Mumbai',                        time:'7:30 PM' },
+  { date:'May 5, 2026',     home:'Delhi Capitals',              away:'Chennai Super Kings',        venue:'Arun Jaitley Stadium, Delhi',                     time:'7:30 PM' },
+  { date:'May 6, 2026',     home:'Sunrisers Hyderabad',         away:'Punjab Kings',               venue:'Rajiv Gandhi International Stadium, Hyderabad',   time:'7:30 PM' },
+  { date:'May 7, 2026',     home:'Lucknow Super Giants',        away:'Royal Challengers Bengaluru',venue:'Ekana Cricket Stadium, Lucknow',                  time:'7:30 PM' },
+  { date:'May 8, 2026',     home:'Delhi Capitals',              away:'Kolkata Knight Riders',      venue:'Arun Jaitley Stadium, Delhi',                     time:'7:30 PM' },
+  { date:'May 9, 2026',     home:'Rajasthan Royals',            away:'Gujarat Titans',             venue:'Sawai Mansingh Stadium, Jaipur',                  time:'7:30 PM' },
+  { date:'May 10, 2026',    home:'Chennai Super Kings',         away:'Lucknow Super Giants',       venue:'MA Chidambaram Stadium, Chennai',                 time:'3:30 PM' },
+  { date:'May 10, 2026',    home:'Royal Challengers Bengaluru', away:'Mumbai Indians',             venue:'Shaheed Veer Narayan Singh Intl. Stadium, Raipur',time:'7:30 PM' },
+  { date:'May 11, 2026',    home:'Punjab Kings',                away:'Delhi Capitals',             venue:'HPCA Stadium, Dharamsala',                        time:'7:30 PM' },
+  { date:'May 12, 2026',    home:'Gujarat Titans',              away:'Sunrisers Hyderabad',        venue:'Narendra Modi Stadium, Ahmedabad',                time:'7:30 PM' },
+  { date:'May 13, 2026',    home:'Royal Challengers Bengaluru', away:'Kolkata Knight Riders',      venue:'Shaheed Veer Narayan Singh Intl. Stadium, Raipur',time:'7:30 PM' },
+  { date:'May 14, 2026',    home:'Punjab Kings',                away:'Mumbai Indians',             venue:'HPCA Stadium, Dharamsala',                        time:'7:30 PM' },
+  { date:'May 15, 2026',    home:'Lucknow Super Giants',        away:'Chennai Super Kings',        venue:'Ekana Cricket Stadium, Lucknow',                  time:'7:30 PM' },
+  { date:'May 16, 2026',    home:'Kolkata Knight Riders',       away:'Gujarat Titans',             venue:'Eden Gardens, Kolkata',                           time:'7:30 PM' },
+  { date:'May 17, 2026',    home:'Punjab Kings',                away:'Royal Challengers Bengaluru',venue:'HPCA Stadium, Dharamsala',                        time:'3:30 PM' },
+  { date:'May 17, 2026',    home:'Delhi Capitals',              away:'Rajasthan Royals',           venue:'Arun Jaitley Stadium, Delhi',                     time:'7:30 PM' },
+  { date:'May 18, 2026',    home:'Chennai Super Kings',         away:'Sunrisers Hyderabad',        venue:'MA Chidambaram Stadium, Chennai',                 time:'7:30 PM' },
+  { date:'May 19, 2026',    home:'Rajasthan Royals',            away:'Lucknow Super Giants',       venue:'Sawai Mansingh Stadium, Jaipur',                  time:'7:30 PM' },
+  { date:'May 20, 2026',    home:'Kolkata Knight Riders',       away:'Mumbai Indians',             venue:'Eden Gardens, Kolkata',                           time:'7:30 PM' },
+  { date:'May 21, 2026',    home:'Chennai Super Kings',         away:'Gujarat Titans',             venue:'MA Chidambaram Stadium, Chennai',                 time:'7:30 PM' },
+  { date:'May 22, 2026',    home:'Sunrisers Hyderabad',         away:'Royal Challengers Bengaluru',venue:'Rajiv Gandhi International Stadium, Hyderabad',   time:'7:30 PM' },
+  { date:'May 23, 2026',    home:'Lucknow Super Giants',        away:'Punjab Kings',               venue:'Ekana Cricket Stadium, Lucknow',                  time:'7:30 PM' },
+  { date:'May 24, 2026',    home:'Mumbai Indians',              away:'Rajasthan Royals',           venue:'Wankhede Stadium, Mumbai',                        time:'3:30 PM' },
+  { date:'May 24, 2026',    home:'Kolkata Knight Riders',       away:'Delhi Capitals',             venue:'Eden Gardens, Kolkata',                           time:'7:30 PM' },
   // ── Playoffs ─────────────────────────────────────────────────
-  { date:'May 26, 2026',    playoff:'Qualifier 1',  venue:'M. Chinnaswamy Stadium, Bengaluru', time:'7:30 PM', tbd:true },
-  { date:'May 27, 2026',    playoff:'Eliminator',   venue:'TBD',                               time:'7:30 PM', tbd:true },
-  { date:'May 29, 2026',    playoff:'Qualifier 2',  venue:'TBD',                               time:'7:30 PM', tbd:true },
-  { date:'May 31, 2026',    playoff:'FINAL',        venue:'M. Chinnaswamy Stadium, Bengaluru', time:'7:30 PM', tbd:true },
+  { date:'TBD',  playoff:'Qualifier 1',  venue:'TBD', time:'7:30 PM', tbd:true },
+  { date:'TBD',  playoff:'Eliminator',   venue:'TBD', time:'7:30 PM', tbd:true },
+  { date:'TBD',  playoff:'Qualifier 2',  venue:'TBD', time:'7:30 PM', tbd:true },
+  { date:'TBD',  playoff:'FINAL',        venue:'TBD', time:'7:30 PM', tbd:true },
 ];
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -601,12 +648,12 @@ function buildList() {
         </div>
       </div>
       <div class="teams-row">
-        <button class="team-btn" id="${id}_home" onclick="pick('${id}','home','${m.home}')">
+        <button class="team-btn" id="${id}_home" data-team="${m.home}" onclick="pick('${id}','home','${m.home}')">
           <span class="team-icon">${homeIcon}</span>
           ${m.home}<br><small style="opacity:0.6;font-size:0.7rem;">(Home)</small>
         </button>
         <span class="vs-label">VS</span>
-        <button class="team-btn" id="${id}_away" onclick="pick('${id}','away','${m.away}')">
+        <button class="team-btn" id="${id}_away" data-team="${m.away}" onclick="pick('${id}','away','${m.away}')">
           <span class="team-icon">${awayIcon}</span>
           ${m.away}<br><small style="opacity:0.6;font-size:0.7rem;">(Away)</small>
         </button>
@@ -689,17 +736,26 @@ function loadFromFile() {
   reader.onload = e => {
     const lines = e.target.result.split('\n');
     const cards = document.querySelectorAll('.match-card:not(.tbd)');
+    let skipped = 0;
     cards.forEach((card, i) => {
       const winner = lines[i]?.trim();
       if (!winner) return;
       const homeBtn = card.querySelector('[id$="_home"]');
       const awayBtn = card.querySelector('[id$="_away"]');
       if (!homeBtn || !awayBtn) return;
-      const homeText = homeBtn.textContent.trim().split('\n')[0].trim();
+      const homeText = homeBtn.dataset.team;
+      const awayText = awayBtn.dataset.team;
+      if (winner !== homeText && winner !== awayText) {
+        skipped++;
+        return; // entry doesn't match either team — leave blank
+      }
       const side = winner === homeText ? 'home' : 'away';
       pick(card.id, side, winner);
     });
-    showToast('📂 Predictions loaded');
+    const msg = skipped > 0
+      ? `📂 Loaded · ${skipped} entr${skipped === 1 ? 'y' : 'ies'} skipped (team mismatch)`
+      : '📂 Predictions loaded';
+    showToast(msg);
   };
   reader.readAsText(file);
 }

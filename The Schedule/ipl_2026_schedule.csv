@@ -1,20 +1,71 @@
-Match #,Date,Home Team,Away Team,Venue,Start Time
+Match #, Date, Home Team, Away Team, Venue, Start Time
 1,"March 28, 2026",Royal Challengers Bengaluru,Sunrisers Hyderabad,"M. Chinnaswamy Stadium, Bengaluru",7:30 PM IST
 2,"March 29, 2026",Mumbai Indians,Kolkata Knight Riders,"Wankhede Stadium, Mumbai",7:30 PM IST
-3,"March 30, 2026",Rajasthan Royals,Chennai Super Kings,"ACA Stadium, Guwahati",7:30 PM IST
-4,"March 31, 2026",Punjab Kings,Delhi Capitals,"PCA Stadium, New Chandigarh",7:30 PM IST
-5,"April 1, 2026",Lucknow Super Giants,Delhi Capitals,"BRSABV Ekana Cricket Stadium, Lucknow",7:30 PM IST
+3,"March 30, 2026",Rajasthan Royals,Chennai Super Kings,"Barsapara Cricket Stadium, Guwahati",7:30 PM IST
+4,"March 31, 2026",Punjab Kings,Gujarat Titans,"Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur",7:30 PM IST
+5,"April 1, 2026",Lucknow Super Giants,Delhi Capitals,"Ekana Cricket Stadium, Lucknow",7:30 PM IST
 6,"April 2, 2026",Kolkata Knight Riders,Sunrisers Hyderabad,"Eden Gardens, Kolkata",7:30 PM IST
 7,"April 3, 2026",Chennai Super Kings,Punjab Kings,"MA Chidambaram Stadium, Chennai",7:30 PM IST
 8,"April 4, 2026",Delhi Capitals,Mumbai Indians,"Arun Jaitley Stadium, Delhi",3:30 PM IST
 9,"April 4, 2026",Gujarat Titans,Rajasthan Royals,"Narendra Modi Stadium, Ahmedabad",7:30 PM IST
-10,"April 5, 2026",Sunrisers Hyderabad,Lucknow Super Giants,"Rajiv Gandhi International Cricket Stadium, Hyderabad",3:30 PM IST
+10,"April 5, 2026",Sunrisers Hyderabad,Lucknow Super Giants,"Rajiv Gandhi International Stadium, Hyderabad",3:30 PM IST
 11,"April 5, 2026",Royal Challengers Bengaluru,Chennai Super Kings,"M. Chinnaswamy Stadium, Bengaluru",7:30 PM IST
-12,"April 6, 2026",Mumbai Indians,Punjab Kings,"Wankhede Stadium, Mumbai",7:30 PM IST
-13,"April 7, 2026",Rajasthan Royals,Mumbai Indians,"ACA Stadium, Guwahati",7:30 PM IST
+12,"April 6, 2026",Kolkata Knight Riders,Punjab Kings,"Eden Gardens, Kolkata",7:30 PM IST
+13,"April 7, 2026",Rajasthan Royals,Mumbai Indians,"Barsapara Cricket Stadium, Guwahati",7:30 PM IST
 14,"April 8, 2026",Delhi Capitals,Gujarat Titans,"Arun Jaitley Stadium, Delhi",7:30 PM IST
 15,"April 9, 2026",Kolkata Knight Riders,Lucknow Super Giants,"Eden Gardens, Kolkata",7:30 PM IST
-16,"April 10, 2026",Punjab Kings,Royal Challengers Bengaluru,"PCA Stadium, New Chandigarh",7:30 PM IST
-17,"April 11, 2026",Chennai Super Kings,Delhi Capitals,"MA Chidambaram Stadium, Chennai",7:30 PM IST
-18,"April 12, 2026",Gujarat Titans,Kolkata Knight Riders,"Narendra Modi Stadium, Ahmedabad",3:30 PM IST
-19,"April 12, 2026",Sunrisers Hyderabad,Rajasthan Royals,"Rajiv Gandhi International Cricket Stadium, Hyderabad",7:30 PM IST
+16,"April 10, 2026",Rajasthan Royals,Royal Challengers Bengaluru,"Barsapara Cricket Stadium, Guwahati",7:30 PM IST
+17,"April 11, 2026",Punjab Kings,Sunrisers Hyderabad,"Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur",3:30 PM IST
+18,"April 11, 2026",Chennai Super Kings,Delhi Capitals,"MA Chidambaram Stadium, Chennai",7:30 PM IST
+19,"April 12, 2026",Lucknow Super Giants,Gujarat Titans,"Ekana Cricket Stadium, Lucknow",3:30 PM IST
+20,"April 12, 2026",Mumbai Indians,Royal Challengers Bengaluru,"Wankhede Stadium, Mumbai",7:30 PM IST
+21,"April 13, 2026",Sunrisers Hyderabad,Rajasthan Royals,"Rajiv Gandhi International Stadium, Hyderabad",7:30 PM IST
+22,"April 14, 2026",Chennai Super Kings,Kolkata Knight Riders,"MA Chidambaram Stadium, Chennai",7:30 PM IST
+23,"April 15, 2026",Royal Challengers Bengaluru,Lucknow Super Giants,"M. Chinnaswamy Stadium, Bengaluru",7:30 PM IST
+24,"April 16, 2026",Mumbai Indians,Punjab Kings,"Wankhede Stadium, Mumbai",7:30 PM IST
+25,"April 17, 2026",Gujarat Titans,Kolkata Knight Riders,"Narendra Modi Stadium, Ahmedabad",7:30 PM IST
+26,"April 18, 2026",Royal Challengers Bengaluru,Delhi Capitals,"M. Chinnaswamy Stadium, Bengaluru",3:30 PM IST
+27,"April 18, 2026",Sunrisers Hyderabad,Chennai Super Kings,"Rajiv Gandhi International Stadium, Hyderabad",7:30 PM IST
+28,"April 19, 2026",Kolkata Knight Riders,Rajasthan Royals,"Eden Gardens, Kolkata",3:30 PM IST
+29,"April 19, 2026",Punjab Kings,Lucknow Super Giants,"Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur",7:30 PM IST
+30,"April 20, 2026",Gujarat Titans,Mumbai Indians,"Narendra Modi Stadium, Ahmedabad",7:30 PM IST
+31,"April 21, 2026",Sunrisers Hyderabad,Delhi Capitals,"Rajiv Gandhi International Stadium, Hyderabad",7:30 PM IST
+32,"April 22, 2026",Lucknow Super Giants,Rajasthan Royals,"Ekana Cricket Stadium, Lucknow",7:30 PM IST
+33,"April 23, 2026",Mumbai Indians,Chennai Super Kings,"Wankhede Stadium, Mumbai",7:30 PM IST
+34,"April 24, 2026",Royal Challengers Bengaluru,Gujarat Titans,"M. Chinnaswamy Stadium, Bengaluru",7:30 PM IST
+35,"April 25, 2026",Delhi Capitals,Punjab Kings,"Arun Jaitley Stadium, Delhi",3:30 PM IST
+36,"April 25, 2026",Rajasthan Royals,Sunrisers Hyderabad,"Sawai Mansingh Stadium, Jaipur",7:30 PM IST
+37,"April 26, 2026",Gujarat Titans,Chennai Super Kings,"Narendra Modi Stadium, Ahmedabad",3:30 PM IST
+38,"April 26, 2026",Lucknow Super Giants,Kolkata Knight Riders,"Ekana Cricket Stadium, Lucknow",7:30 PM IST
+39,"April 27, 2026",Delhi Capitals,Royal Challengers Bengaluru,"Arun Jaitley Stadium, Delhi",7:30 PM IST
+40,"April 28, 2026",Punjab Kings,Rajasthan Royals,"Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur",7:30 PM IST
+41,"April 29, 2026",Mumbai Indians,Sunrisers Hyderabad,"Wankhede Stadium, Mumbai",7:30 PM IST
+42,"April 30, 2026",Gujarat Titans,Royal Challengers Bengaluru,"Narendra Modi Stadium, Ahmedabad",7:30 PM IST
+43,"May 1, 2026",Rajasthan Royals,Delhi Capitals,"Sawai Mansingh Stadium, Jaipur",7:30 PM IST
+44,"May 2, 2026",Chennai Super Kings,Mumbai Indians,"MA Chidambaram Stadium, Chennai",7:30 PM IST
+45,"May 3, 2026",Sunrisers Hyderabad,Kolkata Knight Riders,"Rajiv Gandhi International Stadium, Hyderabad",3:30 PM IST
+46,"May 3, 2026",Gujarat Titans,Punjab Kings,"Narendra Modi Stadium, Ahmedabad",7:30 PM IST
+47,"May 4, 2026",Mumbai Indians,Lucknow Super Giants,"Wankhede Stadium, Mumbai",7:30 PM IST
+48,"May 5, 2026",Delhi Capitals,Chennai Super Kings,"Arun Jaitley Stadium, Delhi",7:30 PM IST
+49,"May 6, 2026",Sunrisers Hyderabad,Punjab Kings,"Rajiv Gandhi International Stadium, Hyderabad",7:30 PM IST
+50,"May 7, 2026",Lucknow Super Giants,Royal Challengers Bengaluru,"Ekana Cricket Stadium, Lucknow",7:30 PM IST
+51,"May 8, 2026",Delhi Capitals,Kolkata Knight Riders,"Arun Jaitley Stadium, Delhi",7:30 PM IST
+52,"May 9, 2026",Rajasthan Royals,Gujarat Titans,"Sawai Mansingh Stadium, Jaipur",7:30 PM IST
+53,"May 10, 2026",Chennai Super Kings,Lucknow Super Giants,"MA Chidambaram Stadium, Chennai",3:30 PM IST
+54,"May 10, 2026",Royal Challengers Bengaluru,Mumbai Indians,"Shaheed Veer Narayan Singh International Stadium, Raipur",7:30 PM IST
+55,"May 11, 2026",Punjab Kings,Delhi Capitals,"Himachal Pradesh Cricket Association Stadium, Dharamsala",7:30 PM IST
+56,"May 12, 2026",Gujarat Titans,Sunrisers Hyderabad,"Narendra Modi Stadium, Ahmedabad",7:30 PM IST
+57,"May 13, 2026",Royal Challengers Bengaluru,Kolkata Knight Riders,"Shaheed Veer Narayan Singh International Stadium, Raipur",7:30 PM IST
+58,"May 14, 2026",Punjab Kings,Mumbai Indians,"Himachal Pradesh Cricket Association Stadium, Dharamsala",7:30 PM IST
+59,"May 15, 2026",Lucknow Super Giants,Chennai Super Kings,"Ekana Cricket Stadium, Lucknow",7:30 PM IST
+60,"May 16, 2026",Kolkata Knight Riders,Gujarat Titans,"Eden Gardens, Kolkata",7:30 PM IST
+61,"May 17, 2026",Punjab Kings,Royal Challengers Bengaluru,"Himachal Pradesh Cricket Association Stadium, Dharamsala",3:30 PM IST
+62,"May 17, 2026",Delhi Capitals,Rajasthan Royals,"Arun Jaitley Stadium, Delhi",7:30 PM IST
+63,"May 18, 2026",Chennai Super Kings,Sunrisers Hyderabad,"MA Chidambaram Stadium, Chennai",7:30 PM IST
+64,"May 19, 2026",Rajasthan Royals,Lucknow Super Giants,"Sawai Mansingh Stadium, Jaipur",7:30 PM IST
+65,"May 20, 2026",Kolkata Knight Riders,Mumbai Indians,"Eden Gardens, Kolkata",7:30 PM IST
+66,"May 21, 2026",Chennai Super Kings,Gujarat Titans,"MA Chidambaram Stadium, Chennai",7:30 PM IST
+67,"May 22, 2026",Sunrisers Hyderabad,Royal Challengers Bengaluru,"Rajiv Gandhi International Stadium, Hyderabad",7:30 PM IST
+68,"May 23, 2026",Lucknow Super Giants,Punjab Kings,"Ekana Cricket Stadium, Lucknow",7:30 PM IST
+69,"May 24, 2026",Mumbai Indians,Rajasthan Royals,"Wankhede Stadium, Mumbai",3:30 PM IST
+70,"May 24, 2026",Kolkata Knight Riders,Delhi Capitals,"Eden Gardens, Kolkata",7:30 PM IST
