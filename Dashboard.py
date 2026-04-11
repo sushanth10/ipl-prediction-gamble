@@ -141,7 +141,7 @@ def main():
     <div class="ipl-header">
         <div class="ipl-title">🏏 IPL Prediction Dashboard 2026</div>
         <div class="ipl-subtitle">Track predictions · Compare performances · Explore scenarios</div>
-        <span class="ipl-badge">🏆 RCB — Defending Champions</span>
+        <span class="ipl-badge">🏆 Niharika — Defending Champion</span>
     </div>
     """, unsafe_allow_html=True)
 

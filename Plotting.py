@@ -415,7 +415,7 @@ def generate_leaderboard_card(leaderboard_df, output_path="The Visuals/leaderboa
                            boxstyle="round,pad=0.005", facecolor="#2c1f38", edgecolor="#4e336b",
                            transform=fig.transFigure, clip_on=False)
     fig.add_artist(badge)
-    fig.text(0.03, y_cursor - 0.067, "RCB \u2014 Defending Champions", fontsize=10, color="#b29ee3", fontweight="bold")
+    fig.text(0.03, y_cursor - 0.067, "Niharika \u2014 Defending Champion", fontsize=10, color="#b29ee3", fontweight="bold")
     
     # ── KPIs ───────────────────────────────────────────────────────────────
     if len(lb) > 0:
@@ -781,7 +781,7 @@ def plot_stadium_map(stadium_df, user_name):
             "Lat": False,
             "Lon": False,
             "Bubble Size": False,
-            "Team": True,
+            "City": True,
             "Wins": True,
             "Losses": True,
             "Win %": ":.1f"

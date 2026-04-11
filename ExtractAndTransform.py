@@ -463,58 +463,61 @@ def get_points_distribution(results_df, predictions):
 
 
 def get_user_stadium_stats(results_df, predictions, schedule_df, selected_user):
-    """Return a DataFrame mapping each IPL stadium to the wins and losses for a specific predictor."""
-    STADIUMS = {
-        "Chennai Super Kings": {"Stadium": "M. A. Chidambaram Stadium", "Lat": 13.0628, "Lon": 80.2793},
-        "Delhi Capitals": {"Stadium": "Arun Jaitley Stadium", "Lat": 28.6378, "Lon": 77.2432},
-        "Gujarat Titans": {"Stadium": "Narendra Modi Stadium", "Lat": 23.0917, "Lon": 72.5975},
-        "Kolkata Knight Riders": {"Stadium": "Eden Gardens", "Lat": 22.5646, "Lon": 88.3433},
-        "Lucknow Super Giants": {"Stadium": "Ekana Cricket Stadium", "Lat": 26.8115, "Lon": 81.0152},
-        "Mumbai Indians": {"Stadium": "Wankhede Stadium", "Lat": 18.9389, "Lon": 72.8256},
-        "Punjab Kings": {"Stadium": "M. Yadavindra Singh Stadium", "Lat": 30.7760, "Lon": 76.7589},
-        "Rajasthan Royals": {"Stadium": "Sawai Mansingh Stadium", "Lat": 26.8940, "Lon": 75.8033},
-        "Royal Challengers Bengaluru": {"Stadium": "M. Chinnaswamy Stadium", "Lat": 12.9788, "Lon": 77.5996},
-        "Sunrisers Hyderabad": {"Stadium": "Rajiv Gandhi Intl Stadium", "Lat": 17.4065, "Lon": 78.5505}
+    """Return a DataFrame mapping each IPL 2026 venue to wins and losses for a specific predictor."""
+    # All 13 venues for IPL 2026, keyed by their name in the schedule CSV
+    VENUES = {
+        "Arun Jaitley Stadium, Delhi":                                       {"Stadium": "Arun Jaitley Stadium",      "City": "Delhi",       "Lat": 28.6378, "Lon": 77.2432},
+        "Barsapara Cricket Stadium, Guwahati":                               {"Stadium": "Barsapara Cricket Stadium", "City": "Guwahati",    "Lat": 26.1433, "Lon": 91.7362},
+        "Eden Gardens, Kolkata":                                             {"Stadium": "Eden Gardens",              "City": "Kolkata",     "Lat": 22.5646, "Lon": 88.3433},
+        "Ekana Cricket Stadium, Lucknow":                                    {"Stadium": "Ekana Cricket Stadium",     "City": "Lucknow",     "Lat": 26.8115, "Lon": 81.0152},
+        "Himachal Pradesh Cricket Association Stadium, Dharamsala":          {"Stadium": "HPCA Stadium",              "City": "Dharamsala",  "Lat": 32.2207, "Lon": 76.3234},
+        "M. Chinnaswamy Stadium, Bengaluru":                                 {"Stadium": "M. Chinnaswamy Stadium",   "City": "Bengaluru",   "Lat": 12.9788, "Lon": 77.5996},
+        "MA Chidambaram Stadium, Chennai":                                   {"Stadium": "MA Chidambaram Stadium",   "City": "Chennai",     "Lat": 13.0628, "Lon": 80.2793},
+        "Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur":{"Stadium": "MYS Intl. Stadium",        "City": "Mullanpur",   "Lat": 30.7760, "Lon": 76.7589},
+        "Narendra Modi Stadium, Ahmedabad":                                  {"Stadium": "Narendra Modi Stadium",    "City": "Ahmedabad",   "Lat": 23.0917, "Lon": 72.5975},
+        "Rajiv Gandhi International Stadium, Hyderabad":                     {"Stadium": "RGI Stadium",              "City": "Hyderabad",   "Lat": 17.4065, "Lon": 78.5505},
+        "Sawai Mansingh Stadium, Jaipur":                                    {"Stadium": "Sawai Mansingh Stadium",   "City": "Jaipur",      "Lat": 26.8940, "Lon": 75.8033},
+        "Shaheed Veer Narayan Singh International Stadium, Raipur":          {"Stadium": "SVN Singh Intl. Stadium",  "City": "Raipur",      "Lat": 21.2780, "Lon": 81.6580},
+        "Wankhede Stadium, Mumbai":                                          {"Stadium": "Wankhede Stadium",         "City": "Mumbai",      "Lat": 18.9389, "Lon": 72.8256},
     }
-    
+
+    # Build a lookup: Match # -> Venue string (from schedule)
+    schedule_clean = schedule_df.copy()
+    schedule_clean.columns = schedule_clean.columns.str.strip()
+    match_venue = {
+        str(row["Match #"]): row.get("Venue", "").strip()
+        for _, row in schedule_clean.iterrows()
+    }
+
     completed = results_df.dropna(subset=["Winner"]).reset_index(drop=True)
-    
-    # Initialize trackers for each team (stadium)
-    stadium_stats = {team: {"wins": 0, "losses": 0} for team in STADIUMS.keys()}
+    venue_stats = {v: {"wins": 0, "losses": 0} for v in VENUES}
     user_preds = predictions.get(selected_user, [])
-    
-    for i, row in completed.iterrows():
+
+    for _, row in completed.iterrows():
         actual = row["Winner"]
         if actual == "NR":
             continue
-            
-        home_team = row.get("Home Team")
+
         match_idx = int(row["Match #"]) - 1
-        
-        # If home_team isn't in schedule_df directly, we should get it from schedule
-        if pd.isna(home_team) or not home_team:
-            sched_row = schedule_df[schedule_df["Match #"].astype(str) == str(row["Match #"])]
-            if not sched_row.empty:
-                home_team = sched_row.iloc[0]["Home Team"]
-                
-        if pd.notna(home_team) and home_team in STADIUMS:
-            if match_idx < len(user_preds):
-                if user_preds[match_idx] == actual:
-                    stadium_stats[home_team]["wins"] += 1
-                else:
-                    stadium_stats[home_team]["losses"] += 1
+        venue_name = match_venue.get(str(row["Match #"]), "")
+
+        if venue_name in VENUES and match_idx < len(user_preds):
+            if user_preds[match_idx] == actual:
+                venue_stats[venue_name]["wins"] += 1
+            else:
+                venue_stats[venue_name]["losses"] += 1
 
     # Compile the final dataframe
     rows = []
-    for team, info in STADIUMS.items():
-        wins = stadium_stats[team]["wins"]
-        losses = stadium_stats[team]["losses"]
+    for venue, info in VENUES.items():
+        wins = venue_stats[venue]["wins"]
+        losses = venue_stats[venue]["losses"]
         total = wins + losses
         win_ratio = (wins / total * 100) if total > 0 else 0.0
 
         rows.append({
-            "Team": team,
             "Stadium": info["Stadium"],
+            "City": info["City"],
             "Lat": info["Lat"],
             "Lon": info["Lon"],
             "Wins": wins,
