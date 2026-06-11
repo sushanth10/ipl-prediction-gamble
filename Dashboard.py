@@ -177,6 +177,25 @@ def main():
     leaderboard_df = leaderboard_df.sort_values("Rank").reset_index(drop=True)
     leaderboard_df["Matchwise Points (Last 5)"] = leaderboard_df["Matchwise Points (Last 5)"].apply(format_matchwise_points)
 
+    # ── Position change since last match ─────────────────────────────────────
+    def compute_pos_delta(lb_current, results_prev):
+        if results_prev.empty:
+            return pd.Series("—", index=lb_current.index)
+        prev_lb, _ = ExtractAndTransform.calculate_scores(results_prev, predictions)
+        prev_lb["Prev Rank"] = prev_lb["Points"].rank(method="dense", ascending=False).astype(int)
+        merged = lb_current[["Participant", "Rank"]].merge(
+            prev_lb[["Participant", "Prev Rank"]], on="Participant", how="left"
+        )
+        def fmt(r):
+            delta = int(r["Prev Rank"]) - int(r["Rank"])   # positive = moved up
+            if delta > 0:  return f"▲{delta}"
+            if delta < 0:  return f"▼{abs(delta)}"
+            return "—"
+        return merged.apply(fmt, axis=1)
+
+    results_prev = results_df.iloc[:-1].copy() if len(results_df) > 1 else pd.DataFrame()
+    leaderboard_df["Pos Δ"] = compute_pos_delta(leaderboard_df, results_prev).values
+
     matchwise_df = ExtractAndTransform.matchwise_predictions(schedule_df, predictions)
     prediction_ratio_counts, home_away_ratio_counts = Analysis.get_prediction_ratios(matchwise_df)
 
@@ -197,14 +216,14 @@ def main():
 
     k1, k2, k3, k4 = st.columns(4)
     k1.metric("🥇 Leader", leader["Participant"], f"{int(leader['Points'])} pts")
-    k2.metric("📋 Matches Played", total_matches, f"of 70 league")
+    k2.metric("📋 Matches Played", total_matches, f"of 74 ")
     k3.metric("👥 Participants", num_participants)
     k4.metric("🎯 Avg Accuracy", f"{avg_accuracy:.1f}%")
 
     st.write("")
 
     # ── Tabs ─────────────────────────────────────────────────────────────────
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs([
         "🏆  Leaderboard",
         "📋  All Predictions",
         "🔢  Matchwise",
@@ -214,6 +233,7 @@ def main():
         "🎭  Personalities",
         "📅  Calendar",
         "🏟️  Team Intelligence",
+        "📊  Player Reports",
     ])
 
     # ── TAB 1: Leaderboard ──────────────────────────────────────────────────
@@ -244,7 +264,7 @@ def main():
         section_label("📊", "Full Leaderboard")
         
         # We need a custom render function here to include the new columns without breaking the old layout:
-        display_cols = ["Rank", "Participant", "Points", "Change", "Accuracy (%)",
+        display_cols = ["Rank", "Pos Δ", "Participant", "Points", "Change", "Accuracy (%)",
                         "Consistency Score", "Current Form (%)", "Upset Accuracy (%)", "Clutch Rate (%)",
                         "Matchwise Points (Last 5)", "Last 5 Matches",
                         "Predicted Points", "Bonus Points", "Correct Predictions"]
@@ -259,9 +279,13 @@ def main():
             change_val = str(row.get("Change", ""))
             change_cls = "change-up" if "▲" in change_val or "🔼" in change_val else "change-down" if "▼" in change_val or "🔽" in change_val else "change-same"
 
+            pos_delta = str(row.get('Pos \u0394', '\u2014'))
+            pos_cls = "change-up" if pos_delta.startswith('\u25b2') else "change-down" if pos_delta.startswith('\u25bc') else "change-same"
+
             rows_html += f"""
             <tr>
                 <td><span class="rank-badge {rank_cls}">{rank}</span></td>
+                <td class="{pos_cls}" style="font-weight:700;text-align:center;">{pos_delta}</td>
                 <td style="font-weight:600;">{row['Participant']}</td>
                 <td style="font-weight:800;color:#f0f0ff;font-size:1.1rem;">{int(row['Points'])}</td>
                 <td class="{change_cls}">{change_val}</td>
@@ -277,7 +301,7 @@ def main():
                 <td style="color:#8b93b8;font-size:0.8rem;">{int(row.get('Correct Predictions',0))}</td>
             </tr>"""
 
-        headers = ["Rank", "Name", "Points", "Chg", "Accuracy", "Consist.", "Form", "Upset Acc", "Clutch",
+        headers = ["Rank", "Pos", "Name", "Points", "Chg", "Accuracy", "Consist.", "Form", "Upset Acc", "Clutch",
                    "Last 5 Pts", "Last 5", "Pred Pts", "Bonus", "Correct"]
         headers_html = "".join(f"<th style='white-space:nowrap;'>{h}</th>" for h in headers)
 
@@ -361,6 +385,12 @@ def main():
         points_progression_df = pd.DataFrame(points_progression)[1:].reset_index()
         points_progression_df = points_progression_df.rename(columns={"index": "Match #"})
         st.dataframe(points_progression_df, use_container_width=True, hide_index=True)
+
+        section_label("⏱️", "Time Spent in Each Position")
+        prog_df_for_rank = Analysis.get_points_progression_df(points_progression)
+        time_spent_df = Analysis.get_time_spent_position(prog_df_for_rank)
+        st.plotly_chart(Plotting.plot_time_spent_position(time_spent_df), use_container_width=True)
+        st.plotly_chart(Plotting.plot_time_spent_position_line(time_spent_df), use_container_width=True)
 
     # ── TAB 5: Head-to-Head ─────────────────────────────────────────────────
     with tab5:
@@ -516,6 +546,15 @@ def main():
         st.plotly_chart(Plotting.plot_stadium_map(user_stadium_df, selected_map_user), use_container_width=True)
 
         st.write("\n\n")
+        section_label("💰", "Stadium Points Map")
+        st.markdown(
+            '<p style="color:#8b93b8;font-size:0.88rem;margin-bottom:10px;">'
+            'Bubble size = total points earned at each ground. Color = points per match efficiency (red→green). Bigger and greener = your lucky money ground.</p>',
+            unsafe_allow_html=True
+        )
+        st.plotly_chart(Plotting.plot_stadium_points_map(user_stadium_df, selected_map_user), use_container_width=True)
+
+        st.write("\n\n")
         col_pts, col_agree = st.columns([1, 1.2])
         
         with col_pts:
@@ -525,6 +564,83 @@ def main():
         with col_agree:
             section_label("🤝", "Participant Agreement Matrix")
             st.plotly_chart(Plotting.plot_agreement_matrix(agree_matrix), use_container_width=True)
+
+
+    # ── TAB 10: Player Reports ──────────────────────────────────────────────
+    with tab10:
+        section_label("📊", "Personalized Season Report Cards")
+        st.markdown(
+            '<p style="color:#8b93b8;font-size:0.88rem;margin-bottom:16px;">'
+            'Beautiful infographic report cards for each player — personalized stats, '
+            'radar charts, fun insights, and a verdict. Download and share with friends!</p>',
+            unsafe_allow_html=True
+        )
+
+        human_players = [p for p in sorted(predictions.keys())
+                         if p not in ExtractAndTransform.NON_HUMAN_PLAYERS]
+
+        selected_player = st.selectbox("Select Player", human_players, key="report_player")
+
+        if st.button("🎨 Generate Report Card", key="gen_report", use_container_width=True):
+            with st.spinner(f"Generating report card for {selected_player}..."):
+                report_data = ExtractAndTransform.get_player_report_data(
+                    selected_player, results_df, predictions, schedule_df,
+                    leaderboard_df, advanced_metrics_df, points_progression,
+                    agree_matrix
+                )
+                out_path = os.path.join(base_path, f"The Visuals/reports/{selected_player}_report.png")
+                os.makedirs(os.path.dirname(out_path), exist_ok=True)
+                img_bytes = Plotting.generate_player_report_card(report_data, output_path=out_path)
+                st.session_state["report_bytes"] = img_bytes
+                st.session_state["report_name"] = selected_player
+
+        if "report_bytes" in st.session_state:
+            rname = st.session_state["report_name"]
+            rbytes = st.session_state["report_bytes"]
+
+            st.image(rbytes, caption=f"{rname}'s Season Report Card", use_column_width=True)
+
+            import datetime
+            st.download_button(
+                label=f"📥 Download {rname}'s Report",
+                data=rbytes,
+                file_name=f"{rname}_IPL2026_report_{datetime.date.today()}.png",
+                mime="image/png",
+                use_container_width=True,
+            )
+
+        st.write("")
+        st.write("")
+        section_label("📦", "Batch Download All Reports")
+
+        if st.button("🗂️ Generate & Download All Reports (ZIP)", key="gen_all_reports",
+                      use_container_width=True):
+            with st.spinner("Generating all report cards... this may take a moment."):
+                out_dir = os.path.join(base_path, "The Visuals/reports")
+                all_reports = Plotting.generate_all_player_reports(
+                    results_df, predictions, schedule_df,
+                    leaderboard_df, advanced_metrics_df,
+                    points_progression, agree_matrix,
+                    output_dir=out_dir
+                )
+
+                # Bundle into ZIP
+                import io, zipfile
+                zip_buffer = io.BytesIO()
+                with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+                    for name, img_bytes in all_reports.items():
+                        zf.writestr(f"{name}_IPL2026_report.png", img_bytes)
+                zip_buffer.seek(0)
+
+                st.success(f"✅ Generated {len(all_reports)} report cards!")
+                import datetime
+                st.download_button(
+                    label="📥 Download All Reports (ZIP)",
+                    data=zip_buffer.getvalue(),
+                    file_name=f"IPL2026_all_reports_{datetime.date.today()}.zip",
+                    mime="application/zip",
+                    use_container_width=True,
+                )
 
 
 if __name__ == "__main__":

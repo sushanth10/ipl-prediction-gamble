@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="description" content="Sushanth Bayari's IPL 2026 Prediction Season Report">
+<title>Sushanth Bayari · IPL 2026 Season Report</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: #08090f;
+  color: #f0f2f6;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, system-ui, sans-serif;
+  min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+}
+.bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.orb { position:absolute; border-radius:50%; filter:blur(90px); animation:orb-drift 10s ease-in-out infinite alternate; }
+.orb-1 { width:420px; height:420px; background:radial-gradient(circle,#7c5cff 0%,transparent 70%); opacity:0.13; top:-140px; right:-100px; }
+.orb-2 { width:320px; height:320px; background:radial-gradient(circle,#f97316 0%,transparent 70%); opacity:0.10; top:55%; left:-80px; animation-delay:-4s; }
+.orb-3 { width:260px; height:260px; background:radial-gradient(circle,#22c55e 0%,transparent 70%); opacity:0.08; bottom:5%; right:5%; animation-delay:-7s; }
+@keyframes orb-drift { from { transform:translate(0,0) scale(1); } to { transform:translate(18px,-22px) scale(1.1); } }
+.wrap { position:relative; z-index:1; max-width:500px; margin:0 auto; padding:20px 16px 40px; }
+.fade-up { opacity:0; transform:translateY(20px); animation:fade-up-in 0.55s ease forwards; }
+@keyframes fade-up-in { to { opacity:1; transform:translateY(0); } }
+.section-lbl { font-size:10.5px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:#3d4259; margin:28px 0 12px 2px; }
+.hero { background:linear-gradient(145deg,#110e20 0%,#161228 40%,#0d1624 100%); border:1px solid rgba(124,92,255,0.22); border-radius:26px; padding:28px 22px 22px; position:relative; overflow:hidden; }
+.hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 85% 15%,rgba(124,92,255,0.14) 0%,transparent 55%); pointer-events:none; }
+.hero::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(124,92,255,0.35),transparent); }
+.hero-eyebrow { font-size:10px; font-weight:700; letter-spacing:3.5px; text-transform:uppercase; color:#3d4259; margin-bottom:12px; }
+.hero-name { font-size:clamp(34px,9vw,44px); font-weight:900; line-height:1; letter-spacing:-1.5px; color:#ffffff; margin-bottom:14px; }
+.rank-badge { display:inline-flex; align-items:center; gap:7px; padding:6px 16px; border-radius:50px; font-size:13px; font-weight:800; margin-bottom:22px; letter-spacing:0.3px; }
+.r-gold   { background:rgba(255,215,0,0.12);  border:1px solid rgba(255,215,0,0.35);  color:#FFD700; }
+.r-silver { background:rgba(192,192,192,0.10); border:1px solid rgba(192,192,192,0.30); color:#C0C0C0; }
+.r-bronze { background:rgba(205,127,50,0.10);  border:1px solid rgba(205,127,50,0.30);  color:#CD7F32; }
+.r-n      { background:rgba(124,92,255,0.10);  border:1px solid rgba(124,92,255,0.28);  color:#a78bfa; }
+.hero-points-row { display:flex; align-items:baseline; gap:6px; margin-bottom:4px; }
+.hero-pts-big { font-size:clamp(48px,13vw,60px); font-weight:900; line-height:1; letter-spacing:-2.5px; color:#ffffff; }
+.hero-pts-label { font-size:18px; font-weight:500; color:#5a6078; }
+.hero-accuracy { font-size:14.5px; font-weight:600; color:#a78bfa; margin-bottom:18px; }
+.hero-badge { display:inline-flex; align-items:center; gap:7px; background:rgba(124,92,255,0.12); border:1px solid rgba(124,92,255,0.30); border-radius:50px; padding:7px 16px; font-size:12.5px; font-weight:700; color:#c4b5fd; margin-bottom:16px; }
+.hero-verdict { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:14px 16px; font-size:13.5px; line-height:1.55; color:#9ba3c0; font-style:italic; }
+.hero-verdict::before { content:'\201C'; font-size:20px; color:rgba(124,92,255,0.5); font-style:normal; margin-right:3px; }
+.hero-verdict::after  { content:'\201D'; font-size:20px; color:rgba(124,92,255,0.5); font-style:normal; margin-left:3px; }
+.kpi-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.kpi-card { background:#0f1118; border:1px solid rgba(255,255,255,0.055); border-radius:18px; padding:18px 16px 14px; position:relative; overflow:hidden; transition:transform 0.18s ease,box-shadow 0.18s ease; -webkit-tap-highlight-color:transparent; }
+.kpi-card:active { transform:scale(0.96); box-shadow:0 0 0 2px rgba(124,92,255,0.25); }
+.kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2.5px; border-radius:18px 18px 0 0; }
+.c-green::before  { background:linear-gradient(90deg,#22c55e 0%,transparent 80%); }
+.c-red::before    { background:linear-gradient(90deg,#ef4444 0%,transparent 80%); }
+.c-gray::before   { background:linear-gradient(90deg,#6b7280 0%,transparent 80%); }
+.c-purple::before { background:linear-gradient(90deg,#7c5cff 0%,transparent 80%); }
+.c-gold::before   { background:linear-gradient(90deg,#FFD700 0%,transparent 80%); }
+.c-blue::before   { background:linear-gradient(90deg,#3b82f6 0%,transparent 80%); }
+.c-green  { box-shadow:inset 0 0 30px rgba(34,197,94,0.04); }
+.c-red    { box-shadow:inset 0 0 30px rgba(239,68,68,0.04); }
+.c-purple { box-shadow:inset 0 0 30px rgba(124,92,255,0.04); }
+.c-gold   { box-shadow:inset 0 0 30px rgba(255,215,0,0.04); }
+.c-blue   { box-shadow:inset 0 0 30px rgba(59,130,246,0.04); }
+.kpi-label { font-size:9.5px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:#3d4259; margin-bottom:10px; }
+.kpi-val { font-size:36px; font-weight:900; line-height:1; letter-spacing:-1.5px; }
+.c-green  .kpi-val { color:#22c55e; }
+.c-red    .kpi-val { color:#ef4444; }
+.c-gray   .kpi-val { color:#9ca3af; }
+.c-purple .kpi-val { color:#a78bfa; }
+.c-gold   .kpi-val { color:#fbbf24; }
+.c-blue   .kpi-val { color:#60a5fa; }
+.kpi-sub { font-size:11px; color:#3d4259; margin-top:5px; line-height:1.4; }
+.kpi-icon { position:absolute; bottom:10px; right:12px; font-size:26px; opacity:0.15; user-select:none; }
+.kpi-wide { grid-column:span 2; }
+.kpi-wide .kpi-val { font-size:46px; }
+.kpi-wide-inner { display:flex; align-items:center; gap:16px; }
+.kpi-wide-right { flex:1; }
+.kpi-wide-period { font-size:11.5px; color:#4a5070; margin-top:4px; line-height:1.4; }
+.footer { text-align:center; font-size:10.5px; letter-spacing:1.5px; color:#1e2234; margin-top:36px; text-transform:uppercase; }
+.chart-card { background:#0f1118; border:1px solid rgba(255,255,255,0.055); border-radius:18px; padding:18px 14px 14px; position:relative; overflow:hidden; }
+.chart-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2.5px; border-radius:18px 18px 0 0; background:linear-gradient(90deg,#7c5cff 0%,transparent 80%); }
+.chart-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px; }
+.chart-title { font-size:10px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:#3d4259; flex:1; }
+.compare-wrap { position:relative; flex-shrink:0; }
+.compare-select { appearance:none; -webkit-appearance:none; background:#161924; border:1px solid rgba(124,92,255,0.25); border-radius:10px; color:#a78bfa; font-size:11px; font-weight:600; padding:7px 26px 7px 11px; cursor:pointer; outline:none; max-width:145px; transition:border-color 0.2s; }
+.compare-select:focus { border-color:rgba(124,92,255,0.55); }
+.compare-arrow { position:absolute; right:8px; top:50%; transform:translateY(-50%); pointer-events:none; color:#5a6078; font-size:9px; }
+.chart-svg-wrap { position:relative; width:100%; }
+.chart-svg { width:100%; height:auto; display:block; }
+.chart-tooltip { position:absolute; background:#1a1d2a; border:1px solid rgba(124,92,255,0.30); border-radius:10px; padding:8px 12px; font-size:11px; pointer-events:none; white-space:nowrap; transform:translateX(-50%); z-index:10; box-shadow:0 4px 20px rgba(0,0,0,0.5); min-width:130px; }
+.tt-match { color:#5a6078; font-size:10px; margin-bottom:5px; font-weight:700; letter-spacing:1px; }
+.tt-row { display:flex; align-items:center; gap:6px; margin-top:4px; }
+.tt-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.tt-val { font-weight:800; font-size:12px; }
+.tt-name { color:#5a6078; font-size:10px; }
+.chart-legend { display:flex; flex-wrap:wrap; gap:14px; margin-top:12px; }
+.legend-item { display:flex; align-items:center; gap:7px; font-size:11px; color:#6b7280; font-weight:600; }
+.legend-line { width:22px; height:3px; border-radius:2px; flex-shrink:0; }
+.tp-best { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:4px 0 16px; }
+.tp-best-left { flex:1; min-width:0; }
+.tp-best-lbl { font-size:9.5px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:#3d4259; margin-bottom:6px; }
+.tp-best-team { font-size:17px; font-weight:800; line-height:1.2; word-break:break-word; }
+.tp-best-sub { font-size:11px; color:#4a5070; margin-top:4px; }
+.tp-best-pts { font-size:46px; font-weight:900; line-height:1; letter-spacing:-2px; flex-shrink:0; }
+.tp-divider { height:1px; background:rgba(255,255,255,0.06); margin-bottom:14px; }
+.tp-svg { width:100%; height:auto; display:block; overflow:visible; }
+.bm-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.bm-eyebrow { font-size:9.5px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:#3d4259; }
+.bm-points { font-size:38px; font-weight:900; color:#10b981; letter-spacing:-1.5px; line-height:1; }
+.bm-match-title { font-size:18px; font-weight:800; color:#f3f4f6; margin-bottom:6px; line-height:1.3; }
+.bm-date { font-size:11px; color:#5a6078; font-weight:600; margin-bottom:16px; }
+.bm-details { display:flex; gap:16px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:12px; padding:12px 14px; }
+.bm-detail-col { flex:1; min-width:0; }
+.bm-detail-lbl { font-size:9px; font-weight:700; color:#4a5070; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+.bm-detail-val { font-size:12px; font-weight:700; color:#e5e7eb; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.bm-detail-val.correct { color:#10b981; }
+
+</style>
+</head>
+<body>
+<div class="bg-canvas">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div class="wrap">
+  <div class="hero fade-up" style="animation-delay:0.05s" id="hero">
+    <div class="hero-eyebrow">IPL 2026 &middot; Season Report</div>
+    <div class="hero-name" id="h-name">—</div>
+    <div id="h-rank"></div>
+    <div class="hero-points-row">
+      <div class="hero-pts-big" id="h-pts">0</div>
+      <div class="hero-pts-label">pts</div>
+    </div>
+    <div class="hero-accuracy" id="h-acc">—</div>
+    <div class="hero-badge" id="h-badge">—</div>
+    <div class="hero-verdict" id="h-verdict">—</div>
+  </div>
+  <div class="section-lbl fade-up" style="animation-delay:0.2s">Season Statistics</div>
+  <div class="kpi-grid" id="kpi-grid"></div>
+  <div class="section-lbl fade-up" style="animation-delay:0.85s">Points Journey</div>
+  <div class="chart-card fade-up" style="animation-delay:0.95s">
+    <div class="chart-header">
+      <div class="chart-title">Cumulative Points Over Season</div>
+      <div class="compare-wrap">
+        <select class="compare-select" id="compare-select"></select>
+        <span class="compare-arrow">&#9660;</span>
+      </div>
+    </div>
+    <div id="chart-container"></div>
+    <div class="chart-legend" id="chart-legend"></div>
+  </div>
+  <div class="section-lbl fade-up" style="animation-delay:1.05s">Team Performance</div>
+  <div class="chart-card fade-up" style="animation-delay:1.12s" id="team-perf-card"></div>
+  <div class="section-lbl fade-up" style="animation-delay:1.18s">Team Accuracy</div>
+  <div class="chart-card fade-up" style="animation-delay:1.25s" id="team-acc-card"></div>
+  <div class="section-lbl fade-up" style="animation-delay:1.31s">Best Matches</div>
+  <div class="chart-card fade-up" style="animation-delay:1.36s" id="best-league-card"></div>
+  <div class="chart-card fade-up" style="animation-delay:1.42s" id="best-overall-card" style="margin-top:16px;"></div>
+  <div class="section-lbl fade-up" style="animation-delay:1.48s">Stadium Performance</div>
+  <div class="chart-card fade-up" style="animation-delay:1.55s" id="stadium-stats-card"></div>
+  <div class="section-lbl fade-up" style="animation-delay:1.61s">Stadium Accuracy</div>
+  <div class="chart-card fade-up" style="animation-delay:1.68s" id="stadium-acc-card"></div>
+  <div class="section-lbl fade-up" style="animation-delay:1.74s">Prediction Similarity</div>
+  <div class="chart-card fade-up" style="animation-delay:1.80s" id="similarity-card"></div>
+  <div class="footer fade-up" style="animation-delay:1.90s">
+    IPL Prediction Game 2026 &middot; Season Report
+  </div>
+</div>
+<script>
+
+var D = {
+  "participant": "Sushanth Bayari",
+  "rank": 6,
+  "total_participants": 12,
+  "points": 635,
+  "accuracy": 45.95,
+  "correct": 34,
+  "wrong": 38,
+  "nr_count": 2,
+  "total_matches": 74,
+  "predicted_pts": 340,
+  "bonus_pts": 285,
+  "longest_win_streak": 3,
+  "winning_period": "April 15, 2026 - April 17, 2026",
+  "longest_loss_streak": 7,
+  "losing_period": "April 28, 2026 - May 3, 2026",
+  "month_accuracy": {
+    "March": 50.0,
+    "April": 47.2,
+    "May": 46.9
+  },
+  "best_month": "March",
+  "best_month_acc": 50.0,
+  "team_analysis": {
+    "Chennai Super Kings": {
+      "predicted": 2,
+      "actual": 6
+    },
+    "Delhi Capitals": {
+      "predicted": 4,
+      "actual": 6
+    },
+    "Gujarat Titans": {
+      "predicted": 10,
+      "actual": 11
+    },
+    "Kolkata Knight Riders": {
+      "predicted": 3,
+      "actual": 6
+    },
+    "Lucknow Super Giants": {
+      "predicted": 4,
+      "actual": 4
+    },
+    "Mumbai Indians": {
+      "predicted": 8,
+      "actual": 4
+    },
+    "Punjab Kings": {
+      "predicted": 12,
+      "actual": 6
+    },
+    "Rajasthan Royals": {
+      "predicted": 10,
+      "actual": 9
+    },
+    "Royal Challengers Bengaluru": {
+      "predicted": 14,
+      "actual": 11
+    },
+    "Sunrisers Hyderabad": {
+      "predicted": 7,
+      "actual": 9
+    }
+  },
+  "fav_team": "Royal Challengers Bengaluru",
+  "fav_team_count": 14,
+  "best_solo_match": "M24: Mum vs Pun",
+  "radar": {
+    "Accuracy": 45.95,
+    "Consistency": 83.3,
+    "Form": 64.4,
+    "Upset Acc": 40.0,
+    "Clutch": 60.0,
+    "Contrarian": 50.0
+  },
+  "crowd_follower": 75.7,
+  "lucky_stadium": "SVN Singh Intl. Stadium (100%)",
+  "unlucky_stadium": "Sawai Mansingh Stadium (25%)",
+  "closest_rival": "Sushanth",
+  "closest_rival_pct": 71.6,
+  "nemesis": "Rando",
+  "nemesis_pct": 40.5,
+  "inverse_score": 574,
+  "primary_badge": [
+    "❄️ Ice Cold",
+    "7 wrong in a row..."
+  ],
+  "all_badges": [
+    [
+      "❄️ Ice Cold",
+      "7 wrong in a row..."
+    ],
+    [
+      "🎯 The Clutch King",
+      "Ice in the veins on 50/50 calls"
+    ],
+    [
+      "💜 Bengaluru Superfan",
+      "Picked Royal Challengers Bengaluru 14 times"
+    ],
+    [
+      "🔥 The Contrarian",
+      "Goes against the grain and wins"
+    ],
+    [
+      "🐑 The Sheep",
+      "Always picks with the crowd"
+    ]
+  ],
+  "fun_stats": [
+    "You agreed with the crowd 76% of the time",
+    "Your best month was March (50% accuracy)",
+    "You were the ONLY one right on M24: Mum vs Pun",
+    "You picked Royal Challengers Bengaluru to win 14 times",
+    "If you'd flipped every pick, you'd have 574 pts",
+    "Your prediction twin: Sushanth (72% match)",
+    "Your nemesis: Rando (only 40% match)"
+  ],
+  "verdict": "Consistent performer. You've got the cricketing brain. 🧠",
+  "progression": [
+    0,
+    0,
+    0,
+    10,
+    20,
+    20,
+    20,
+    34,
+    34,
+    34,
+    48,
+    58,
+    63,
+    63,
+    77,
+    91,
+    91,
+    96,
+    96,
+    110,
+    110,
+    110,
+    110,
+    120,
+    134,
+    144,
+    144,
+    154,
+    154,
+    164,
+    164,
+    174,
+    188,
+    188,
+    198,
+    212,
+    212,
+    228,
+    228,
+    242,
+    242,
+    242,
+    242,
+    242,
+    242,
+    242,
+    242,
+    252,
+    252,
+    252,
+    252,
+    252,
+    252,
+    262,
+    272,
+    272,
+    283,
+    293,
+    293,
+    293,
+    309,
+    323,
+    323,
+    337,
+    347,
+    347,
+    357,
+    357,
+    371,
+    385,
+    385,
+    460,
+    460,
+    535,
+    635
+  ],
+  "all_progressions": {
+    "Rakshit": [
+      0,
+      10,
+      10,
+      20,
+      30,
+      44,
+      58,
+      58,
+      68,
+      82,
+      96,
+      106,
+      111,
+      121,
+      135,
+      149,
+      149,
+      154,
+      164,
+      178,
+      192,
+      192,
+      192,
+      202,
+      202,
+      202,
+      202,
+      212,
+      212,
+      222,
+      222,
+      222,
+      236,
+      236,
+      246,
+      246,
+      261,
+      261,
+      261,
+      275,
+      292,
+      306,
+      306,
+      306,
+      306,
+      325,
+      339,
+      339,
+      353,
+      365,
+      365,
+      365,
+      380,
+      390,
+      400,
+      400,
+      400,
+      410,
+      410,
+      410,
+      426,
+      440,
+      440,
+      454,
+      464,
+      464,
+      464,
+      464,
+      464,
+      464,
+      464,
+      539,
+      539,
+      614,
+      714
+    ],
+    "Niharika": [
+      0,
+      10,
+      20,
+      20,
+      20,
+      34,
+      48,
+      48,
+      48,
+      62,
+      76,
+      86,
+      91,
+      91,
+      105,
+      119,
+      119,
+      124,
+      134,
+      148,
+      148,
+      164,
+      164,
+      174,
+      174,
+      184,
+      202,
+      202,
+      219,
+      229,
+      229,
+      229,
+      243,
+      243,
+      253,
+      267,
+      282,
+      282,
+      297,
+      311,
+      311,
+      311,
+      324,
+      341,
+      351,
+      351,
+      351,
+      361,
+      361,
+      361,
+      361,
+      361,
+      361,
+      361,
+      361,
+      361,
+      372,
+      372,
+      391,
+      406,
+      422,
+      436,
+      436,
+      450,
+      450,
+      460,
+      470,
+      470,
+      470,
+      484,
+      484,
+      559,
+      559,
+      559,
+      659
+    ],
+    "Shreya": [
+      0,
+      10,
+      20,
+      20,
+      20,
+      20,
+      20,
+      34,
+      44,
+      44,
+      58,
+      68,
+      73,
+      83,
+      83,
+      97,
+      97,
+      102,
+      112,
+      112,
+      126,
+      126,
+      126,
+      136,
+      136,
+      146,
+      146,
+      146,
+      146,
+      146,
+      146,
+      146,
+      160,
+      160,
+      170,
+      170,
+      170,
+      186,
+      201,
+      215,
+      215,
+      215,
+      228,
+      228,
+      228,
+      228,
+      242,
+      242,
+      256,
+      256,
+      256,
+      256,
+      256,
+      256,
+      266,
+      266,
+      266,
+      266,
+      266,
+      281,
+      297,
+      311,
+      324,
+      338,
+      348,
+      358,
+      358,
+      358,
+      358,
+      372,
+      372,
+      447,
+      497,
+      497,
+      597
+    ],
+    "Raghavendra": [
+      0,
+      0,
+      0,
+      0,
+      10,
+      10,
+      24,
+      38,
+      38,
+      38,
+      38,
+      48,
+      53,
+      53,
+      53,
+      67,
+      67,
+      72,
+      82,
+      82,
+      96,
+      96,
+      106,
+      116,
+      130,
+      140,
+      140,
+      150,
+      150,
+      160,
+      160,
+      170,
+      170,
+      170,
+      180,
+      194,
+      209,
+      225,
+      240,
+      254,
+      254,
+      254,
+      254,
+      271,
+      281,
+      281,
+      295,
+      305,
+      319,
+      331,
+      331,
+      331,
+      346,
+      356,
+      366,
+      366,
+      366,
+      376,
+      395,
+      410,
+      410,
+      424,
+      424,
+      424,
+      434,
+      444,
+      454,
+      454,
+      454,
+      454,
+      464,
+      464,
+      464,
+      464,
+      464
+    ],
+    "Yashaswini": [
+      0,
+      10,
+      20,
+      20,
+      30,
+      44,
+      44,
+      58,
+      68,
+      82,
+      82,
+      92,
+      97,
+      97,
+      97,
+      97,
+      97,
+      102,
+      112,
+      126,
+      126,
+      126,
+      136,
+      146,
+      146,
+      156,
+      156,
+      156,
+      156,
+      166,
+      184,
+      194,
+      208,
+      208,
+      218,
+      232,
+      232,
+      248,
+      263,
+      277,
+      294,
+      294,
+      294,
+      294,
+      294,
+      294,
+      294,
+      304,
+      304,
+      304,
+      304,
+      304,
+      304,
+      314,
+      324,
+      324,
+      335,
+      345,
+      364,
+      364,
+      380,
+      394,
+      394,
+      394,
+      404,
+      404,
+      414,
+      414,
+      428,
+      442,
+      452,
+      452,
+      452,
+      452,
+      552
+    ],
+    "Sushanth": [
+      0,
+      10,
+      20,
+      30,
+      40,
+      54,
+      54,
+      68,
+      68,
+      68,
+      82,
+      92,
+      97,
+      97,
+      111,
+      125,
+      125,
+      130,
+      130,
+      144,
+      158,
+      158,
+      158,
+      168,
+      182,
+      192,
+      210,
+      210,
+      210,
+      210,
+      210,
+      220,
+      234,
+      249,
+      259,
+      273,
+      273,
+      289,
+      304,
+      318,
+      318,
+      318,
+      318,
+      335,
+      335,
+      335,
+      335,
+      345,
+      359,
+      359,
+      376,
+      391,
+      406,
+      416,
+      416,
+      416,
+      416,
+      426,
+      445,
+      445,
+      461,
+      475,
+      475,
+      475,
+      485,
+      495,
+      505,
+      517,
+      517,
+      531,
+      531,
+      606,
+      606,
+      681,
+      781
+    ],
+    "Sushanth Bayari": [
+      0,
+      0,
+      0,
+      10,
+      20,
+      20,
+      20,
+      34,
+      34,
+      34,
+      48,
+      58,
+      63,
+      63,
+      77,
+      91,
+      91,
+      96,
+      96,
+      110,
+      110,
+      110,
+      110,
+      120,
+      134,
+      144,
+      144,
+      154,
+      154,
+      164,
+      164,
+      174,
+      188,
+      188,
+      198,
+      212,
+      212,
+      228,
+      228,
+      242,
+      242,
+      242,
+      242,
+      242,
+      242,
+      242,
+      242,
+      252,
+      252,
+      252,
+      252,
+      252,
+      252,
+      262,
+      272,
+      272,
+      283,
+      293,
+      293,
+      293,
+      309,
+      323,
+      323,
+      337,
+      347,
+      347,
+      357,
+      357,
+      371,
+      385,
+      385,
+      460,
+      460,
+      535,
+      635
+    ],
+    "Spoorthi": [
+      0,
+      10,
+      10,
+      10,
+      20,
+      20,
+      20,
+      20,
+      20,
+      20,
+      20,
+      20,
+      25,
+      35,
+      35,
+      49,
+      49,
+      54,
+      64,
+      64,
+      64,
+      80,
+      90,
+      100,
+      100,
+      110,
+      110,
+      120,
+      137,
+      147,
+      147,
+      157,
+      157,
+      157,
+      167,
+      167,
+      167,
+      183,
+      198,
+      212,
+      229,
+      229,
+      229,
+      229,
+      239,
+      239,
+      253,
+      253,
+      253,
+      265,
+      282,
+      282,
+      297,
+      297,
+      297,
+      297,
+      297,
+      307,
+      326,
+      341,
+      357,
+      357,
+      357,
+      357,
+      357,
+      367,
+      367,
+      379,
+      379,
+      379,
+      389,
+      389,
+      389,
+      389,
+      389
+    ],
+    "Sudeep": [
+      0,
+      10,
+      20,
+      30,
+      40,
+      40,
+      54,
+      54,
+      54,
+      54,
+      54,
+      64,
+      69,
+      69,
+      69,
+      83,
+      83,
+      88,
+      98,
+      98,
+      98,
+      98,
+      108,
+      118,
+      118,
+      128,
+      146,
+      156,
+      156,
+      166,
+      184,
+      184,
+      184,
+      184,
+      194,
+      194,
+      194,
+      194,
+      209,
+      223,
+      223,
+      223,
+      223,
+      240,
+      240,
+      240,
+      254,
+      264,
+      264,
+      276,
+      293,
+      293,
+      293,
+      303,
+      303,
+      321,
+      321,
+      321,
+      340,
+      355,
+      371,
+      371,
+      384,
+      398,
+      408,
+      408,
+      418,
+      430,
+      444,
+      444,
+      444,
+      519,
+      519,
+      519,
+      619
+    ]
+  },
+  "team_points": {
+    "Chennai Super Kings": 10,
+    "Delhi Capitals": 0,
+    "Gujarat Titans": 166,
+    "Kolkata Knight Riders": 0,
+    "Lucknow Super Giants": 28,
+    "Mumbai Indians": 10,
+    "Punjab Kings": 76,
+    "Rajasthan Royals": 48,
+    "Royal Challengers Bengaluru": 253,
+    "Sunrisers Hyderabad": 34
+  },
+  "team_accuracy": {
+    "Chennai Super Kings": {
+      "correct": 1,
+      "total": 2,
+      "accuracy": 50.0
+    },
+    "Delhi Capitals": {
+      "correct": 0,
+      "total": 4,
+      "accuracy": 0.0
+    },
+    "Gujarat Titans": {
+      "correct": 8,
+      "total": 10,
+      "accuracy": 80.0
+    },
+    "Kolkata Knight Riders": {
+      "correct": 0,
+      "total": 3,
+      "accuracy": 0.0
+    },
+    "Lucknow Super Giants": {
+      "correct": 2,
+      "total": 4,
+      "accuracy": 50.0
+    },
+    "Mumbai Indians": {
+      "correct": 1,
+      "total": 8,
+      "accuracy": 12.5
+    },
+    "Punjab Kings": {
+      "correct": 6,
+      "total": 11,
+      "accuracy": 54.5
+    },
+    "Rajasthan Royals": {
+      "correct": 4,
+      "total": 10,
+      "accuracy": 40.0
+    },
+    "Royal Challengers Bengaluru": {
+      "correct": 9,
+      "total": 14,
+      "accuracy": 64.3
+    },
+    "Sunrisers Hyderabad": {
+      "correct": 3,
+      "total": 6,
+      "accuracy": 50.0
+    }
+  },
+  "best_league_match": {
+    "match_no": 60,
+    "date": "May 16, 2026",
+    "home": "Gujarat Titans",
+    "away": "Kolkata Knight Riders",
+    "prediction": "Gujarat Titans",
+    "winner": "Gujarat Titans",
+    "points": 16
+  },
+  "best_overall_match": {
+    "match_no": 74,
+    "date": "May 31, 2026",
+    "home": "Royal Challengers Bengaluru",
+    "away": "Gujarat Titans",
+    "prediction": "Royal Challengers Bengaluru",
+    "winner": "Royal Challengers Bengaluru",
+    "points": 100
+  },
+  "stadium_stats": [
+    {
+      "Stadium": "Narendra Modi Stadium",
+      "City": "Ahmedabad",
+      "Lat": 23.0917,
+      "Lon": 72.5975,
+      "Wins": 4,
+      "Losses": 4,
+      "Win %": 50.0,
+      "Points": 137,
+      "Pts/Match": 17.125
+    },
+    {
+      "Stadium": "MYS Intl. Stadium",
+      "City": "Mullanpur",
+      "Lat": 30.776,
+      "Lon": 76.7589,
+      "Wins": 3,
+      "Losses": 2,
+      "Win %": 60.0,
+      "Points": 95,
+      "Pts/Match": 19.0
+    },
+    {
+      "Stadium": "HPCA Stadium",
+      "City": "Dharamsala",
+      "Lat": 32.2207,
+      "Lon": 76.3234,
+      "Wins": 2,
+      "Losses": 2,
+      "Win %": 50.0,
+      "Points": 89,
+      "Pts/Match": 22.25
+    },
+    {
+      "Stadium": "MA Chidambaram Stadium",
+      "City": "Chennai",
+      "Lat": 13.0628,
+      "Lon": 80.2793,
+      "Wins": 4,
+      "Losses": 3,
+      "Win %": 57.14285714285714,
+      "Points": 48,
+      "Pts/Match": 6.857142857142857
+    },
+    {
+      "Stadium": "Arun Jaitley Stadium",
+      "City": "Delhi",
+      "Lat": 28.6378,
+      "Lon": 77.2432,
+      "Wins": 3,
+      "Losses": 4,
+      "Win %": 42.857142857142854,
+      "Points": 42,
+      "Pts/Match": 6.0
+    },
+    {
+      "Stadium": "Ekana Cricket Stadium",
+      "City": "Lucknow",
+      "Lat": 26.8115,
+      "Lon": 81.0152,
+      "Wins": 3,
+      "Losses": 4,
+      "Win %": 42.857142857142854,
+      "Points": 42,
+      "Pts/Match": 6.0
+    },
+    {
+      "Stadium": "Wankhede Stadium",
+      "City": "Mumbai",
+      "Lat": 18.9389,
+      "Lon": 72.8256,
+      "Wins": 3,
+      "Losses": 4,
+      "Win %": 42.857142857142854,
+      "Points": 38,
+      "Pts/Match": 5.428571428571429
+    },
+    {
+      "Stadium": "RGI Stadium",
+      "City": "Hyderabad",
+      "Lat": 17.4065,
+      "Lon": 78.5505,
+      "Wins": 3,
+      "Losses": 4,
+      "Win %": 42.857142857142854,
+      "Points": 34,
+      "Pts/Match": 4.857142857142857
+    },
+    {
+      "Stadium": "Eden Gardens",
+      "City": "Kolkata",
+      "Lat": 22.5646,
+      "Lon": 88.3433,
+      "Wins": 2,
+      "Losses": 4,
+      "Win %": 33.33333333333333,
+      "Points": 30,
+      "Pts/Match": 5.0
+    },
+    {
+      "Stadium": "M. Chinnaswamy Stadium",
+      "City": "Bengaluru",
+      "Lat": 12.9788,
+      "Lon": 77.5996,
+      "Wins": 3,
+      "Losses": 2,
+      "Win %": 60.0,
+      "Points": 30,
+      "Pts/Match": 6.0
+    },
+    {
+      "Stadium": "SVN Singh Intl. Stadium",
+      "City": "Raipur",
+      "Lat": 21.278,
+      "Lon": 81.658,
+      "Wins": 2,
+      "Losses": 0,
+      "Win %": 100.0,
+      "Points": 20,
+      "Pts/Match": 10.0
+    },
+    {
+      "Stadium": "Barsapara Cricket Stadium",
+      "City": "Guwahati",
+      "Lat": 26.1433,
+      "Lon": 91.7362,
+      "Wins": 1,
+      "Losses": 2,
+      "Win %": 33.33333333333333,
+      "Points": 10,
+      "Pts/Match": 3.3333333333333335
+    },
+    {
+      "Stadium": "Sawai Mansingh Stadium",
+      "City": "Jaipur",
+      "Lat": 26.894,
+      "Lon": 75.8033,
+      "Wins": 1,
+      "Losses": 3,
+      "Win %": 25.0,
+      "Points": 10,
+      "Pts/Match": 2.5
+    }
+  ],
+  "nr_points": 10,
+  "similarity_stats": [
+    {
+      "participant": "Sushanth",
+      "similarity_pct": 71.6,
+      "agreed_count": 53,
+      "total_matches": 74,
+      "disagreed_count": 21,
+      "correct_p": 6,
+      "correct_o": 15
+    },
+    {
+      "participant": "Yashaswini",
+      "similarity_pct": 71.6,
+      "agreed_count": 53,
+      "total_matches": 74,
+      "disagreed_count": 21,
+      "correct_p": 9,
+      "correct_o": 12
+    },
+    {
+      "participant": "Rakshit",
+      "similarity_pct": 63.5,
+      "agreed_count": 47,
+      "total_matches": 74,
+      "disagreed_count": 27,
+      "correct_p": 11,
+      "correct_o": 16
+    },
+    {
+      "participant": "Raghavendra",
+      "similarity_pct": 60.8,
+      "agreed_count": 45,
+      "total_matches": 74,
+      "disagreed_count": 29,
+      "correct_p": 13,
+      "correct_o": 16
+    },
+    {
+      "participant": "Shreya",
+      "similarity_pct": 59.5,
+      "agreed_count": 44,
+      "total_matches": 74,
+      "disagreed_count": 30,
+      "correct_p": 16,
+      "correct_o": 14
+    },
+    {
+      "participant": "Niharika",
+      "similarity_pct": 56.8,
+      "agreed_count": 42,
+      "total_matches": 74,
+      "disagreed_count": 32,
+      "correct_p": 13,
+      "correct_o": 17
+    },
+    {
+      "participant": "Sudeep",
+      "similarity_pct": 56.8,
+      "agreed_count": 42,
+      "total_matches": 74,
+      "disagreed_count": 32,
+      "correct_p": 15,
+      "correct_o": 17
+    },
+    {
+      "participant": "Spoorthi",
+      "similarity_pct": 45.9,
+      "agreed_count": 34,
+      "total_matches": 74,
+      "disagreed_count": 40,
+      "correct_p": 22,
+      "correct_o": 18
+    }
+  ]
+};
+
+var RANK_META = {
+  1: { cls: 'r-gold',   label: '1st Place' },
+  2: { cls: 'r-silver', label: '2nd Place' },
+  3: { cls: 'r-bronze', label: '3rd Place' }
+};
+
+function rankMeta(r) {
+  return RANK_META[r] || { cls: 'r-n', label: '#' + r + ' Place' };
+}
+
+function countUp(el, target, ms, suffix) {
+  if (!el || target == null) return;
+  var isFloat = (target % 1 !== 0);
+  var t0 = performance.now();
+  function tick(now) {
+    var p  = Math.min((now - t0) / ms, 1);
+    var ep = 1 - Math.pow(1 - p, 3);
+    var v  = ep * target;
+    el.textContent = (isFloat ? v.toFixed(1) : Math.round(v)) + (suffix || '');
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+/* Remove characters outside printable Latin + common punctuation */
+function clean(str) {
+  if (!str) return '';
+  return str.replace(/[^ -ÿ–-…]/g, '').trim();
+}
+
+function renderHero() {
+  document.getElementById('h-name').textContent = D.participant;
+
+  var rm = rankMeta(D.rank);
+  document.getElementById('h-rank').innerHTML =
+    '<span class="rank-badge ' + rm.cls + '">' +
+      '#' + D.rank + '&nbsp;&nbsp;' + rm.label + '&nbsp;of&nbsp;' + D.total_participants +
+    '</span>';
+
+  countUp(document.getElementById('h-pts'), D.points, 1400, '');
+
+  document.getElementById('h-acc').textContent =
+    D.accuracy.toFixed(1) + '% accuracy · ' +
+    D.correct + ' correct of ' + D.total_matches + ' matches';
+
+  var badge = D.primary_badge || ['The Predictor', 'A true cricket analyst'];
+  document.getElementById('h-badge').textContent = clean(badge[0]) + '  —  ' + badge[1];
+
+  document.getElementById('h-verdict').textContent = clean(D.verdict);
+}
+
+function renderKPIs() {
+  var grid = document.getElementById('kpi-grid');
+  var rankCls = (D.rank === 1) ? 'c-gold' : 'c-blue';
+
+  var CARDS = [
+    { label:'Correct',           cls:'c-green',  icon:'✅', val:D.correct,             sub:'predictions hit' },
+    { label:'Wrong',             cls:'c-red',    icon:'❌', val:D.wrong,               sub:'predictions missed' },
+    { label:'No Result',         cls:'c-gray',   icon:'➖', val:D.nr_count,            sub:'washed-out matches' },
+    { label:'Bonus Points',      cls:'c-gold',   icon:'⭐', val:D.bonus_pts,           sub:'from special matches' },
+    { label:'Accuracy',          cls:'c-purple', icon:'', val:D.accuracy, sub:D.correct+' of '+D.total_matches+' matches', suffix:'%' },
+    { label:'Total Points',      cls:rankCls,    icon:'', val:D.points,  sub:'Rank #'+D.rank+' of '+D.total_participants },
+    { label:'Best Win Streak',   cls:'c-green',  icon:'', val:D.longest_win_streak,  sub:'matches in a row',
+      period:(D.winning_period||'').replace(/, 2026/g,''), wide:true },
+    { label:'Worst Loss Streak', cls:'c-red',    icon:'❄️', val:D.longest_loss_streak, sub:'matches in a row',
+      period:(D.losing_period||'').replace(/, 2026/g,''),  wide:true }
+  ];
+
+  CARDS.forEach(function(card, i) {
+    var el    = document.createElement('div');
+    var delay = (0.28 + i * 0.07).toFixed(2);
+
+    if (card.wide) {
+      el.className = 'kpi-card kpi-wide ' + card.cls + ' fade-up';
+      el.style.animationDelay = delay + 's';
+      el.innerHTML =
+        '<div class="kpi-label">' + card.label + '</div>' +
+        '<div class="kpi-wide-inner">' +
+          '<div class="kpi-val" id="kv-' + i + '">0</div>' +
+          '<div class="kpi-wide-right">' +
+            '<div class="kpi-sub">' + card.sub + '</div>' +
+            '<div class="kpi-wide-period">' + (card.period || '') + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="kpi-icon">' + card.icon + '</div>';
+    } else {
+      el.className = 'kpi-card ' + card.cls + ' fade-up';
+      el.style.animationDelay = delay + 's';
+      el.innerHTML =
+        '<div class="kpi-label">' + card.label + '</div>' +
+        '<div class="kpi-val" id="kv-' + i + '">0</div>' +
+        '<div class="kpi-sub">' + card.sub + '</div>' +
+        '<div class="kpi-icon">' + card.icon + '</div>';
+    }
+    grid.appendChild(el);
+
+    (function(idx, c) {
+      setTimeout(function() {
+        countUp(document.getElementById('kv-' + idx), c.val, 1100, c.suffix || '');
+      }, 280 + idx * 70);
+    })(i, card);
+  });
+}
+
+// ── Feature 3: Points Journey Chart ─────────────────────────────────────────
+var ALL_PROGS = D.all_progressions || {};
+var P_COL = '#a78bfa';   // player colour
+var C_COL = '#f97316';   // compare colour
+var CW = 560, CH = 230;  // SVG viewBox size
+var PL = 48, PR = 12, PT = 15, PB = 32;  // padding
+var IW = CW - PL - PR, IH = CH - PT - PB;
+var activeCompare = null;
+var tooltipEl = null;
+
+function niceMax(v) {
+  if (!v) return 100;
+  var mag = Math.pow(10, Math.floor(Math.log10(v)));
+  return Math.ceil(v / mag) * mag;
+}
+function px(i, n) { return PL + (i / Math.max(n - 1, 1)) * IW; }
+function py(v, yMax) { return PT + IH - (v / yMax) * IH; }
+
+function catmull(pts) {
+  if (pts.length < 2) return '';
+  var d = 'M' + pts[0][0].toFixed(1) + ' ' + pts[0][1].toFixed(1);
+  for (var i = 0; i < pts.length - 1; i++) {
+    var p0 = pts[Math.max(0, i - 1)], p1 = pts[i];
+    var p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+    var c1x = (p1[0] + (p2[0] - p0[0]) / 6).toFixed(1);
+    var c1y = (p1[1] + (p2[1] - p0[1]) / 6).toFixed(1);
+    var c2x = (p2[0] - (p3[0] - p1[0]) / 6).toFixed(1);
+    var c2y = (p2[1] - (p3[1] - p1[1]) / 6).toFixed(1);
+    d += ' C' + c1x + ' ' + c1y + ',' + c2x + ' ' + c2y + ',' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1);
+  }
+  return d;
+}
+
+function buildSVG(prog, yMax, col, gradId, showFill) {
+  var n = prog.length;
+  var pts = prog.map(function(v, i) { return [px(i, n), py(v, yMax)]; });
+  var lp  = catmull(pts);
+  var out = [];
+  if (showFill) {
+    var fp = lp + ' L' + pts[n-1][0].toFixed(1) + ' ' + (PT+IH) + ' L' + PL + ' ' + (PT+IH) + ' Z';
+    out.push('<defs><linearGradient id="' + gradId + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="' + col + '" stop-opacity="0.25"/><stop offset="100%" stop-color="' + col + '" stop-opacity="0"/></linearGradient></defs>');
+    out.push('<path d="' + fp + '" fill="url(#' + gradId + ')" stroke="none"/>');
+  }
+  out.push('<path d="' + lp + '" fill="none" stroke="' + col + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>');
+  var last = pts[n - 1];
+  out.push('<circle cx="' + last[0].toFixed(1) + '" cy="' + last[1].toFixed(1) + '" r="4" fill="' + col + '" stroke="#0f1118" stroke-width="2"/>');
+  return { svg: out.join(''), pts: pts };
+}
+
+function buildGrid(yMax, n) {
+  var out = [], ticks = 5, step = yMax / ticks;
+  for (var t = 0; t <= ticks; t++) {
+    var v = t * step, y = py(v, yMax).toFixed(1);
+    out.push('<line x1="' + PL + '" y1="' + y + '" x2="' + (CW-PR) + '" y2="' + y + '" stroke="rgba(255,255,255,0.045)" stroke-width="1"/>');
+    out.push('<text x="' + (PL-5) + '" y="' + y + '" text-anchor="end" dominant-baseline="middle" fill="#3d4259" font-size="9" font-family="system-ui,sans-serif">' + Math.round(v) + '</text>');
+  }
+  var xStep = Math.max(1, Math.ceil(n / 8));
+  for (var i = 0; i < n; i += xStep) {
+    var x = px(i, n).toFixed(1);
+    out.push('<text x="' + x + '" y="' + (CH-6) + '" text-anchor="middle" fill="#3d4259" font-size="9" font-family="system-ui,sans-serif">' + i + '</text>');
+  }
+  return out.join('');
+}
+
+function renderChart() {
+  var container = document.getElementById('chart-container');
+  if (!container) return;
+  var pp = D.progression || [];
+  var cp = activeCompare ? (ALL_PROGS[activeCompare] || []) : null;
+  var allVals = pp.concat(cp || []);
+  var yMax = niceMax(allVals.length ? Math.max.apply(null, allVals) : 100);
+  var grid = buildGrid(yMax, pp.length);
+  var pr   = buildSVG(pp, yMax, P_COL, 'pg', true);
+  var cr   = cp ? buildSVG(cp, yMax, C_COL, null, false) : null;
+  var cur  = '<line id="cur" x1="0" y1="' + PT + '" x2="0" y2="' + (PT+IH) + '" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="4 3" opacity="0"/>';
+  var ov   = '<rect id="ov" x="' + PL + '" y="' + PT + '" width="' + IW + '" height="' + IH + '" fill="transparent" style="cursor:crosshair"/>';
+  var svg  = '<svg class="chart-svg" viewBox="0 0 ' + CW + ' ' + CH + '" xmlns="http://www.w3.org/2000/svg">' + grid + pr.svg + (cr ? cr.svg : '') + cur + ov + '</svg>';
+  container.innerHTML = '<div class="chart-svg-wrap">' + svg + '</div>';
+
+  var leg = document.getElementById('chart-legend');
+  if (leg) {
+    var lh = '<div class="legend-item"><div class="legend-line" style="background:' + P_COL + '"></div>' + D.participant + '</div>';
+    if (activeCompare) lh += '<div class="legend-item"><div class="legend-line" style="background:' + C_COL + '"></div>' + activeCompare + '</div>';
+    leg.innerHTML = lh;
+  }
+  attachInteraction(pr.pts, cr ? cr.pts : null, pp, cp);
+}
+
+function attachInteraction(pPts, cPts, pp, cp) {
+  var ov  = document.getElementById('ov');
+  var cur = document.getElementById('cur');
+  var wrap = document.querySelector('.chart-svg-wrap');
+  if (!ov || !cur || !wrap) return;
+  if (!tooltipEl) { tooltipEl = document.createElement('div'); tooltipEl.className = 'chart-tooltip'; }
+  tooltipEl.style.opacity = '0'; tooltipEl.style.top = '-9999px';
+  if (!wrap.contains(tooltipEl)) wrap.appendChild(tooltipEl);
+
+  function show(idx) {
+    if (idx < 0 || idx >= pPts.length) return;
+    cur.setAttribute('x1', pPts[idx][0].toFixed(1)); cur.setAttribute('x2', pPts[idx][0].toFixed(1)); cur.setAttribute('opacity', '1');
+    var html = '<div class="tt-match">MATCH ' + idx + '</div>';
+    html += '<div class="tt-row"><div class="tt-dot" style="background:' + P_COL + '"></div><span class="tt-val" style="color:' + P_COL + '">' + pp[idx] + ' pts</span>&nbsp;<span class="tt-name">' + D.participant + '</span></div>';
+    if (cp && cPts) html += '<div class="tt-row"><div class="tt-dot" style="background:' + C_COL + '"></div><span class="tt-val" style="color:' + C_COL + '">' + (cp[idx]||0) + ' pts</span>&nbsp;<span class="tt-name">' + activeCompare + '</span></div>';
+    tooltipEl.innerHTML = html;
+    var svgEl = wrap.querySelector('svg');
+    var ratio = svgEl ? svgEl.getBoundingClientRect().width / CW : 1;
+    var xPx   = pPts[idx][0] * ratio;
+    var tipW  = tooltipEl.offsetWidth || 140;
+    var left  = Math.min(Math.max(xPx, tipW/2 + 4), wrap.offsetWidth - tipW/2 - 4);
+    tooltipEl.style.left = left + 'px'; tooltipEl.style.top = '2px'; tooltipEl.style.opacity = '1';
+  }
+  function hide() { cur.setAttribute('opacity','0'); tooltipEl.style.opacity='0'; }
+  function indexFromX(clientX) {
+    var svgEl = wrap.querySelector('svg');
+    var rect  = svgEl ? svgEl.getBoundingClientRect() : wrap.getBoundingClientRect();
+    var ratio = rect.width / CW;
+    var relX  = clientX - rect.left;
+    var svgX  = relX / ratio;
+    var i     = Math.round((svgX - PL) / IW * (pPts.length - 1));
+    return Math.max(0, Math.min(pPts.length - 1, i));
+  }
+  ov.addEventListener('mousemove', function(e) { show(indexFromX(e.clientX)); });
+  ov.addEventListener('mouseleave', hide);
+  ov.addEventListener('touchmove',  function(e) { e.preventDefault(); show(indexFromX(e.touches[0].clientX)); }, { passive: false });
+  ov.addEventListener('touchend',   hide);
+}
+
+function renderCompareDropdown() {
+  var sel = document.getElementById('compare-select');
+  if (!sel) return;
+  var others = Object.keys(ALL_PROGS).filter(function(k) { return k !== D.participant; }).sort();
+  var opts = '<option value="">Compare with...</option>';
+  others.forEach(function(k) { opts += '<option value="' + k + '">' + k + '</option>'; });
+  sel.innerHTML = opts;
+  sel.addEventListener('change', function() {
+    activeCompare = this.value || null;
+    renderChart();
+  });
+}
+
+// ── Feature 4: Team Performance ─────────────────────────────────────────────
+var TEAM_COLORS = {
+  'Chennai Super Kings':'#F9CD05', 'Delhi Capitals':'#17449B',
+  'Gujarat Titans':'#6db0e0', 'Kolkata Knight Riders':'#8b5cf6',
+  'Lucknow Super Giants':'#00ADEF', 'Mumbai Indians':'#3b82f6',
+  'Punjab Kings':'#ef4444', 'Rajasthan Royals':'#EA1A84',
+  'Royal Challengers Bengaluru':'#ef4444', 'Sunrisers Hyderabad':'#f97316'
+};
+var TEAM_SHORT = {
+  'Chennai Super Kings':'CSK', 'Delhi Capitals':'DC',
+  'Gujarat Titans':'GT', 'Kolkata Knight Riders':'KKR',
+  'Lucknow Super Giants':'LSG', 'Mumbai Indians':'MI',
+  'Punjab Kings':'PBKS', 'Rajasthan Royals':'RR',
+  'Royal Challengers Bengaluru':'RCB', 'Sunrisers Hyderabad':'SRH'
+};
+
+function renderTeamPerf() {
+  var container = document.getElementById('team-perf-card');
+  if (!container || !D.team_points) return;
+
+  // Sort entries descending by points
+  var entries = Object.keys(D.team_points).map(function(t) {
+    return [t, D.team_points[t]];
+  }).sort(function(a, b) { return b[1] - a[1]; });
+
+  if (!entries.length) { container.style.display = 'none'; return; }
+
+  var best = entries[0], bestTeam = best[0], bestPts = best[1];
+  var bestCol = TEAM_COLORS[bestTeam] || '#a78bfa';
+  var maxPts  = bestPts;
+  var BAR_MAX = 330;   // max bar pixel width in SVG units
+  var ROW_H   = 36;
+  var svgH    = entries.length * ROW_H + 4;
+
+  // ── Best team hero ──
+  var hero =
+    '<div class="tp-best">' +
+      '<div class="tp-best-left">' +
+        '<div class="tp-best-lbl">Best Franchise</div>' +
+        '<div class="tp-best-team" style="color:' + bestCol + '">' + bestTeam + '</div>' +
+        '<div class="tp-best-sub">Your most profitable team this season</div>' +
+      '</div>' +
+      '<div class="tp-best-pts" style="color:' + bestCol + '">' + bestPts + '<span style="font-size:16px;font-weight:500;color:#5a6078"> pts</span></div>' +
+    '</div>' +
+    '<div class="tp-divider"></div>';
+
+  // ── SVG bar chart ──
+  var bars = '';
+  entries.forEach(function(e, i) {
+    var team = e[0], pts = e[1];
+    var col  = TEAM_COLORS[team] || '#a78bfa';
+    var abbr = TEAM_SHORT[team]  || team.substring(0, 3).toUpperCase();
+    var barW = Math.max(6, (pts / maxPts) * BAR_MAX);
+    var y    = i * ROW_H;
+    var midY = (y + ROW_H / 2).toFixed(1);
+
+    // Team abbrev
+    bars += '<text x="0" y="' + midY + '" dominant-baseline="middle" fill="#6b7280" font-size="10.5" font-weight="700" font-family="system-ui,sans-serif">' + abbr + '</text>';
+    // Background track
+    bars += '<rect x="52" y="' + (y + 8) + '" width="' + BAR_MAX + '" height="20" rx="5" fill="rgba(255,255,255,0.04)"/>';
+    // Colored bar
+    bars += '<rect x="52" y="' + (y + 8) + '" width="' + barW.toFixed(1) + '" height="20" rx="5" fill="' + col + '" opacity="0.88"/>';
+    // Points label
+    bars += '<text x="' + (52 + barW + 7).toFixed(1) + '" y="' + midY + '" dominant-baseline="middle" fill="#9ca3af" font-size="10.5" font-weight="700" font-family="system-ui,sans-serif">' + pts + '</text>';
+  });
+
+  var svg = '<svg class="tp-svg" viewBox="0 0 ' + (52 + BAR_MAX + 45) + ' ' + svgH + '">' + bars + '</svg>';
+  var note = '<div style="font-size:10px;color:#5a6078;margin-top:14px;font-style:italic;font-weight:600;text-align:center;border-top:1px dashed rgba(255,255,255,0.04);padding-top:10px;">' +
+             '* Excludes ' + (D.nr_points || 0) + ' pts earned from ' + (D.nr_count || 0) + ' No Result (NR) matches</div>';
+  container.innerHTML = hero + svg + note;
+}
+
+// ── Feature 5: Team Accuracy ────────────────────────────────────────────
+function renderTeamAccuracy() {
+  var container = document.getElementById('team-acc-card');
+  if (!container || !D.team_accuracy) return;
+
+  // Sort entries descending by accuracy; require at least 2 matches for best-team
+  var entries = Object.keys(D.team_accuracy).map(function(t) {
+    return [t, D.team_accuracy[t]];
+  }).sort(function(a, b) {
+    if (a[1].total === 0 && b[1].total > 0) return 1;
+    if (b[1].total === 0 && a[1].total > 0) return -1;
+    return b[1].accuracy - a[1].accuracy;
+  });
+
+  if (!entries.length) { container.style.display = 'none'; return; }
+
+  // Pick best with >= 2 matches if possible
+  var best = entries.find(function(e) { return e[1].total >= 2; }) || entries.find(function(e) { return e[1].total > 0; }) || entries[0];
+  var bestTeam = best[0], bestData = best[1];
+  var bestCol  = TEAM_COLORS[bestTeam] || '#a78bfa';
+  var BAR_MAX  = 330, ROW_H = 36;
+  var svgH     = entries.length * ROW_H + 4;
+
+  // ── Best team hero ──
+  var hero =
+    '<div class="tp-best">' +
+      '<div class="tp-best-left">' +
+        '<div class="tp-best-lbl">Best Accuracy Franchise</div>' +
+        '<div class="tp-best-team" style="color:' + bestCol + '">' + bestTeam + '</div>' +
+        '<div class="tp-best-sub">' + bestData.correct + ' correct from ' + bestData.total + ' matches</div>' +
+      '</div>' +
+      '<div class="tp-best-pts" style="color:' + bestCol + '">' + bestData.accuracy.toFixed(0) + '<span style="font-size:22px;font-weight:700;color:' + bestCol + '">%</span></div>' +
+    '</div>' +
+    '<div class="tp-divider"></div>';
+
+  // ── SVG accuracy bar chart ──
+  var bars = '';
+  entries.forEach(function(e, i) {
+    var team = e[0], data = e[1];
+    var col  = TEAM_COLORS[team] || '#a78bfa';
+    var abbr = TEAM_SHORT[team]  || team.substring(0, 3).toUpperCase();
+    var barW = Math.max(6, (data.accuracy / 100) * BAR_MAX);
+    var y    = i * ROW_H;
+    var midY = (y + ROW_H / 2).toFixed(1);
+    var lbl  = data.accuracy.toFixed(0) + '% (' + data.correct + '/' + data.total + ')';
+
+    bars += '<text x="0" y="' + midY + '" dominant-baseline="middle" fill="#6b7280" font-size="10.5" font-weight="700" font-family="system-ui,sans-serif">' + abbr + '</text>';
+    bars += '<rect x="52" y="' + (y + 8) + '" width="' + BAR_MAX + '" height="20" rx="5" fill="rgba(255,255,255,0.04)"/>';
+    bars += '<rect x="52" y="' + (y + 8) + '" width="' + barW.toFixed(1) + '" height="20" rx="5" fill="' + col + '" opacity="0.88"/>';
+    bars += '<text x="' + (52 + barW + 7).toFixed(1) + '" y="' + midY + '" dominant-baseline="middle" fill="#9ca3af" font-size="10.5" font-weight="700" font-family="system-ui,sans-serif">' + lbl + '</text>';
+  });
+
+  var svg = '<svg class="tp-svg" viewBox="0 0 ' + (52 + BAR_MAX + 90) + ' ' + svgH + '">' + bars + '</svg>';
+  container.innerHTML = hero + svg;
+}
+
+// ── Feature 6: Best Matches ──────────────────────────────────────────────
+function renderBestMatches() {
+  renderBestMatchCard('best-league-card', D.best_league_match, 'Best League Match');
+  renderBestMatchCard('best-overall-card', D.best_overall_match, 'Best Match (Overall)');
+}
+
+function renderBestMatchCard(elementId, bm, title) {
+  var container = document.getElementById(elementId);
+  if (!container || !bm) return;
+
+  var ptsText = '+' + bm.points;
+  var col = TEAM_COLORS[bm.winner] || '#10b981';
+
+  var html =
+    '<div class="bm-header">' +
+      '<div class="bm-eyebrow">' + title + '</div>' +
+      '<div class="bm-points" style="color:' + col + '">' + ptsText + '<span style="font-size:14px;font-weight:700;color:#5a6078"> pts</span></div>' +
+    '</div>' +
+    '<div class="bm-match-title">' + bm.home + ' vs ' + bm.away + '</div>' +
+    '<div class="bm-date">Match #' + bm.match_no + ' &middot; ' + bm.date + '</div>' +
+    '<div class="bm-details">' +
+      '<div class="bm-detail-col">' +
+        '<div class="bm-detail-lbl">Your Prediction</div>' +
+        '<div class="bm-detail-val correct">' + (bm.prediction || '—') + '</div>' +
+      '</div>' +
+      '<div class="bm-detail-col">' +
+        '<div class="bm-detail-lbl">Match Winner</div>' +
+        '<div class="bm-detail-val" style="color:' + col + '">' + bm.winner + '</div>' +
+      '</div>' +
+    '</div>';
+
+  container.innerHTML = html;
+}
+
+// ── Feature 7: Stadium Stats ─────────────────────────────────────────────
+function renderStadiumStats() {
+  var container = document.getElementById('stadium-stats-card');
+  if (!container || !D.stadium_stats) return;
+
+  var entries = D.stadium_stats.slice();
+  if (!entries.length) { container.style.display = 'none'; return; }
+
+  // Sort descending by Points first, then by Win %
+  entries.sort(function(a, b) {
+    if (b.Points !== a.Points) return b.Points - a.Points;
+    return b['Win %'] - a['Win %'];
+  });
+
+  var best = entries[0];
+  var bestCol = '#10b981'; // Green for success
+  var BAR_MAX = 330, ROW_H = 36;
+  var svgH = entries.length * ROW_H + 4;
+  var maxPts = Math.max(10, entries[0].Points);
+
+  var totalMatches = best.Wins + best.Losses;
+  var hero =
+    '<div class="tp-best">' +
+      '<div class="tp-best-left">' +
+        '<div class="tp-best-lbl">Luckiest Stadium</div>' +
+        '<div class="tp-best-team" style="color:' + bestCol + '">' + best.Stadium + '</div>' +
+        '<div class="tp-best-sub">' + best.City + ' &middot; ' + best.Wins + ' wins / ' + totalMatches + ' matches (' + best['Win %'].toFixed(0) + '% Win Rate)</div>' +
+      '</div>' +
+      '<div class="tp-best-pts" style="color:' + bestCol + '">' + best.Points + '<span style="font-size:16px;font-weight:500;color:#5a6078"> pts</span></div>' +
+    '</div>' +
+    '<div class="tp-divider"></div>';
+
+  var bars = '';
+  entries.forEach(function(e, i) {
+    var name = e.Stadium, pts = e.Points, wins = e.Wins, losses = e.Losses;
+    var total = wins + losses;
+    var barW = Math.max(6, (pts / maxPts) * BAR_MAX);
+    var y = i * ROW_H;
+    var midY = (y + ROW_H / 2).toFixed(1);
+    
+    var shortName = name.replace(' Cricket Stadium', '').replace(' Stadium', '').replace(' International', ' Intl.');
+    var lbl = pts + ' pts (' + wins + '/' + total + ' W/M)';
+
+    bars += '<text x="0" y="' + midY + '" dominant-baseline="middle" fill="#6b7280" font-size="10.5" font-weight="700" font-family="system-ui,sans-serif">' + shortName.toUpperCase() + '</text>';
+    bars += '<rect x="110" y="' + (y + 8) + '" width="' + BAR_MAX + '" height="20" rx="5" fill="rgba(255,255,255,0.04)"/>';
+    bars += '<rect x="110" y="' + (y + 8) + '" width="' + barW.toFixed(1) + '" height="20" rx="5" fill="#3b82f6" opacity="0.88"/>';
+    bars += '<text x="' + (110 + barW + 7).toFixed(1) + '" y="' + midY + '" dominant-baseline="middle" fill="#9ca3af" font-size="10.5" font-weight="700" font-family="system-ui,sans-serif">' + lbl + '</text>';
+  });
+
+  var svg = '<svg class="tp-svg" viewBox="0 0 540 ' + svgH + '">' + bars + '</svg>';
+  var note = '<div style="font-size:10px;color:#5a6078;margin-top:14px;font-style:italic;font-weight:600;text-align:center;border-top:1px dashed rgba(255,255,255,0.04);padding-top:10px;">' +
+             '* Excludes ' + (D.nr_points || 0) + ' pts earned from ' + (D.nr_count || 0) + ' No Result (NR) matches</div>';
+  container.innerHTML = hero + svg + note;
+}
+
+// ── Feature 8: Stadium Accuracy ──────────────────────────────────────────
+function renderStadiumAccuracy() {
+  var container = document.getElementById('stadium-acc-card');
+  if (!container || !D.stadium_stats) return;
+
+  var entries = D.stadium_stats.slice();
+  if (!entries.length) { container.style.display = 'none'; return; }
+
+  // Sort descending by Win % first, then by total matches played, and push 0-match entries to bottom
+  entries.sort(function(a, b) {
+    var totalA = a.Wins + a.Losses;
+    var totalB = b.Wins + b.Losses;
+    if (totalA === 0 && totalB > 0) return 1;
+    if (totalB === 0 && totalA > 0) return -1;
+    if (b['Win %'] !== a['Win %']) return b['Win %'] - a['Win %'];
+    return totalB - totalA;
+  });
+
+  // Require at least 3 matches for the best stadium highlight, fallback to 2, then fallback to first
+  var best = entries.filter(function(e) { return (e.Wins + e.Losses) >= 3; })[0] ||
+             entries.filter(function(e) { return (e.Wins + e.Losses) >= 2; })[0] ||
+             entries[0];
+
+  var bestCol = '#10b981'; // Green for success / accuracy
+  var BAR_MAX = 330, ROW_H = 36;
+  var svgH = entries.length * ROW_H + 4;
+
+  var bestTotal = best.Wins + best.Losses;
+  var hero =
+    '<div class="tp-best">' +
+      '<div class="tp-best-left">' +
+        '<div class="tp-best-lbl">Luckiest Stadium by Win %</div>' +
+        '<div class="tp-best-team" style="color:' + bestCol + '">' + best.Stadium + '</div>' +
+        '<div class="tp-best-sub">' + best.City + ' &middot; ' + best.Wins + ' correct / ' + bestTotal + ' matches</div>' +
+      '</div>' +
+      '<div class="tp-best-pts" style="color:' + bestCol + '">' + best['Win %'].toFixed(0) + '<span style="font-size:16px;font-weight:700;color:#5a6078">%</span></div>' +
+    '</div>' +
+    '<div class="tp-divider"></div>';
+
+  var bars = '';
+  entries.forEach(function(e, i) {
+    var name = e.Stadium, winRate = e['Win %'], wins = e.Wins, losses = e.Losses;
+    var total = wins + losses;
+    var barW = Math.max(6, (winRate / 100) * BAR_MAX);
+    var y = i * ROW_H;
+    var midY = (y + ROW_H / 2).toFixed(1);
+    
+    var shortName = name.replace(' Cricket Stadium', '').replace(' Stadium', '').replace(' International', ' Intl.');
+    var lbl = winRate.toFixed(0) + '% (' + wins + '/' + total + ' W/M)';
+
+    bars += '<text x="0" y="' + midY + '" dominant-baseline="middle" fill="#6b7280" font-size="10.5" font-weight="700" font-family="system-ui,sans-serif">' + shortName.toUpperCase() + '</text>';
+    bars += '<rect x="110" y="' + (y + 8) + '" width="' + BAR_MAX + '" height="20" rx="5" fill="rgba(255,255,255,0.04)"/>';
+    bars += '<rect x="110" y="' + (y + 8) + '" width="' + barW.toFixed(1) + '" height="20" rx="5" fill="#10b981" opacity="0.88"/>';
+    bars += '<text x="' + (110 + barW + 7).toFixed(1) + '" y="' + midY + '" dominant-baseline="middle" fill="#9ca3af" font-size="10.5" font-weight="700" font-family="system-ui,sans-serif">' + lbl + '</text>';
+  });
+
+  var svg = '<svg class="tp-svg" viewBox="0 0 540 ' + svgH + '">' + bars + '</svg>';
+  var note = '<div style="font-size:10px;color:#5a6078;margin-top:14px;font-style:italic;font-weight:600;text-align:center;border-top:1px dashed rgba(255,255,255,0.04);padding-top:10px;">' +
+             '* Highlighted luckiest stadium requires a minimum of 3 matches played</div>';
+  container.innerHTML = hero + svg + note;
+}
+
+// ── Feature 9: Prediction Similarity ─────────────────────────────────────
+function renderSimilarity() {
+  var container = document.getElementById('similarity-card');
+  if (!container || !D.similarity_stats) return;
+
+  var entries = D.similarity_stats;
+  if (!entries.length) { container.style.display = 'none'; return; }
+
+  var best = entries[0];
+  var bestCol = '#8b5cf6'; // Violet theme for similarity
+  var ROW_H = 46;
+  var svgH = entries.length * ROW_H + 4;
+  var BAR_MAX = 220;
+  var X_START = 110;
+
+  var hero =
+    '<div class="tp-best">' +
+      '<div class="tp-best-left">' +
+        '<div class="tp-best-lbl">Prediction Twin</div>' +
+        '<div class="tp-best-team" style="color:' + bestCol + '">' + best.participant + '</div>' +
+        '<div class="tp-best-sub">Most similar predictions (' + best.agreed_count + ' / ' + best.total_matches + ' agreed)</div>' +
+      '</div>' +
+      '<div class="tp-best-pts" style="color:' + bestCol + '">' + best.similarity_pct.toFixed(0) + '<span style="font-size:16px;font-weight:700;color:#5a6078">%</span></div>' +
+    '</div>' +
+    '<div class="tp-divider"></div>';
+
+  var bars = '';
+  entries.forEach(function(e, i) {
+    var other = e.participant;
+    var pct = e.similarity_pct;
+    var agreed = e.agreed_count;
+    var total = e.total_matches;
+    var diag = e.disagreed_count;
+    var pCorrect = e.correct_p;
+    var oCorrect = e.correct_o;
+    
+    var barW = Math.max(6, (pct / 100) * BAR_MAX);
+    var y = i * ROW_H;
+    var midY1 = y + 16;
+    var midY2 = y + 34;
+
+    // Opponent name
+    bars += '<text x="0" y="' + midY1 + '" fill="#e5e7eb" font-size="11" font-weight="700" font-family="system-ui,sans-serif">' + other.toUpperCase() + '</text>';
+    // Track
+    bars += '<rect x="' + X_START + '" y="' + (y + 4) + '" width="' + BAR_MAX + '" height="16" rx="4" fill="rgba(255,255,255,0.04)"/>';
+    // Bar
+    bars += '<rect x="' + X_START + '" y="' + (y + 4) + '" width="' + barW.toFixed(1) + '" height="16" rx="4" fill="' + bestCol + '" opacity="0.88"/>';
+    // Pct label
+    bars += '<text x="' + (X_START + BAR_MAX + 10) + '" y="' + midY1 + '" fill="#e5e7eb" font-size="11" font-weight="700" font-family="system-ui,sans-serif">' + pct.toFixed(0) + '% (' + agreed + '/' + total + ')</text>';
+    // Disagreed details line
+    var disMsg = 'Disagreed: You ' + pCorrect + ' - ' + oCorrect + ' ' + other + ' (' + diag + ' matches)';
+    bars += '<text x="' + X_START + '" y="' + midY2 + '" fill="#9ca3af" font-size="10" font-weight="600" font-family="system-ui,sans-serif">' + disMsg + '</text>';
+  });
+
+  var svg = '<svg class="tp-svg" viewBox="0 0 540 ' + svgH + '">' + bars + '</svg>';
+  container.innerHTML = hero + svg;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  renderHero();
+  renderKPIs();
+  renderCompareDropdown();
+  renderChart();
+  renderTeamPerf();
+  renderTeamAccuracy();
+  renderBestMatches();
+  renderStadiumStats();
+  renderStadiumAccuracy();
+  renderSimilarity();
+});
+
+</script>
+</body>
+</html>

@@ -246,33 +246,63 @@ def plot_bar_chart_race(points_progression) :
 
 
 def plot_time_spent_position(time_spent_position_df):
-    all_ranks = pd.Series(range(1, 12), name="Rank")
+    """Plotly heatmap of Time Spent in Each Position."""
+    import plotly.graph_objects as go
+    
+    df_pivot = time_spent_position_df.pivot(index='Participant', columns='Rank', values='Count').fillna(0)
+    all_ranks = sorted(df_pivot.columns)
+    df_pivot = df_pivot[all_ranks]
+    
+    fig = go.Figure(data=go.Heatmap(
+        z=df_pivot.values,
+        x=df_pivot.columns,
+        y=df_pivot.index,
+        colorscale="Viridis",
+        text=df_pivot.values,
+        texttemplate="%{text}",
+        hoverinfo="x+y+z",
+        showscale=True
+    ))
+    
+    fig.update_layout(
+        title="⏱️ Time Spent in Each Position",
+        xaxis_title="Rank",
+        yaxis_title="Participant",
+        xaxis=dict(dtick=1),
+        template="plotly_dark",
+        height=400 + 30 * len(df_pivot),
+        margin=dict(l=10, r=10, t=50, b=10)
+    )
+    return fig
 
-    participants = time_spent_position_df['Participant'].unique()
 
-    colorscale = px.colors.qualitative.Bold
-    color_map = {participants[i]: colorscale[i % len(colorscale)] for i in range(len(participants))}
-
-    for participant in time_spent_position_df['Participant'].unique():
-        sub_df = time_spent_position_df[time_spent_position_df['Participant'] == participant]
-        sub_df = pd.merge(all_ranks, sub_df, on="Rank", how="left").fillna(0)
-
-        x = np.linspace(1, 11, num = 11)
-
-        fig = px.line(
-            x = x,
-            y = sub_df['Count'],
-            line_shape='spline',
-            title = f'Time spent by {participant}',
-            color_discrete_sequence=[color_map[participant]]
-        )
-
-        fig.update_layout(
-            xaxis=dict(dtick=1),
-            template="plotly_dark"
-        )
-
-        st.plotly_chart(fig, use_container_width=True)    
+def plot_time_spent_position_line(time_spent_position_df):
+    """Plotly smooth multi-line graph of Time Spent in Each Position."""
+    import plotly.express as px
+    
+    df_pivot = time_spent_position_df.pivot(index='Participant', columns='Rank', values='Count').fillna(0)
+    all_ranks = sorted(df_pivot.columns)
+    df_pivot = df_pivot[all_ranks]
+    df_melt = df_pivot.reset_index().melt(id_vars='Participant', value_vars=all_ranks, var_name='Rank', value_name='Count')
+    
+    fig = px.line(
+        df_melt,
+        x='Rank',
+        y='Count',
+        color='Participant',
+        line_shape='spline',
+        title="📈 Time Spent in Each Position (Line Graph)",
+        color_discrete_sequence=px.colors.qualitative.G10
+    )
+    
+    fig.update_layout(
+        xaxis_title="Rank",
+        yaxis_title="Matches",
+        xaxis=dict(dtick=1),
+        template="plotly_dark",
+        margin=dict(l=10, r=10, t=50, b=10)
+    )
+    return fig
 
 def plot_position_graph(points_progression):
     data = []
@@ -435,7 +465,7 @@ def generate_leaderboard_card(leaderboard_df, output_path="The Visuals/leaderboa
     # KPI 2. Matches
     fig.text(0.30, y_cursor - 0.15, "MATCHES PLAYED", fontsize=10, color=SUBTEXT, fontweight="bold")
     fig.text(0.30, y_cursor - 0.175, str(total_matches), fontsize=18, color=TEXT, fontweight="bold")
-    fig.text(0.30, y_cursor - 0.198, "of 70 league", fontsize=11, color=GREEN)
+    fig.text(0.30, y_cursor - 0.198, "of 74 league", fontsize=11, color=GREEN)
 
     # KPI 3. Participants
     fig.text(0.58, y_cursor - 0.15, "PARTICIPANTS", fontsize=10, color=SUBTEXT, fontweight="bold")
@@ -448,9 +478,9 @@ def generate_leaderboard_card(leaderboard_df, output_path="The Visuals/leaderboa
     y_cursor -= 0.25
 
     # ── Full Leaderboard Table ─────────────────────────────────────────────
-    col_labels  = ["Rank", "Participant", "Points", "Accuracy", "Last 5 Form", "Last 5 Pts", "W-Streak", "L-Streak"]
-    col_widths  = [0.06,    0.16,          0.09,     0.10,       0.20,          0.13,         0.09,        0.09     ]
-    col_aligns  = ["center","left",        "center", "center",   "left",        "left",       "center",    "center"  ]
+    col_labels  = ["Rank", "Pos", "Participant", "Points", "Accuracy", "Last 5 Form", "Last 5 Pts", "W-Str", "L-Str"]
+    col_widths  = [0.055,   0.05,  0.14,          0.08,     0.09,       0.18,          0.12,         0.075,   0.075  ]
+    col_aligns  = ["center","center","left",      "center", "center",   "left",        "left",       "center", "center"]
     row_h       = 0.048
 
     # Header
@@ -509,15 +539,22 @@ def generate_leaderboard_card(leaderboard_df, output_path="The Visuals/leaderboa
         import re
         pts_str = "  ".join(re.findall(r">(\d+)<", str(vals)))
 
+        # Position delta coloring
+        pos_delta = str(lb.at[idx, "Pos \u0394"]) if "Pos \u0394" in lb.columns else "\u2014"
+        if pos_delta.startswith("\u25b2"):  pos_col = GREEN
+        elif pos_delta.startswith("\u25bc"): pos_col = RED
+        else:                               pos_col = SUBTEXT
+
         row_data = [
             (str(rank),                   rank_col,  col_aligns[0]),
-            (str(row["Participant"]),      TEXT,      col_aligns[1]),
-            (str(int(row["Points"])),      TEXT,      col_aligns[2]),
-            (f"{accuracy_val:.1f}%",       SUBTEXT,   col_aligns[3]),
-            (last5_str,                    TEXT,      col_aligns[4]),
-            (pts_str,                      TEXT,      col_aligns[5]),
-            (str(wstreak),                 GREEN,     col_aligns[6]),
-            (str(lstreak),                 RED,       col_aligns[7]),
+            (pos_delta,                   pos_col,   col_aligns[1]),
+            (str(row["Participant"]),      TEXT,      col_aligns[2]),
+            (str(int(row["Points"])),      TEXT,      col_aligns[3]),
+            (f"{accuracy_val:.1f}%",       SUBTEXT,   col_aligns[4]),
+            (last5_str,                    TEXT,      col_aligns[5]),
+            (pts_str,                      TEXT,      col_aligns[6]),
+            (str(wstreak),                 GREEN,     col_aligns[7]),
+            (str(lstreak),                 RED,       col_aligns[8]),
         ]
 
         for j, (val, color, align) in enumerate(row_data):
@@ -626,11 +663,15 @@ def plot_agreement_matrix(agree_df):
 
 
 def plot_points_distribution(dist_df):
-    """Stacked/Grouped bar of 0, 5, 10, 20 pt matches per participant."""
+    """Stacked bar of 0, 5, 10-14, 15+ pt matches per participant."""
+    # Sort participants from least losses to most losses
+    dist_df = dist_df.sort_values("0 pts", ascending=True).reset_index(drop=True)
     fig = go.Figure()
-    colors = {"0 pts": "#ef4444", "5 pts": "#6b7280", "10 pts": "#3b82f6", "20 pts": "#22c55e"}
+    colors = {"0 pts": "#ef4444", "5 pts": "#6b7280", "10-14 pts": "#3b82f6", "15+ pts": "#22c55e"}
     
-    for bucket in ["0 pts", "5 pts", "10 pts", "20 pts"]:
+    for bucket in ["0 pts", "5 pts", "10-14 pts", "15+ pts"]:
+        if bucket not in dist_df.columns:
+            continue
         fig.add_trace(go.Bar(
             name=bucket,
             x=dist_df["Participant"],
@@ -800,3 +841,479 @@ def plot_stadium_map(stadium_df, user_name):
     )
     
     return fig
+
+
+def plot_stadium_points_map(stadium_df, user_name):
+    """Map sized by total Points earned per stadium, colored by Pts/Match efficiency."""
+    stadium_df = stadium_df.copy()
+    # Give 0-point stadiums a small dot to stay visible
+    stadium_df["Bubble Size"] = stadium_df["Points"].astype(float) + 0.1
+
+    fig = px.scatter_mapbox(
+        stadium_df,
+        lat="Lat",
+        lon="Lon",
+        hover_name="Stadium",
+        size="Bubble Size",
+        color="Pts/Match",
+        color_continuous_scale="RdYlGn",
+        hover_data={
+            "Lat": False,
+            "Lon": False,
+            "Bubble Size": False,
+            "City": True,
+            "Points": True,
+            "Wins": True,
+            "Losses": True,
+            "Pts/Match": ":.1f"
+        },
+        zoom=3.8,
+        center={"lat": 22.0, "lon": 79.0},
+        height=600
+    )
+
+    fig.update_layout(
+        title=f"💰 {user_name}'s Points Earned by Stadium",
+        mapbox_style="carto-darkmatter",
+        template="plotly_dark",
+        margin=dict(l=10, r=10, t=50, b=10),
+        coloraxis_colorbar=dict(title="Pts/Match")
+    )
+
+    return fig
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  PERSONALIZED PLAYER REPORT CARD
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def generate_player_report_card(report_data, output_path="report.png"):
+    """
+    Render a beautiful, tall infographic (1080×1920) as a dark-themed PNG.
+    `report_data` is the dict returned by ExtractAndTransform.get_player_report_data().
+    Returns the image as bytes.
+    """
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    import matplotlib.patches as mpatches
+    from matplotlib.patches import FancyBboxPatch
+    import numpy as np
+    import textwrap
+    import re
+
+    def strip_emoji(text):
+        """Remove emoji characters that DejaVu Sans can't render."""
+        emoji_pattern = re.compile(
+            "[\U0001F300-\U0001FAFF\U00002702-\U000027B0\U0000FE00-\U0000FE0F"
+            "\U0000200D\U00002640-\U00002642\U00002600-\U000027BF\U0001F900-\U0001F9FF]+",
+            flags=re.UNICODE
+        )
+        return emoji_pattern.sub('', text).strip()
+
+    # ── Color Palette ────────────────────────────────────────────────────────
+    BG         = "#0e1117"
+    CARD_BG    = "#151822"
+    CARD_BG2   = "#1a1f2e"
+    ACCENT     = "#262b3d"
+    PURPLE     = "#7c5cff"
+    PURPLE_L   = "#a78bfa"
+    PURPLE_D   = "#4e336b"
+    TEXT       = "#f0f2f6"
+    SUBTEXT    = "#8b96b0"
+    DIM        = "#5a6078"
+    GOLD       = "#FFD700"
+    SILVER     = "#C0C0C0"
+    BRONZE     = "#CD7F32"
+    GREEN      = "#22c55e"
+    RED        = "#ef4444"
+    BLUE       = "#3b82f6"
+    ORANGE_A   = "#f97316"
+
+    d = report_data  # shorthand
+
+    # ── Canvas Setup ─────────────────────────────────────────────────────────
+    fig_w, fig_h = 10.8, 24.5  # Tall canvas — exactly fits all sections
+    fig = plt.figure(figsize=(fig_w, fig_h), facecolor=BG, dpi=100)
+    ax_main = fig.add_axes([0, 0, 1, 1])
+    ax_main.set_xlim(0, fig_w)
+    ax_main.set_ylim(0, fig_h)
+    ax_main.set_facecolor(BG)
+    ax_main.axis("off")
+
+    # Helper to draw rounded cards
+    def draw_card(x, y, w, h, color=CARD_BG, radius=0.25, border_color=None):
+        card = FancyBboxPatch((x, y), w, h,
+                              boxstyle=f"round,pad={radius}",
+                              facecolor=color,
+                              edgecolor=border_color or "none",
+                              linewidth=1.5,
+                              transform=ax_main.transData, clip_on=False)
+        ax_main.add_patch(card)
+        return card
+
+    y = fig_h  # start from top
+
+    # ═══ SECTION 1: HEADER ═══════════════════════════════════════════════════
+    header_h = 3.2
+    y -= header_h
+
+    # Header gradient card
+    draw_card(0.3, y, fig_w - 0.6, header_h - 0.15,
+              color="#12101f", border_color=PURPLE_D, radius=0.3)
+
+    # Decorative gradient circle (top-right)
+    circle1 = plt.Circle((fig_w - 1.5, y + header_h - 0.8), 1.2,
+                          color=PURPLE, alpha=0.08, transform=ax_main.transData)
+    ax_main.add_patch(circle1)
+    circle2 = plt.Circle((1.5, y + 0.5), 0.8,
+                          color=ORANGE_A, alpha=0.06, transform=ax_main.transData)
+    ax_main.add_patch(circle2)
+
+    # Rank medal
+    medal_map = {1: ("🥇", GOLD), 2: ("🥈", SILVER), 3: ("🥉", BRONZE)}
+    medal_emoji, medal_color = medal_map.get(d["rank"], ("", SUBTEXT))
+
+    # Title: "IPL 2026 · SEASON REPORT"
+    ax_main.text(0.6, y + header_h - 0.65, "IPL 2026  ·  SEASON REPORT",
+                 fontsize=11, fontweight="bold", color=SUBTEXT,
+                 fontfamily="DejaVu Sans", ha="left", va="center")
+
+    # Player Name (large)
+    ax_main.text(0.6, y + header_h - 1.35, d["participant"],
+                 fontsize=36, fontweight="bold", color=TEXT,
+                 fontfamily="DejaVu Sans", ha="left", va="center")
+
+    # Rank + Badge line
+    rank_text = f"Rank #{d['rank']} of {d['total_participants']}"
+    ax_main.text(0.6, y + header_h - 2.0, rank_text,
+                 fontsize=16, fontweight="bold", color=medal_color if d["rank"] <= 3 else PURPLE_L,
+                 fontfamily="DejaVu Sans", ha="left", va="center")
+
+    # Personality badge
+    badge_title, badge_desc = d["primary_badge"]
+    badge_clean = strip_emoji(badge_title)
+    # Badge pill
+    draw_card(0.5, y + 0.25, 5.5, 0.65, color=PURPLE_D, border_color=PURPLE, radius=0.15)
+    ax_main.text(0.7, y + 0.57, f"{badge_clean}  //  {badge_desc}",
+                 fontsize=11, fontweight="bold", color=PURPLE_L,
+                 fontfamily="DejaVu Sans", ha="left", va="center")
+
+    y -= 0.25
+
+    # ═══ SECTION 2: KPI STRIP ════════════════════════════════════════════════
+    kpi_h = 1.6
+    y -= kpi_h
+
+    kpis = [
+        ("POINTS", str(d["points"]), GOLD if d["rank"] == 1 else TEXT),
+        ("ACCURACY", f"{d['accuracy']:.1f}%", PURPLE_L),
+        ("CORRECT", str(d["correct"]), GREEN),
+        ("WRONG", str(d["wrong"]), RED),
+        ("BONUS", str(d["bonus_pts"]), ORANGE_A),
+    ]
+
+    kpi_w = (fig_w - 0.6 - 0.3 * (len(kpis) - 1)) / len(kpis)
+    for i, (label, value, color) in enumerate(kpis):
+        kx = 0.3 + i * (kpi_w + 0.3)
+        draw_card(kx, y, kpi_w, kpi_h - 0.1, color=CARD_BG, radius=0.15)
+        ax_main.text(kx + kpi_w / 2, y + kpi_h - 0.45, label,
+                     fontsize=9, fontweight="bold", color=DIM,
+                     ha="center", va="center", fontfamily="DejaVu Sans")
+        ax_main.text(kx + kpi_w / 2, y + 0.45, value,
+                     fontsize=22, fontweight="bold", color=color,
+                     ha="center", va="center", fontfamily="DejaVu Sans")
+
+    y -= 0.3
+
+    # ═══ SECTION 3: POINTS JOURNEY SPARKLINE ═════════════════════════════════
+    spark_h = 2.4
+    y -= spark_h
+
+    draw_card(0.3, y, fig_w - 0.6, spark_h - 0.1, color=CARD_BG, radius=0.2)
+
+    ax_main.text(0.6, y + spark_h - 0.4, "POINTS JOURNEY",
+                 fontsize=10, fontweight="bold", color=SUBTEXT,
+                 ha="left", va="center", fontfamily="DejaVu Sans")
+
+    # Embed a mini axes for the sparkline
+    spark_left = 0.07
+    spark_bottom = (y + 0.3) / fig_h
+    spark_width = 0.86
+    spark_height_frac = (spark_h - 0.9) / fig_h
+
+    ax_spark = fig.add_axes([spark_left, spark_bottom, spark_width, spark_height_frac])
+    ax_spark.set_facecolor("none")
+
+    prog = d["progression"]
+    x_vals = list(range(len(prog)))
+    ax_spark.fill_between(x_vals, prog, alpha=0.15, color=PURPLE)
+    ax_spark.plot(x_vals, prog, color=PURPLE_L, linewidth=2.5, solid_capstyle="round")
+    ax_spark.scatter([len(prog) - 1], [prog[-1]], color=GOLD if d["rank"] == 1 else PURPLE_L,
+                     s=50, zorder=5, edgecolors=TEXT, linewidths=1)
+
+    ax_spark.set_xlim(0, max(len(prog) - 1, 1))
+    ax_spark.set_ylim(0, max(prog) * 1.1 if max(prog) > 0 else 10)
+    ax_spark.tick_params(colors=DIM, labelsize=7)
+    ax_spark.spines["top"].set_visible(False)
+    ax_spark.spines["right"].set_visible(False)
+    ax_spark.spines["left"].set_color(ACCENT)
+    ax_spark.spines["bottom"].set_color(ACCENT)
+    ax_spark.set_xlabel("Match #", fontsize=8, color=DIM)
+
+    y -= 0.25
+
+    # ═══ SECTION 4: PERFORMANCE DNA RADAR ════════════════════════════════════
+    radar_h = 3.4
+    y -= radar_h
+
+    draw_card(0.3, y, fig_w - 0.6, radar_h - 0.1, color=CARD_BG, radius=0.2)
+
+    ax_main.text(0.6, y + radar_h - 0.4, "PERFORMANCE DNA",
+                 fontsize=10, fontweight="bold", color=SUBTEXT,
+                 ha="left", va="center", fontfamily="DejaVu Sans")
+
+    # Radar chart embedded axes
+    radar_center_x = 0.5
+    radar_center_y = (y + 0.2) / fig_h
+    radar_size = (radar_h - 0.9) / fig_h
+
+    ax_radar = fig.add_axes(
+        [radar_center_x - radar_size * 0.65,
+         radar_center_y,
+         radar_size * 1.3,
+         radar_size],
+        polar=True
+    )
+    ax_radar.set_facecolor("none")
+
+    categories = list(d["radar"].keys())
+    values = list(d["radar"].values())
+    N = len(categories)
+
+    angles = np.linspace(0, 2 * np.pi, N, endpoint=False).tolist()
+    values_plot = values + [values[0]]
+    angles += [angles[0]]
+
+    ax_radar.fill(angles, values_plot, color=PURPLE, alpha=0.18)
+    ax_radar.plot(angles, values_plot, color=PURPLE_L, linewidth=2.5)
+    ax_radar.scatter(angles[:-1], values, color=PURPLE_L, s=40, zorder=5)
+
+    ax_radar.set_thetagrids(np.degrees(angles[:-1]), categories,
+                            fontsize=9, fontweight="bold", color=SUBTEXT)
+    ax_radar.set_ylim(0, 100)
+    ax_radar.set_yticks([25, 50, 75, 100])
+    ax_radar.set_yticklabels(["25", "50", "75", "100"], fontsize=7, color=DIM)
+    ax_radar.spines["polar"].set_color(ACCENT)
+    ax_radar.grid(color=ACCENT, linewidth=0.5)
+    ax_radar.tick_params(colors=DIM)
+
+    y -= 0.25
+
+    # ═══ SECTION 5: TEAM LOYALTY ═════════════════════════════════════════════
+    team_h = 3.0
+    y -= team_h
+
+    draw_card(0.3, y, fig_w - 0.6, team_h - 0.1, color=CARD_BG, radius=0.2)
+
+    ax_main.text(0.6, y + team_h - 0.4, "TEAM LOYALTY",
+                 fontsize=10, fontweight="bold", color=SUBTEXT,
+                 ha="left", va="center", fontfamily="DejaVu Sans")
+
+    # Embed bar chart axes
+    bar_left = 0.08
+    bar_bottom = (y + 0.25) / fig_h
+    bar_width = 0.84
+    bar_height_frac = (team_h - 0.9) / fig_h
+
+    ax_team = fig.add_axes([bar_left, bar_bottom, bar_width, bar_height_frac])
+    ax_team.set_facecolor("none")
+
+    ta = d["team_analysis"]
+    teams_sorted = sorted(ta.keys(), key=lambda t: ta[t]["predicted"], reverse=True)
+    team_labels = [team_initials.get(t, t[:3]) for t in teams_sorted]
+    pred_vals = [ta[t]["predicted"] for t in teams_sorted]
+    colors_bar = [team_colors.get(t, PURPLE) for t in teams_sorted]
+
+    bars = ax_team.barh(range(len(teams_sorted)), pred_vals, color=colors_bar, height=0.6, alpha=0.85)
+    ax_team.set_yticks(range(len(teams_sorted)))
+    ax_team.set_yticklabels(team_labels, fontsize=8, fontweight="bold", color=SUBTEXT)
+    ax_team.invert_yaxis()
+    ax_team.set_xlabel("Times Predicted to Win", fontsize=8, color=DIM)
+    ax_team.tick_params(colors=DIM, labelsize=7)
+    ax_team.spines["top"].set_visible(False)
+    ax_team.spines["right"].set_visible(False)
+    ax_team.spines["left"].set_color(ACCENT)
+    ax_team.spines["bottom"].set_color(ACCENT)
+
+    # Add count labels
+    for i, (bar, val) in enumerate(zip(bars, pred_vals)):
+        ax_team.text(bar.get_width() + 0.3, bar.get_y() + bar.get_height() / 2,
+                     str(val), fontsize=8, fontweight="bold", color=TEXT,
+                     va="center")
+
+    y -= 0.25
+
+    # ═══ SECTION 6: STREAKS & HIGHLIGHTS ═════════════════════════════════════
+    streak_h = 1.7
+    y -= streak_h
+
+    # Two side-by-side cards
+    half_w = (fig_w - 0.9) / 2
+
+    # Win streak card
+    draw_card(0.3, y, half_w, streak_h - 0.1, color="#0f1a12", border_color="#1a3d1f", radius=0.15)
+    ax_main.text(0.55, y + streak_h - 0.35, "BEST WIN STREAK",
+                 fontsize=9, fontweight="bold", color=GREEN, ha="left", va="center",
+                 fontfamily="DejaVu Sans")
+    ax_main.text(0.55, y + streak_h * 0.45, str(d["longest_win_streak"]),
+                 fontsize=32, fontweight="bold", color=GREEN, ha="left", va="center",
+                 fontfamily="DejaVu Sans")
+    ax_main.text(0.55 + 1.2, y + streak_h * 0.45, "matches",
+                 fontsize=11, color=SUBTEXT, ha="left", va="center",
+                 fontfamily="DejaVu Sans")
+    if d["winning_period"]:
+        period_text = d["winning_period"].replace(", 2026", "")
+        ax_main.text(0.55, y + 0.25, period_text,
+                     fontsize=8, color=DIM, ha="left", va="center",
+                     fontfamily="DejaVu Sans")
+
+    # Loss streak card
+    loss_x = 0.3 + half_w + 0.3
+    draw_card(loss_x, y, half_w, streak_h - 0.1, color="#1a0f0f", border_color="#3d1a1a", radius=0.15)
+    ax_main.text(loss_x + 0.25, y + streak_h - 0.35, "WORST LOSS STREAK",
+                 fontsize=9, fontweight="bold", color=RED, ha="left", va="center",
+                 fontfamily="DejaVu Sans")
+    ax_main.text(loss_x + 0.25, y + streak_h * 0.45, str(d["longest_loss_streak"]),
+                 fontsize=32, fontweight="bold", color=RED, ha="left", va="center",
+                 fontfamily="DejaVu Sans")
+    ax_main.text(loss_x + 0.25 + 1.2, y + streak_h * 0.45, "matches",
+                 fontsize=11, color=SUBTEXT, ha="left", va="center",
+                 fontfamily="DejaVu Sans")
+    if d["losing_period"]:
+        period_text = d["losing_period"].replace(", 2026", "")
+        ax_main.text(loss_x + 0.25, y + 0.25, period_text,
+                     fontsize=8, color=DIM, ha="left", va="center",
+                     fontfamily="DejaVu Sans")
+
+    y -= 0.25
+
+    # ═══ SECTION 7: STADIUMS ═════════════════════════════════════════════════
+    stadium_h = 1.2
+    y -= stadium_h
+
+    draw_card(0.3, y, fig_w - 0.6, stadium_h - 0.1, color=CARD_BG, radius=0.15)
+
+    ax_main.text(0.6, y + stadium_h - 0.35, "STADIUMS",
+                 fontsize=10, fontweight="bold", color=SUBTEXT,
+                 ha="left", va="center", fontfamily="DejaVu Sans")
+
+    ax_main.text(0.6, y + 0.4, "Lucky:",
+                 fontsize=10, fontweight="bold", color=GREEN,
+                 ha="left", va="center", fontfamily="DejaVu Sans")
+    ax_main.text(1.8, y + 0.4, d["lucky_stadium"],
+                 fontsize=10, color=TEXT, ha="left", va="center",
+                 fontfamily="DejaVu Sans")
+
+    ax_main.text(fig_w / 2 + 0.3, y + 0.4, "Unlucky:",
+                 fontsize=10, fontweight="bold", color=RED,
+                 ha="left", va="center", fontfamily="DejaVu Sans")
+    ax_main.text(fig_w / 2 + 1.8, y + 0.4, d["unlucky_stadium"],
+                 fontsize=10, color=TEXT, ha="left", va="center",
+                 fontfamily="DejaVu Sans")
+
+    y -= 0.25
+
+    # ═══ SECTION 8: FUN STATS ════════════════════════════════════════════════
+    fun_stats = d["fun_stats"]
+    num_fun = len(fun_stats)
+    fun_row_h = 0.42
+    fun_h = 0.7 + num_fun * fun_row_h
+    y -= fun_h
+
+    draw_card(0.3, y, fig_w - 0.6, fun_h - 0.1, color=CARD_BG2, border_color=PURPLE_D, radius=0.2)
+
+    ax_main.text(0.6, y + fun_h - 0.4, "FUN STATS",
+                 fontsize=10, fontweight="bold", color=PURPLE_L,
+                 ha="left", va="center", fontfamily="DejaVu Sans")
+
+    bullet_icons = [">", ">", ">", ">", ">", ">", ">"]
+    bullet_colors = [PURPLE_L, GREEN, ORANGE_A, BLUE, RED, PURPLE_L, RED]
+    for i, stat in enumerate(fun_stats):
+        icon = bullet_icons[i] if i < len(bullet_icons) else ">"
+        bcolor = bullet_colors[i] if i < len(bullet_colors) else PURPLE_L
+        # Colored bullet
+        ax_main.text(0.6, y + fun_h - 0.8 - i * fun_row_h,
+                     icon, fontsize=11, fontweight="bold", color=bcolor,
+                     ha="left", va="center", fontfamily="DejaVu Sans")
+        ax_main.text(0.85, y + fun_h - 0.8 - i * fun_row_h,
+                     stat, fontsize=10.5, color=TEXT, ha="left", va="center",
+                     fontfamily="DejaVu Sans")
+
+    y -= 0.25
+
+    # ═══ SECTION 9: FINAL VERDICT ════════════════════════════════════════════
+    verdict_h = 1.1
+    y -= verdict_h
+
+    draw_card(0.3, y, fig_w - 0.6, verdict_h - 0.1,
+              color="#1a1230", border_color=PURPLE, radius=0.2)
+
+    ax_main.text(fig_w / 2, y + verdict_h - 0.35, "THE VERDICT",
+                 fontsize=10, fontweight="bold", color=PURPLE_L,
+                 ha="center", va="center", fontfamily="DejaVu Sans")
+
+    # Wrap long verdict text — strip emojis for matplotlib
+    verdict_clean = strip_emoji(d["verdict"])
+    wrapped = textwrap.fill(verdict_clean, width=50)
+    ax_main.text(fig_w / 2, y + 0.35, wrapped,
+                 fontsize=14, fontweight="bold", color=TEXT,
+                 ha="center", va="center", fontfamily="DejaVu Sans",
+                 style="italic")
+
+    # ═══ FOOTER ══════════════════════════════════════════════════════════════
+    y -= 0.5
+    ax_main.text(fig_w / 2, y, "IPL Prediction Game 2026  ·  Season Report",
+                 fontsize=9, color=DIM, ha="center", va="center",
+                 fontfamily="DejaVu Sans")
+
+
+    # ── Save ─────────────────────────────────────────────────────────────────
+    plt.savefig(output_path, dpi=200, bbox_inches="tight",
+                facecolor=BG, edgecolor="none", pad_inches=0.1)
+
+    with open(output_path, "rb") as f:
+        img_bytes = f.read()
+
+    plt.close(fig)
+    return img_bytes
+
+
+def generate_all_player_reports(results_df, predictions, schedule_df,
+                                leaderboard_df, advanced_metrics_df,
+                                points_progression, agree_matrix_df,
+                                output_dir="The Visuals/reports"):
+    """
+    Batch-generate report card PNGs for all human participants.
+    Returns a dict of {participant_name: image_bytes}.
+    """
+    import os
+    import ExtractAndTransform
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    human_players = [p for p in predictions.keys()
+                     if p not in ExtractAndTransform.NON_HUMAN_PLAYERS]
+
+    reports = {}
+    for participant in human_players:
+        report_data = ExtractAndTransform.get_player_report_data(
+            participant, results_df, predictions, schedule_df,
+            leaderboard_df, advanced_metrics_df, points_progression,
+            agree_matrix_df
+        )
+        out_path = os.path.join(output_dir, f"{participant}_report.png")
+        img_bytes = generate_player_report_card(report_data, output_path=out_path)
+        reports[participant] = img_bytes
+
+    return reports

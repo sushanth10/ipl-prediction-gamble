@@ -11,19 +11,42 @@ def prediction_counts_analysis(predictions):
     return counts_df
 
 def get_prediction_ratios(matchwise_predictions_df):
-    prediction_difference_map = {11:'11:0',9: '1:10', 7: '2:9', 5: '3:8', 3: '4:7', 1: '5:6'}
-    home_away_ratio_map = {-9:'1:10', -7:'2:9', -5:'3:8', (-3):'4:7', (-1):'5:6',1:'6:5', 3:'7:4', 5:'8:3', 7:'9:2', 9:'10:1'}
-    matchwise_predictions_df["Absolute Prediction Difference"] = abs(matchwise_predictions_df['Home Predictors'].str.split(',').apply(len) - matchwise_predictions_df['Away Predictors'].str.split(',').apply(len))
-    matchwise_predictions_df["Prediction Difference"] = (matchwise_predictions_df['Home Predictors'].str.split(',').apply(len) - matchwise_predictions_df['Away Predictors'].str.split(',').apply(len))
-    matchwise_predictions_df["Prediction Ratio"] = matchwise_predictions_df["Absolute Prediction Difference"].map(prediction_difference_map)
-    matchwise_predictions_df["Home-Away Ratio"] = matchwise_predictions_df["Prediction Difference"].map(home_away_ratio_map)
-    # major_gen_predictions = matchwise_predictions_df.apply(lambda row: row["Home Team"] if row["Prediction Difference"] > 0 else row["Away Team"], axis=1)
+    def count_valid(col_val):
+        """Count non-empty comma-separated entries — empty string gives 0, not 1."""
+        return len([x for x in str(col_val).split(",") if x.strip()])
+
+    home_counts = matchwise_predictions_df["Home Predictors"].apply(count_valid)
+    away_counts = matchwise_predictions_df["Away Predictors"].apply(count_valid)
+
+    # Prediction ratio: absolute split, format as "max:min" (e.g. 9:3, 6:6)
+    def pred_ratio(h, a):
+        hi, lo = max(h, a), min(h, a)
+        return f"{hi}:{lo}"
+
+    matchwise_predictions_df = matchwise_predictions_df.copy()
+    matchwise_predictions_df["Prediction Ratio"] = [
+        pred_ratio(h, a) for h, a in zip(home_counts, away_counts)
+    ]
+
+    # Home-Away Ratio: directional, format as "H:A" (e.g. 9:3, 3:9)
+    matchwise_predictions_df["Home-Away Ratio"] = [
+        f"{h}:{a}" for h, a in zip(home_counts, away_counts)
+    ]
+
     prediction_ratio_counts = matchwise_predictions_df["Prediction Ratio"].value_counts().reset_index()
     prediction_ratio_counts.columns = ["Prediction Ratio", "Count"]
     prediction_ratio_counts = prediction_ratio_counts.sort_values(by="Count", ascending=False)
+
     home_away_ratio_counts = matchwise_predictions_df["Home-Away Ratio"].value_counts().reset_index()
     home_away_ratio_counts.columns = ["Home-Away Ratio", "Count"]
-    home_away_ratio_counts.sort_values(by="Home-Away Ratio", ascending=True, inplace=True)
+    # Sort by home count numerically
+    home_away_ratio_counts["_sort"] = home_away_ratio_counts["Home-Away Ratio"].apply(
+        lambda x: int(x.split(":")[0])
+    )
+    home_away_ratio_counts.sort_values("_sort", ascending=True, inplace=True)
+    home_away_ratio_counts.drop(columns=["_sort"], inplace=True)
+    home_away_ratio_counts.reset_index(drop=True, inplace=True)
+
     return prediction_ratio_counts, home_away_ratio_counts
 
 

@@ -17,7 +17,7 @@ Royal Challengers Bengaluru
 Sunrisers Hyderabad
 Delhi Capitals
 Gujarat Titans
-Mumbai Indians
+Royal Challengers Bengaluru
 Rajasthan Royals
 Kolkata Knight Riders
 Royal Challengers Bengaluru
@@ -44,7 +44,7 @@ Delhi Capitals
 Mumbai Indians
 Sunrisers Hyderabad
 Punjab Kings
-Lucknow Super Giants
+Mumbai Indians
 Chennai Super Kings
 Punjab Kings
 Lucknow Super Giants
@@ -68,3 +68,7 @@ Sunrisers Hyderabad
 Lucknow Super Giants
 Rajasthan Royals
 Delhi Capitals
+Royal Challengers Bengaluru
+Sunrisers Hyderabad
+Gujarat Titans
+Royal Challengers Bengaluru

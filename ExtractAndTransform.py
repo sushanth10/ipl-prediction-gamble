@@ -83,9 +83,8 @@ def calculate_scores(results_df, predictions):
                 current_losing_streak = 0
             elif i < len(predicted_winners) and predicted_winners[i] == actual_winner:
                 points_earned = 10 + bonus_points
-                if i < 70:
-                    total_predicted_points += 10
-                    total_bonus_points += bonus_points
+                total_predicted_points += 10
+                total_bonus_points += bonus_points
                 score += points_earned
                 correct_predictions += 1
                 last_five_results.append("✅")
@@ -440,13 +439,13 @@ def get_agreement_matrix(predictions, results_df):
 
 
 def get_points_distribution(results_df, predictions):
-    """Return a DataFrame[participant × score_bucket] of match counts."""
+    """Return a DataFrame[participant x score_bucket] of match counts."""
     completed = results_df.dropna(subset=["Winner"]).reset_index(drop=True)
     participants = list(predictions.keys())
     rows = []
     for p in participants:
         preds = predictions[p]
-        buckets = {"0 pts": 0, "5 pts": 0, "10 pts": 0, "20 pts": 0}
+        buckets = {"0 pts": 0, "5 pts": 0, "10-14 pts": 0, "15+ pts": 0}
         for i, row in completed.iterrows():
             actual = row["Winner"]
             bonus = int(row.get("Bonus Points", 0) or 0)
@@ -454,8 +453,12 @@ def get_points_distribution(results_df, predictions):
             if actual == "NR":
                 buckets["5 pts"] += 1
             elif pred == actual:
-                key = "20 pts" if bonus > 0 else "10 pts"
-                buckets[key] += 1
+                if bonus >= 5:                 # e.g. 10 base + 5+ bonus = 15+
+                    buckets["15+ pts"] += 1
+                elif bonus > 0:                # 10 base + 4 bonus = 14 pts
+                    buckets["10-14 pts"] += 1
+                else:                          # 10 base, no bonus
+                    buckets["10-14 pts"] += 1
             else:
                 buckets["0 pts"] += 1
         rows.append({"Participant": p, **buckets})
@@ -490,7 +493,7 @@ def get_user_stadium_stats(results_df, predictions, schedule_df, selected_user):
     }
 
     completed = results_df.dropna(subset=["Winner"]).reset_index(drop=True)
-    venue_stats = {v: {"wins": 0, "losses": 0} for v in VENUES}
+    venue_stats = {v: {"wins": 0, "losses": 0, "points": 0} for v in VENUES}
     user_preds = predictions.get(selected_user, [])
 
     for _, row in completed.iterrows():
@@ -500,20 +503,24 @@ def get_user_stadium_stats(results_df, predictions, schedule_df, selected_user):
 
         match_idx = int(row["Match #"]) - 1
         venue_name = match_venue.get(str(row["Match #"]), "")
+        bonus = int(row.get("Bonus Points", 0) or 0)
 
         if venue_name in VENUES and match_idx < len(user_preds):
             if user_preds[match_idx] == actual:
                 venue_stats[venue_name]["wins"] += 1
+                venue_stats[venue_name]["points"] += 10 + bonus
             else:
                 venue_stats[venue_name]["losses"] += 1
 
     # Compile the final dataframe
     rows = []
     for venue, info in VENUES.items():
-        wins = venue_stats[venue]["wins"]
+        wins   = venue_stats[venue]["wins"]
         losses = venue_stats[venue]["losses"]
-        total = wins + losses
+        points = venue_stats[venue]["points"]
+        total  = wins + losses
         win_ratio = (wins / total * 100) if total > 0 else 0.0
+        pts_per_match = (points / total) if total > 0 else 0.0
 
         rows.append({
             "Stadium": info["Stadium"],
@@ -522,7 +529,241 @@ def get_user_stadium_stats(results_df, predictions, schedule_df, selected_user):
             "Lon": info["Lon"],
             "Wins": wins,
             "Losses": losses,
-            "Win %": win_ratio
+            "Win %": win_ratio,
+            "Points": points,
+            "Pts/Match": pts_per_match
         })
 
     return pd.DataFrame(rows)
+
+
+# ─── Non-human participants to exclude from personal reports ─────────────────
+NON_HUMAN_PLAYERS = {"GPT", "Gemini", "Rando"}
+
+
+def get_player_report_data(participant, results_df, predictions, schedule_df,
+                           leaderboard_df, advanced_metrics_df, points_progression,
+                           agree_matrix_df):
+    """Compute all per-player statistics needed for the personalized report card infographic."""
+    import numpy as np
+    from collections import Counter
+
+    completed = results_df.dropna(subset=["Winner"]).reset_index(drop=True)
+    total_matches = len(completed)
+    preds = predictions.get(participant, [])
+    participants = list(predictions.keys())
+
+    # ── Basic stats from leaderboard ────────────────────────────────────────
+    lb_row = leaderboard_df[leaderboard_df["Participant"] == participant].iloc[0]
+    rank = int(lb_row["Rank"])
+    points = int(lb_row["Points"])
+    accuracy = float(lb_row["Accuracy (%)"])
+    correct = int(lb_row["Correct Predictions"])
+    predicted_pts = int(lb_row.get("Predicted Points", 0))
+    bonus_pts = int(lb_row.get("Bonus Points", 0))
+    longest_win_streak = int(lb_row.get("Longest Winning Streak", 0))
+    winning_period = lb_row.get("Winning Period", "")
+    longest_loss_streak = int(lb_row.get("Longest Losing Streak", 0))
+    losing_period = lb_row.get("Losing Period", "")
+
+    # NR count
+    nr_count = int((completed["Winner"] == "NR").sum())
+    wrong = total_matches - correct - nr_count
+
+    # ── Monthly accuracy breakdown ──────────────────────────────────────────
+    monthly = {}
+    for i, row in completed.iterrows():
+        actual = row["Winner"]
+        if actual == "NR":
+            continue
+        date_str = row["Date"]
+        # Extract month name from date like "March 28, 2026"
+        month = date_str.strip().split()[0] if isinstance(date_str, str) else "Unknown"
+        if month not in monthly:
+            monthly[month] = {"correct": 0, "total": 0}
+        monthly[month]["total"] += 1
+        if i < len(preds) and preds[i] == actual:
+            monthly[month]["correct"] += 1
+
+    month_accuracy = {m: round(v["correct"] / v["total"] * 100, 1) if v["total"] > 0 else 0
+                      for m, v in monthly.items()}
+    best_month = max(month_accuracy, key=month_accuracy.get) if month_accuracy else "N/A"
+    best_month_acc = month_accuracy.get(best_month, 0)
+
+    # ── Team prediction analysis ────────────────────────────────────────────
+    team_pred_counts = Counter(preds[:total_matches])
+    # Actual wins per team
+    actual_wins = Counter(completed[completed["Winner"] != "NR"]["Winner"].tolist())
+    team_analysis = {}
+    all_teams = sorted(set(list(team_pred_counts.keys()) + list(actual_wins.keys())))
+    for team in all_teams:
+        team_analysis[team] = {
+            "predicted": team_pred_counts.get(team, 0),
+            "actual": actual_wins.get(team, 0),
+        }
+
+    # ── Favourite team (most predicted) ─────────────────────────────────────
+    fav_team = max(team_pred_counts, key=team_pred_counts.get) if team_pred_counts else "N/A"
+    fav_team_count = team_pred_counts.get(fav_team, 0)
+
+    # ── Best solo match ─────────────────────────────────────────────────────
+    adv_row = advanced_metrics_df[advanced_metrics_df["Participant"] == participant].iloc[0]
+    best_solo_match = adv_row.get("Best Solo Match", "—")
+
+    # ── Radar / Performance DNA values ──────────────────────────────────────
+    radar = {
+        "Accuracy": accuracy,
+        "Consistency": float(adv_row.get("Consistency Score", 0)),
+        "Form": float(adv_row.get("Current Form (%)", 0)),
+        "Upset Acc": float(adv_row.get("Upset Accuracy (%)", 0)),
+        "Clutch": float(adv_row.get("Clutch Rate (%)", 0)),
+        "Contrarian": float(adv_row.get("Contrarian Index (%)", 0)),
+    }
+
+    crowd_follower = float(adv_row.get("Crowd Follower (%)", 0))
+
+    # ── Lucky & unlucky stadium ─────────────────────────────────────────────
+    schedule_clean = schedule_df.copy()
+    schedule_clean.columns = schedule_clean.columns.str.strip()
+    user_stadium_df = get_user_stadium_stats(results_df, predictions, schedule_df, participant)
+    played_stadiums = user_stadium_df[(user_stadium_df["Wins"] + user_stadium_df["Losses"]) > 0]
+    if not played_stadiums.empty:
+        lucky_stadium = played_stadiums.loc[played_stadiums["Win %"].idxmax()]
+        unlucky_stadium = played_stadiums.loc[played_stadiums["Win %"].idxmin()]
+        lucky_name = f"{lucky_stadium['Stadium']} ({lucky_stadium['Win %']:.0f}%)"
+        unlucky_name = f"{unlucky_stadium['Stadium']} ({unlucky_stadium['Win %']:.0f}%)"
+    else:
+        lucky_name = "N/A"
+        unlucky_name = "N/A"
+
+    # ── Closest rival & nemesis from agreement matrix ───────────────────────
+    if participant in agree_matrix_df.index:
+        agree_row = agree_matrix_df.loc[participant].drop(participant, errors="ignore")
+        # Filter to only other participants
+        agree_row = agree_row[agree_row.index.isin(participants)]
+        if not agree_row.empty:
+            closest_rival = agree_row.idxmax()
+            closest_rival_pct = agree_row.max()
+            nemesis = agree_row.idxmin()
+            nemesis_pct = agree_row.min()
+        else:
+            closest_rival = nemesis = "N/A"
+            closest_rival_pct = nemesis_pct = 0
+    else:
+        closest_rival = nemesis = "N/A"
+        closest_rival_pct = nemesis_pct = 0
+
+    # ── Inverse score (what if they picked the opposite every time?) ────────
+    inverse_score = 0
+    for i, row in completed.iterrows():
+        actual = row["Winner"]
+        bonus = int(row.get("Bonus Points", 0) or 0)
+        if actual == "NR":
+            inverse_score += 5
+        elif i < len(preds) and preds[i] != actual:
+            # They got it wrong → in inverse world, they'd be right
+            inverse_score += 10 + bonus
+        # If they got it right → in inverse world, they'd be wrong → 0 pts
+    
+    # ── Personality badge assignment ────────────────────────────────────────
+    badges = []
+    if rank == 1:
+        badges.append(("👑 The Champion", "Stood atop them all"))
+    if rank == len(leaderboard_df):
+        badges.append(("🪵 Wooden Spoon", "There's always next year!"))
+    if accuracy >= 60:
+        badges.append(("🧠 The Oracle", "Sees the future clearly"))
+    if longest_win_streak >= 7:
+        badges.append(("🔥 On Fire", f"{longest_win_streak} wins in a row!"))
+    if longest_loss_streak >= 7:
+        badges.append(("❄️ Ice Cold", f"{longest_loss_streak} wrong in a row..."))
+    if radar["Clutch"] >= 60:
+        badges.append(("🎯 The Clutch King", "Ice in the veins on 50/50 calls"))
+    if radar["Upset Acc"] >= 50:
+        badges.append(("🌪️ Upset Whisperer", "Knows when the underdog bites"))
+    if radar["Consistency"] >= 96:
+        badges.append(("🧱 The Rock", "Steady as they come"))
+    if fav_team_count >= 12:
+        badges.append((f"💜 {fav_team.split()[-1]} Superfan", f"Picked {fav_team} {fav_team_count} times"))
+    if radar["Contrarian"] >= 40:
+        badges.append(("🔥 The Contrarian", "Goes against the grain and wins"))
+    if crowd_follower >= 75:
+        badges.append(("🐑 The Sheep", "Always picks with the crowd"))
+
+    # Pick the most fitting badge (first match = most impressive)
+    primary_badge = badges[0] if badges else ("🏏 The Predictor", "A true cricket analyst")
+
+    # ── Fun stat lines ──────────────────────────────────────────────────────
+    fun_stats = []
+    fun_stats.append(f"You agreed with the crowd {crowd_follower:.0f}% of the time")
+    fun_stats.append(f"Your best month was {best_month} ({best_month_acc:.0f}% accuracy)")
+    if best_solo_match != "—":
+        fun_stats.append(f"You were the ONLY one right on {best_solo_match}")
+    fun_stats.append(f"You picked {fav_team} to win {fav_team_count} times")
+    fun_stats.append(f"If you'd flipped every pick, you'd have {inverse_score} pts")
+    fun_stats.append(f"Your prediction twin: {closest_rival} ({closest_rival_pct:.0f}% match)")
+    fun_stats.append(f"Your nemesis: {nemesis} (only {nemesis_pct:.0f}% match)")
+
+    # ── Final verdict quip ──────────────────────────────────────────────────
+    if rank == 1:
+        verdict = "The undisputed champion. Cricket runs in your veins. 🏆"
+    elif rank == 2:
+        verdict = "So close! Silver stings, but what a season. 🥈"
+    elif rank == 3:
+        verdict = "Bronze is beautiful. You were in the race till the end. 🥉"
+    elif accuracy >= 55:
+        verdict = "Strong reads, solid instincts. The sharp analyst. 📊"
+    elif accuracy >= 45:
+        verdict = "Consistent performer. You've got the cricketing brain. 🧠"
+    elif longest_win_streak >= 6:
+        verdict = f"When you're hot, you're HOT. {longest_win_streak} in a row! 🔥"
+    elif longest_loss_streak >= 6:
+        verdict = "The rollercoaster rider. Wild swings, wild season. 🎢"
+    elif radar["Contrarian"] >= 30:
+        verdict = "The rebel who doesn't follow the herd. Respect. 🐺"
+    elif crowd_follower >= 70:
+        verdict = "Safety in numbers... mostly. A crowd favourite picker. 🐑"
+    else:
+        verdict = "A season of ups, downs, and cricket chaos. What a ride! 🏏"
+
+    # ── Points progression for sparkline ────────────────────────────────────
+    player_progression = points_progression.get(participant, [0])
+
+    return {
+        "participant": participant,
+        "rank": rank,
+        "total_participants": len(leaderboard_df),
+        "points": points,
+        "accuracy": accuracy,
+        "correct": correct,
+        "wrong": wrong,
+        "nr_count": nr_count,
+        "total_matches": total_matches,
+        "predicted_pts": predicted_pts,
+        "bonus_pts": bonus_pts,
+        "longest_win_streak": longest_win_streak,
+        "winning_period": winning_period,
+        "longest_loss_streak": longest_loss_streak,
+        "losing_period": losing_period,
+        "month_accuracy": month_accuracy,
+        "best_month": best_month,
+        "best_month_acc": best_month_acc,
+        "team_analysis": team_analysis,
+        "fav_team": fav_team,
+        "fav_team_count": fav_team_count,
+        "best_solo_match": best_solo_match,
+        "radar": radar,
+        "crowd_follower": crowd_follower,
+        "lucky_stadium": lucky_name,
+        "unlucky_stadium": unlucky_name,
+        "closest_rival": closest_rival,
+        "closest_rival_pct": closest_rival_pct,
+        "nemesis": nemesis,
+        "nemesis_pct": nemesis_pct,
+        "inverse_score": inverse_score,
+        "primary_badge": primary_badge,
+        "all_badges": badges,
+        "fun_stats": fun_stats,
+        "verdict": verdict,
+        "progression": player_progression,
+    }
